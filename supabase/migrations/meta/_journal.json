@@ -1,0 +1,69 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1750970158639,
+      "tag": "20250626203558_nappy_darwin",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751368652908,
+      "tag": "20250701111732_conscious_black_bird",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751467426160,
+      "tag": "20250702144346_famous_paladin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759759266157,
+      "tag": "20251006140106_square_outlaw_kid",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1759844231307,
+      "tag": "20251007133711_common_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1759912386574,
+      "tag": "20251008083306_striped_skreet",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1759916465915,
+      "tag": "20251008094105_smiling_wolfpack",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1759936398440,
+      "tag": "20251008151318_productive_doctor_octopus",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1763387476056,
+      "tag": "20251117135116_good_smasher",
+      "breakpoints": true
+    }
+  ]
+}

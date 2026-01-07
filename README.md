@@ -1,0 +1,877 @@
+# Decodifi AI Starter
+
+## Step-by-step setup
+
+[Create a new repository from this template](https://github.com/new?template_name=ai-starter&template_owner=decodifi-tyler)
+
+### Install dependencies
+
+```bash
+bun i
+```
+
+### Set up environment variables
+
+```bash
+cp .env.local.example .env.local
+```
+
+### Run the local database
+
+```bash
+bun run db:start
+```
+
+### Run the development server
+
+```bash
+bun dev
+```
+
+You now have a local supabase instance running and a development server. There is a default user created with the email `admin@decodifi.uk` and the password `mHMGB1uzkdfQ16xU`.
+
+## Database Management with Drizzle
+
+This project uses [Drizzle ORM](https://orm.drizzle.team) in combination with [Supabase](https://supabase.com) for managing the database schema in a version controlled way.
+
+### Database Schema
+
+The database schema is defined in TypeScript under `supabase/schemas/index.ts`. This is where you define all your tables, columns, and relationships. As your project grows, you can split the schema into multiple files.
+
+### RLS Policies
+
+**IMPORTANT:** All tables require an RLS policy to be defined. Without this, all data in the table will be public even to unauthenticated users.
+
+The RLS policies are defined with your tables in the schema as follows:
+
+```typescript
+export const posts = pgTable(
+  'posts',
+  {
+    id: uuid('id').primaryKey(),
+    authorId: uuid('author_id')
+      .notNull()
+      .references(() => users.id),
+    title: text('title').notNull(),
+    content: text('content').notNull()
+  },
+  (t) => [
+    crudPolicy({
+      // All authenticated users can read
+      read: true,
+      // Only the author can modify
+      modify: sql`author_id = auth.uid()`,
+      role: authenticatedRole
+    }),
+    crudPolicy({
+      // All users can read
+      read: true,
+      // No unauthenticated user can modify
+      modify: false,
+      role: anonRole
+    })
+  ]
+);
+```
+
+### Making Schema Changes
+
+To modify the database schema:
+
+1.  Edit the schema definitions in `supabase/schemas/index.ts`
+2.  Generate a migration:
+
+```bash
+bun run db:diff
+```
+
+This will create a new migration file in `supabase/migrations` that contains SQL to update your database.
+
+Note: If you make a mistake or the migration fails to apply, you can run `npx drizzle-kit drop` to remove a migration.
+
+3.  Apply the migration:
+
+```bash
+bun run db:migrate
+```
+
+4.  Regenerate the types:
+
+```bash
+bun run db:generate-types
+```
+
+This will generate the types in the `utils/supabase/types.ts` file. You only need to do this if you make changes to the properties of the tables.
+
+This will execute the migration SQL against your database.
+
+### Managing Buckets
+
+Buckets are managed in the `supabase/schemas/buckets/index.sql` file. Buckets in Supabase are defined in the `storage.buckets` table, and the files in the buckets are represented by rows in the `storage.objects` table. There is no way to reference these tables in drizzle so the schema for the buckets is managed in a separate sql file. Because of this, migrations must be generated using a different workflow to the one defined above.
+
+#### Why is this so complicated?
+
+The benefit of all this is that the buckets can be version controlled, meaning different branches can have different buckets and policies. Drizzle is only configured the manage the public schema, and doesn't have the ability to insert rows, which limits it's usefulness for managing buckets. This process uses the standard supabase delcarative schemas approach, but includes a few additional steps to make everything compatible with the drizzle migrations.
+
+#### Creating a new bucket
+
+To create a new bucket, add a new record to the `storage.buckets` table and a policy to the `storage.objects` table. Bucket names must follow the s3 bucket naming convention, which is a lowercase alphanumeric dash separated string. Bucket names must be unique.
+
+```sql
+-- /supabase/schemas/buckets/index.sql
+-- ... other SQL statements
+insert into storage.buckets (id, name, public) values ('example-bucket-name', 'example-bucket-name', true);
+create policy "Allow authenticated users to access example-bucket-name bucket" on storage.objects for all
+    using (bucket_id = 'example-bucket-name' and auth.role() = 'authenticated')
+    with check (bucket_id = 'example-bucket-name' and auth.role() = 'authenticated');
+```
+
+**Important note**: Make sure to update your RLS policies to allow access only to users under the correct conditions. A common pattern is to allow users access to files inside a folder that matches their user ID, or an ID of a group or organisation they belong to. Please refer to the [supabase documentation](https://supabase.com/docs/guides/storage/security/access-control) for more information and useful examples.
+
+Then use this command to generate a new empty drizzle migration:
+
+```bash
+bun run db:diff --custom
+```
+
+Make a note of the name of the file generated by the above command, then run the following commands to generate the migration code (making sure to replace `0000_FILENAME` with the name of the file you just noted):
+
+```bash
+bun run db:stop # If you don't do this, the next command will report that there are no schema changes
+bunx supabase db diff --schemas storage > supabase/migrations/0000_FILENAME.sql
+```
+
+This will populate the migration file you just generated to contain the SQL to add the RLS policies, but because buckets are defined as a row in the `storage.buckets` table, we need to add the bucket insertion statement manually to the top of the migration file.
+
+Copy the first line of the schema changes we made above and paste it at the top of the migration file you just generated.
+
+```sql
+insert into storage.buckets (id, name, public) values ('example-bucket-name', 'example-bucket-name', true);
+
+-- ...The RLS policy definition/modification generated by drizzle...
+```
+
+Finally, apply the migration to the local database:
+
+```bash
+bun run db:start
+bun run db:migrate
+```
+
+Note: If you get a message saying `ERROR: invalid byte sequence for encoding "UTF8": 0xff (SQLSTATE 22021)`, the migration file was generated an invalid encoding, and you will need to manually update the file to be valid UTF-8.
+
+#### Making changes to bucket policies
+
+Because the bucket is defined in an earlier migration, making changes to the bucket policies allows you to directly use the generated migration code. All we need to do is make sure the migration is registered in drizzle.
+
+Simply edit the policies in the `supabase/schemas/buckets/index.sql` file. Then run the following command to generate a new migration:
+
+```bash
+bun run db:diff --custom
+```
+
+Make a note of the name of the file generated by the above command, then run the following commands to generate the migration code (making sure to replace `0000_FILENAME` with the name of the file you just noted):
+
+```bash
+bun run db:stop
+bunx supabase db diff --schemas storage > supabase/migrations/0000_FILENAME.sql
+```
+
+Finally, apply the migration to the local database:
+
+```bash
+bun run db:start
+bun run db:migrate
+```
+
+Note: If you get a message saying `ERROR: invalid byte sequence for encoding "UTF8": 0xff (SQLSTATE 22021)`, the migration file was generated an invalid encoding, and you will need to manually update the file to be valid UTF-8.
+
+#### Deleting a bucket
+
+To delete a bucket, remove the bucket insertion and policies from the `supabase/schemas/buckets/index.sql` file and run the following command to generate a new empty migration with drizzle:
+
+```bash
+bun run db:diff --custom
+```
+
+Make a note of the name of the file generated by the above command, then run the following commands to generate the migration code (making sure to replace `0000_FILENAME` with the name of the file you just noted):
+
+```bash
+bun run db:stop
+bunx supabase db diff --schemas storage > supabase/migrations/0000_FILENAME.sql
+```
+
+This will populate the migration file you just generated to contain the SQL to remove the RLS policies, but because buckets are defined in an earlier migration, we need to add the bucket deletion statement manually to the top of the migration file.
+
+Add the bucket deletion statement to the top of the migration file you just generated:
+
+```sql
+delete from storage.buckets where id = 'example-bucket-name';
+
+-- ...The RLS policy deletion generated by drizzle...
+```
+
+Finally, apply the migration to the local database:
+
+```bash
+bun run db:start
+bun run db:migrate
+```
+
+Note: If you get a message saying `ERROR: invalid byte sequence for encoding "UTF8": 0xff (SQLSTATE 22021)`, the migration file was generated an invalid encoding, and you will need to manually update the file to be valid UTF-8.
+
+## Data Fetching with Supabase Store & Hooks
+
+This starter kit includes an elegant Supabase integration that provides seamless server-to-client query continuity with zero query duplication. Write your query once on the server, get both data and reactive client-side filtering automatically.
+
+### Key Features
+
+- **🎯 Zero Query Duplication**: Define queries once on server, get both data and client reactivity
+- **🔄 Seamless Server-to-Client**: Server queries automatically become reactive on the client
+- **🏷️ Full Type Safety**: Complete TypeScript support with official Supabase client
+- **⚡ Smart Filter Reconstruction**: Client reconstructs server query structure + adds dynamic filters
+- **🧹 Clean Architecture**: No complex proxies, just elegant utility functions
+- **🔧 Official Supabase**: Built on top of the official client, no reinventing the wheel
+
+### How It Works
+
+1.  **Server**: Use `executeWithMetadata()` to capture query URL and execute
+2.  **Client**: `useSupabaseStore()` reconstructs base query + applies user filters
+3.  **Reactive**: Filter changes trigger fresh queries with proper Supabase syntax
+
+### Quick Start
+
+#### 1. Server-Side: Execute Queries with Metadata
+
+```typescript
+// app/page.tsx
+'use server';
+
+import { createClient, executeWithMetadata } from '@/utils/supabase/server';
+import { Tables } from '@/utils/supabase/types';
+
+// Define the expected shape of the data
+export type ProductWithPrices = Tables<'products'> & {
+  prices: Tables<'prices'>[];
+};
+
+export default async function ProductsPage() {
+  const supabase = createClient();
+
+  // Build your query using the official Supabase client
+  const productsQuery = supabase
+    .from('products')
+    .select('*, prices(*)')
+    .eq('active', true)
+    .eq('prices.active', true)
+    .order('metadata->index')
+    .order('unit_amount', { foreignTable: 'prices' });
+
+  // Execute with metadata capture - this runs the query AND captures URL/params
+  const productsQueryResult = await executeWithMetadata<ProductWithPrices>(productsQuery);
+
+  // Pass the query result to the client
+  return <ProductsList productsQuery={productsQueryResult} />;
+}
+```
+
+#### 2. Client-Side: Reactive Hooks
+
+```typescript
+// components/ProductsList.tsx
+'use client';
+
+import { useSupabaseStore } from '@/utils/supabase/hooks';
+import type { QueryResult } from '@/utils/supabase/server';
+import { ProductWithPrices } from '@/app/page';
+
+interface Props {
+  productsQuery: QueryResult<ProductWithPrices>;
+}
+
+export default function ProductsList({ productsQuery }: Props) {
+  // Hook automatically reconstructs server query + handles user filters
+  const {data: products, filters, loading, error, updateFilters, refetch} = useSupabaseStore(productsQuery);
+
+  return (
+    <div>
+      {/* Search input - adds ilike filter on top of base query */}
+      <input
+        type="text"
+        value={filters.name_ilike ? filters.name_ilike.replace(/%/g, '') : ''}
+        onChange={(e) => updateFilters({
+          name_ilike: e.target.value ? `%${e.target.value}%` : null
+        })}
+        placeholder="Search products..."
+      />
+
+      {/* Checkbox - pre-filled from server query (active=true) */}
+      <input
+        type="checkbox"
+        checked={filters.active || false}
+        onChange={(e) => updateFilters({ active: e.target.checked })}
+      />
+
+      {/* Results */}
+      {loading && <div>Loading...</div>}
+      {error && <div>Error: {error}</div>}
+
+      {/* Displays the server loaded products on page load, and updates when filters change */}
+      {products.map((product) => (
+        <div key={product.id}>
+          <h3>{product.name}</h3>
+          <p>{product.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### API Reference
+
+#### Server-Side (`utils/supabase/server.ts`)
+
+##### `executeWithMetadata<T>(query, tableName): Promise<QueryResult<T>>`
+
+Executes a Supabase query and captures metadata for client-side reconstruction.
+
+```typescript
+const queryResult = await executeWithMetadata<ProductWithPrices>(
+  supabase.from('products').select('*, prices(*)').eq('active', true)
+);
+
+// Returns QueryResult with:
+// - data: T[] - Query results
+// - queryKey: string - Unique identifier
+// - tableName: string - Table name
+// - url: string - Full query URL
+// - searchParams: Record<string, string> - Parsed URL parameters
+```
+
+##### Query Building (Official Supabase Client)
+
+```typescript
+// automatically authenticates using the current user's session
+const supabase = createClient();
+
+// All official Supabase methods work
+const query = supabase
+  .from('products')
+  .select('*, prices(*), categories(*)')
+  .eq('active', true)
+  .gte('price', 100)
+  .order('created_at', { ascending: false })
+  .limit(10);
+
+const result = await executeWithMetadata(query);
+```
+
+#### Client-Side (`utils/supabase/hooks.ts`)
+
+##### `useSupabaseStore(queryResult): [data, filters, loading, error, updateFilters, refetch]`
+
+Takes a server QueryResult and makes it reactive with client-side filtering.
+
+```typescript
+const [
+  data, // T[] - Current filtered data
+  filters, // Record<string, any> - Current filter state
+  loading, // boolean - Loading state
+  error, // string | null - Error message
+  updateFilters, // (filters) => void - Update filters
+  refetch // () => Promise<void> - Manual refetch
+] = useSupabaseStore(productsQuery);
+```
+
+### Filter Operations
+
+The hook supports all Supabase filter operations via naming conventions:
+
+```typescript
+updateFilters({
+  // Equality (default)
+  name: 'Product Name',
+  active: true,
+
+  // Comparison operators
+  price_gt: 100, // price > 100
+  price_gte: 100, // price >= 100
+  price_lt: 1000, // price < 1000
+  price_lte: 1000, // price <= 1000
+
+  // Text search
+  name_like: '%search%', // SQL LIKE (case sensitive)
+  name_ilike: '%search%', // SQL ILIKE (case insensitive)
+
+  // Array operations
+  status_in: ['active', 'pending'], // status IN (...)
+
+  // Not equal
+  category_neq: 'archived' // category != 'archived'
+});
+```
+
+#### Removing Filters
+
+Set filters to `null`, `undefined`, or empty string to remove them:
+
+```typescript
+updateFilters({
+  name_ilike: null, // Removes name filter
+  active: undefined, // Removes active filter
+  category: '' // Removes category filter
+});
+```
+
+### How Filter Reconstruction Works
+
+#### 1. Server Query Parameters Captured
+
+```typescript
+// Server query:
+supabase.from('products')
+  .select('*, prices(*)')
+  .eq('active', true)
+  .eq('prices.active', true)
+  .order('metadata->index')
+
+// Becomes URL parameters:
+{
+  'select': '*,prices(*)',
+  'active': 'eq.true',
+  'prices.active': 'eq.true',
+  'order': 'metadata->index.asc'
+}
+```
+
+#### 2. Server passes URL parameters to client
+
+```typescript
+// Server executes query and passes URL parameters and data to client
+const productsQuery = await executeWithMetadata<ShapeOfData>(query);
+// productsQuery contains a neat bundle of everything the client needs to set up the hook
+
+// Client receives QueryResult with URL parameters
+<ClientComponent productsQuery={productsQuery} />
+```
+
+#### 3. Client Reconstructs Query Structure
+
+```typescript
+// Client receives QueryResult with URL parameters
+const {
+  data: products,
+  filters,
+  loading,
+  error,
+  updateFilters
+} = useSupabaseStore(productsQuery);
+
+// The hook reconstructs the query structure from the URL parameters
+const query = supabase
+  .from('products')
+  .select('*, prices(*)')
+  .eq('active', true)
+  .eq('prices.active', true)
+  .order('metadata->index');
+```
+
+### Filter State Pre-population
+
+The hook automatically extracts user-modifiable filters from server parameters:
+
+```typescript
+// Server URL: ?active=eq.true&category=eq.electronics&order=name.asc
+
+// Extracted to filters state:
+{
+  active: true,        // eq.true → boolean true
+  category: 'electronics'  // eq.electronics → string
+}
+```
+
+### Advanced Examples
+
+#### Complex Queries with Joins
+
+```typescript
+// Server
+const ordersQuery = supabase
+  .from('orders')
+  .select(
+    `
+    *,
+    customer:customers(*),
+    order_items(
+      *,
+      product:products(*)
+    )
+  `
+  )
+  .eq('status', 'active')
+  .gte('created_at', '2023-01-01')
+  .order('created_at', { ascending: false });
+
+const ordersResult = await executeWithMetadata(ordersQuery);
+
+// Client - same complex query structure maintained
+const {
+  data: orders,
+  filters,
+  loading,
+  error,
+  updateFilters
+} = useSupabaseStore(ordersResult);
+
+// Add filters on top of complex base query
+updateFilters({
+  customer_name_ilike: '%john%',
+  total_gte: 100
+});
+```
+
+#### Multiple Parallel Queries
+
+```typescript
+// Server
+const [productsResult, categoriesResult, userResult] = await Promise.all([
+  executeWithMetadata(supabase.from('products').select('*').eq('active', true)),
+  executeWithMetadata(supabase.from('categories').select('*').order('name')),
+  supabase.auth.getUser()
+]);
+
+// Client
+const {
+  data: products,
+  filters: productFilters,
+  updateFilters: updateProductFilters
+} = useSupabaseStore(productsResult);
+const {
+  data: categories,
+  filters: categoryFilters,
+  updateFilters: updateCategoryFilters
+} = useSupabaseStore(categoriesResult);
+```
+
+### Migration Guide
+
+#### From Manual Query Duplication
+
+**Before:**
+
+```typescript
+// Server (app/page.tsx)
+const products = await supabase.from('products').select('*').eq('active', true);
+
+// Client (component.tsx) - DUPLICATE QUERY!
+const handleSearch = async (term) => {
+  const { data } = await supabase
+    .from('products')
+    .select('*')
+    .eq('active', true) // Must remember all server filters
+    .ilike('name', `%${term}%`);
+  setProducts(data);
+};
+```
+
+**After:**
+
+```typescript
+// Server (app/page.tsx)
+const productsResult = await executeWithMetadata(
+  supabase.from('products').select('*').eq('active', true)
+);
+
+// Client (component.tsx) - NO DUPLICATION!
+const {
+  data: products,
+  filters,
+  updateFilters
+} = useSupabaseStore(productsResult);
+const handleSearch = (term) => updateFilters({ name_ilike: `%${term}%` });
+```
+
+#### From Custom Query Builders
+
+**Before:**
+
+```typescript
+// Complex proxy/wrapper implementations
+const trackedClient = createTrackedClient();
+const { data, queryMeta } = await trackedClient.from('products').execute();
+```
+
+**After:**
+
+```typescript
+// Simple utility with official client
+const result = await executeWithMetadata(supabase.from('products').select('*'));
+```
+
+### Page Structure Patterns
+
+This starter kit uses Next.js SSR to improve loading performance. To accomplish this, we gather all data required for the initial page load on the server. Then, the client component takes over for reactive filtering and subsequent data fetching.
+
+#### Data-Fetching Pages
+
+For pages that fetch data, follow the server-to-client pattern:
+
+```typescript
+// app/products/page.tsx (Server Component)
+import { executeWithMetadata } from '@/utils/supabase/server';
+import { ProductsList } from './products-list';
+
+export default async function ProductsPage() {
+  const supabase = createClient();
+  const productsQuery = await executeWithMetadata(
+    supabase.from('products').select('*')
+  );
+
+  return <ProductsList productsQuery={productsQuery} />;
+}
+
+// app/products/products-list.tsx (Client Component)
+'use client';
+import { useSupabaseStore } from '@/utils/supabase/hooks';
+
+export function ProductsList({ productsQuery }) {
+  const { data: products, filters, updateFilters } = useSupabaseStore(productsQuery);
+  // ...
+}
+```
+
+#### Form/Action Pages
+
+For pages with forms or actions that don't fetch initial data:
+
+```typescript
+// app/products/new/page.tsx (Server Component)
+import { NewProductForm } from './client';
+
+export default function NewProductPage() {
+  // Server component - could fetch initial data if needed
+  // e.g., categories, user preferences, etc.
+
+  return <NewProductForm />;
+}
+
+// app/products/new/client.tsx (Client Component)
+'use client';
+export function NewProductForm() {
+  // All form logic and state management
+}
+
+// app/products/new/actions.ts (Server Actions)
+'use server';
+export async function createProductAction(data) {
+  // Server-side form processing
+}
+```
+
+For pages with forms that do require data fetching such as edit forms:
+
+```typescript
+// app/products/edit/[id]/page.tsx (Server Component)
+import { executeWithMetadata } from '@/utils/supabase/server';
+import { ProductEditForm } from './client';
+
+export default async function EditProductPage({ params }) {
+  const { id } = await params;
+  const productQuery = await executeWithMetadata(supabase.from('products').select('*').eq('id', id));
+  return <ProductEditForm productQuery={productQuery} />;
+}
+
+// app/products/edit/[id]/client.tsx (Client Component)
+'use client';
+import { useSupabaseStore } from '@/utils/supabase/hooks';
+
+export function ProductEditForm({ productQuery }) {
+  const { data: products, filters, updateFilters } = useSupabaseStore(productQuery);
+
+  return (
+    <form action={updateProduct}>
+      <input type="text" value={products[0]?.name} name="name" />
+      <button type="submit">Save</button>
+    </form>
+  );
+}
+
+// app/products/edit/[id]/actions.ts (Server Actions)
+'use server';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
+
+export async function updateProduct(formData: FormData) {
+  // process the form data on the server
+  const supabase = createClient();
+  const id = formData.get('id');
+  const name = formData.get('name');
+  await supabase.from('products').update({ name }).eq('id', id);
+  return redirect('/admin/products');
+}
+```
+
+This structure ensures:
+
+- ✅ **Pages are always server components** (Next.js App Router best practice)
+- ✅ **Clear separation** between server and client logic
+- ✅ **Future-ready** for adding server-side data fetching
+- ✅ **Consistent patterns** across your application
+
+### Benefits
+
+✅ **Zero Query Duplication** - Write once, use everywhere
+✅ **Full Type Safety** - Official Supabase TypeScript support
+✅ **No Learning Curve** - Standard Supabase API
+✅ **Future Proof** - Built on official client, gets updates automatically
+✅ **Clean Architecture** - Simple utility functions, no complex abstractions
+✅ **Smart Reconstruction** - Automatically handles query structure vs user filters
+✅ **Pre-populated State** - UI controls reflect server query state
+✅ **Proper Next.js Structure** - Server components for pages, client components for interactivity
+
+This approach gives you the best of both worlds: the simplicity and type safety of the official Supabase client with powerful server-to-client query continuity.
+
+## Testing
+
+We use [Playwright](https://playwright.dev) for E2E testing. The tests run in a test database that is automatically created and dropped when the tests are run.
+
+### Running tests
+
+```bash
+bun run test
+```
+
+### Writing tests
+
+We use the `test` directory to write our tests. Each file in the `test` directory is treated as a test file.
+
+I would reccommend at least having two tests for each CRUD operation. One to test users that should be allowed access, and one to test users that should be denied access.
+
+If you experience bugs, it is a good approach to create a test that reproduces the bug and then fix the bug. This allows AI to work until the bug is fixed.
+
+## Configuring production infrastructure
+
+### Deploying to Vercel
+
+```bash
+# bun dlx vercel login
+# bun dlx vercel link
+# bun dlx vercel env pull .env.local
+bun run vercel:deploy
+```
+
+#### Environment variables
+
+...
+
+### Configuring supabase
+
+Create a new supabase project at [supabase.com](https://supabase.com) and then run `bun run supabase:link` to link your project to the local supabase instance. Run `bun run supabase:push` to push the database schema to the remote database.
+
+In your Supabase project, navigate to [auth > URL configuration](https://app.supabase.com/project/_/auth/url-configuration) and set your main production URL (e.g. https://your-deployment-url.vercel.app) as the site url.
+
+You will also need to configure your auth providers as required.
+
+## UI Theming with shadcn/ui
+
+This project uses [shadcn/ui](https://ui.shadcn.com/) components located in the `components/ui/` directory. These components provide a consistent, accessible, and customizable design system.
+
+### Theme Customization
+
+For easy theme customization, we recommend using the [tweakcn theme generator](https://tweakcn.com/editor/theme). This visual editor allows you to:
+
+- Customize colors, typography, and other design tokens
+- Preview components in real-time
+- Export themes directly to your project
+
+### Important: Color Format Conversion
+
+**Note:** When using the tweakcn CLI command to install a theme, the color variables will be defined in OKLCH format, which doesn't support Tailwind's opacity syntax (e.g., `bg-primary/50`) in Tailwind v3.
+
+After installing a theme via CLI, you'll need to convert the color format. Use this prompt with your AI assistant:
+
+```
+Update all color definitions in the main.css file to use the rgb() format instead of oklch(), so that Tailwind's opacity utilities (e.g., bg-primary/50) work correctly
+```
+
+This conversion ensures that:
+
+- Button hover states work properly (e.g., `hover:bg-primary/90`)
+- All Tailwind opacity utilities function correctly
+- Colors maintain their visual appearance while gaining opacity support
+
+### Theme Structure
+
+The theme is defined in `styles/main.css` with CSS custom properties for:
+
+- **Primary Colors**: Main brand colors and their foregrounds
+- **Secondary Colors**: Supporting colors for UI elements
+- **Base Colors**: Background, foreground, and text colors
+- **Component Colors**: Card, popover, and muted colors
+- **Semantic Colors**: Destructive, accent, and border colors
+- **Chart Colors**: Data visualization color palette
+- **Sidebar Colors**: Navigation-specific colors
+
+All components in `components/ui/` automatically use these theme variables, ensuring consistent styling across your application.
+
+## Configure Stripe
+
+Next, we'll need to configure [Stripe](https://stripe.com/) to handle test payments. If you don't already have a Stripe account, create one now.
+
+For the following steps, make sure you have the ["Test Mode" toggle](https://stripe.com/docs/testing) switched on.
+
+### Create a Webhook
+
+We need to create a webhook in the `Developers` section of Stripe. Pictured in the architecture diagram above, this webhook is the piece that connects Stripe to your Vercel Serverless Functions.
+
+1.  Click the "Add Endpoint" button on the [test Endpoints page](https://dashboard.stripe.com/test/webhooks).
+2.  Enter your production deployment URL followed by `/api/webhooks` for the endpoint URL. (e.g. `https://your-deployment-url.vercel.app/api/webhooks`)
+3.  Click `Select events` under the `Select events to listen to` heading.
+4.  Click `Select all events` in the `Select events to send` section.
+5.  Copy `Signing secret` as we'll need that in the next step (e.g `whsec_xxx`) (/!\ be careful not to copy the webook id we_xxxx).
+6.  In addition to the `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` and the `STRIPE_SECRET_KEY` we've set earlier during deployment, we need to add the webhook secret as `STRIPE_WEBHOOK_SECRET` env var.
+
+Optionally, to speed up the setup, we have added a [fixtures file](fixtures/stripe-fixtures.json) to bootstrap test product and pricing data in your Stripe account. The [Stripe CLI](https://stripe.com/docs/stripe-cli#install) `fixtures` command executes a series of API requests defined in this JSON file. Simply run `stripe fixtures fixtures/stripe-fixtures.json`.
+
+**Important:** Make sure that you've configured your Stripe webhook correctly and redeployed with all needed environment variables.
+
+### Configure the Stripe customer portal
+
+1.  Set your custom branding in the [settings](https://dashboard.stripe.com/settings/branding)
+2.  Configure the Customer Portal [settings](https://dashboard.stripe.com/test/settings/billing/portal)
+3.  Toggle on "Allow customers to update their payment methods"
+4.  Toggle on "Allow customers to update subscriptions"
+5.  Toggle on "Allow customers to cancel subscriptions"
+6.  Add the products and prices that you want
+7.  Set up the required business information and links
+
+### Use the Stripe CLI to test webhooks
+
+Use the [Stripe CLI](https://stripe.com/docs/stripe-cli) to [login to your Stripe account](https://stripe.com/docs/stripe-cli#login-account):
+
+```bash
+bun run stripe:login
+```
+
+This will print a URL to navigate to in your browser and provide access to your Stripe account.
+
+Next, start local webhook forwarding:
+
+```bash
+bun run stripe:listen
+```
+
+Running this Stripe command will print a webhook secret (such as, `whsec_***`) to the console. Set `STRIPE_WEBHOOK_SECRET` to this value in your `.env.local` file. If you haven't already, you should also set `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY` in your `.env.local` file using the **test mode**(!) keys from your Stripe dashboard.
+
+## Run the Next.js client
+
+In a separate terminal, run the following command to start the development server:
+
+```bash
+bun dev
+```
+
+Note that webhook forwarding and the development server must be running concurrently in two separate terminals for the application to work correctly.
+
+Finally, navigate to [http://localhost:3000](http://localhost:3000) in your browser to see the application rendered.

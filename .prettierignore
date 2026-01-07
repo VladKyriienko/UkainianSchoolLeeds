@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Generated files
+*.d.ts
+.next/types/**/*
+
+# Config files
+*.config.js
+*.config.ts
+postcss.config.js
+tailwind.config.js
+
+# Test coverage
+coverage/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+# Lock files
+package-lock.json
+yarn.lock
+bun.lockb
+
+# Test files (not part of build)
+tests/**
+**/*.spec.ts
+**/*.test.ts
+
+# Schema and migration files (not part of build)
+supabase/schemas/**
+supabase/migrations/**
+
+# Playwright config
+playwright.config.ts
+
+# Generated types file
+utils/supabase/types.ts

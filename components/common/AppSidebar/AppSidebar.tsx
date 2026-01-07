@@ -1,0 +1,151 @@
+'use client';
+
+import * as React from 'react';
+import Link from 'next/link';
+import { User } from '@supabase/supabase-js';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+  SidebarTrigger,
+  useSidebar
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { NavMain } from './NavMain';
+import { NavUser } from './NavUser';
+import { CompletionBanner } from '@/components/common/CompletionBanner/CompletionBanner';
+import Logo from '@/components/icons/Logo';
+import DarkModeToggle from '@/components/common/RootLayout/DarkModeToggle';
+import { cn } from '@/utils/cn';
+import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
+import type { CompletionData } from '@/components/common/CompletionBanner/types';
+import { RouteConfig } from '@/utils/route-protection';
+
+export type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  user?: User | null | undefined;
+  userProfile?:
+    | { full_name: string | null; avatar_url: string | null }
+    | null
+    | undefined;
+  isAdmin?: boolean | undefined;
+  navItems?: RouteConfig[] | undefined;
+  completionBannerData?:
+    | {
+        completionData: CompletionData;
+        settings: {
+          showCompletionBanner: boolean;
+        };
+        postSignupSettings: {
+          requirePostSignupCompletion: boolean;
+          postSignupCompletionPath: string;
+        };
+        fieldConfig: CompletionFieldConfig[];
+      }
+    | null
+    | undefined;
+  showDarkModeToggle?: boolean;
+  showSidebarTrigger?: boolean;
+  className?: string;
+  mobileBurgerPosition?: 'left' | 'right';
+};
+
+export function AppSidebar({
+  navItems = [],
+  completionBannerData,
+  showDarkModeToggle = true,
+  showSidebarTrigger = false,
+  className,
+  mobileBurgerPosition = 'right',
+  side: desktopSidebarPosition = 'left',
+  ...props
+}: AppSidebarProps) {
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleMobileClose = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  return (
+    <Sidebar
+      side={isMobile ? mobileBurgerPosition : desktopSidebarPosition}
+      collapsible="icon"
+      className={cn(className)}
+      {...props}
+    >
+      <SidebarHeader className="border-b border-sidebar-border">
+        {/* Expanded state */}
+        <div className="flex items-center justify-between p-2 group-data-[collapsible=icon]:hidden">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <Logo className="h-8 w-8" />
+            <span className="font-semibold text-sidebar-foreground">
+              Decodifi
+            </span>
+          </Link>
+
+          {/* Controls */}
+          <div className="flex items-center gap-2">
+            {showDarkModeToggle && <DarkModeToggle />}
+            {showSidebarTrigger && !isMobile && (
+              <SidebarTrigger className="h-8 w-8" />
+            )}
+            {/* Mobile close button */}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleMobileClose}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close sidebar</span>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Collapsed state */}
+        {!isMobile && (
+          <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-2 p-2">
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <Logo className="h-8 w-8" />
+            </Link>
+            {showSidebarTrigger && <SidebarTrigger className="h-8 w-8" />}
+          </div>
+        )}
+
+        {/* Completion Banner - only show when expanded and data exists */}
+        {completionBannerData && (
+          <div className="px-2 pb-2 group-data-[collapsible=icon]:hidden">
+            <CompletionBanner
+              completionData={completionBannerData.completionData}
+              settings={completionBannerData.settings}
+              postSignupSettings={completionBannerData.postSignupSettings}
+              fieldConfig={completionBannerData.fieldConfig}
+              variant="sidebar"
+              className="border-0 shadow-none"
+            />
+          </div>
+        )}
+      </SidebarHeader>
+
+      <SidebarContent>
+        <NavMain items={navItems} />
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border">
+        <NavUser />
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
+  );
+}
