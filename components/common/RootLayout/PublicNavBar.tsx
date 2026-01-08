@@ -20,7 +20,7 @@ export function PublicNavBar({ showDarkModeToggle = true }: PublicNavBarProps) {
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <Logo className="h-8 w-8" />
-          <span className="font-semibold">Decodifi</span>
+          <span className="font-semibold">AI Template</span>
         </Link>
 
         {/* Actions */}

@@ -27,25 +27,25 @@ import { RouteConfig } from '@/utils/route-protection';
 export type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user?: User | null | undefined;
   userProfile?:
-    | { full_name: string | null; avatar_url: string | null }
-    | null
-    | undefined;
+  | { full_name: string | null; avatar_url: string | null }
+  | null
+  | undefined;
   isAdmin?: boolean | undefined;
   navItems?: RouteConfig[] | undefined;
   completionBannerData?:
-    | {
-        completionData: CompletionData;
-        settings: {
-          showCompletionBanner: boolean;
-        };
-        postSignupSettings: {
-          requirePostSignupCompletion: boolean;
-          postSignupCompletionPath: string;
-        };
-        fieldConfig: CompletionFieldConfig[];
-      }
-    | null
-    | undefined;
+  | {
+    completionData: CompletionData;
+    settings: {
+      showCompletionBanner: boolean;
+    };
+    postSignupSettings: {
+      requirePostSignupCompletion: boolean;
+      postSignupCompletionPath: string;
+    };
+    fieldConfig: CompletionFieldConfig[];
+  }
+  | null
+  | undefined;
   showDarkModeToggle?: boolean;
   showSidebarTrigger?: boolean;
   className?: string;
@@ -87,7 +87,7 @@ export function AppSidebar({
           >
             <Logo className="h-8 w-8" />
             <span className="font-semibold text-sidebar-foreground">
-              Decodifi
+              Ukrainia School
             </span>
           </Link>
 

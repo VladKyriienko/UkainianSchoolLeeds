@@ -18,11 +18,10 @@ export function PublicHomeClient() {
       <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-8">
         <div className="space-y-4">
           <h1 className="text-5xl font-bold tracking-tight">
-            Welcome to Decodifi AI Starter
+            Welcome to Ukrainia School
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A modern, production-ready Next.js starter with authentication,
-            admin panel, and beautiful UI components.
+            A school for Ukrainian children.
           </p>
         </div>
 

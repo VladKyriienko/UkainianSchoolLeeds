@@ -6,8 +6,8 @@ import Providers from '@/providers/providers';
 import 'styles/main.css';
 import { createClient, UserWithRoles } from '@/utils/supabase/server';
 
-const title = 'Decodifi AI Starter';
-const description = 'Brought to you by Vercel, Stripe, and Supabase.';
+const title = 'Ukrainia School';
+const description = 'Ukrainia School is a school for Ukrainian children.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),

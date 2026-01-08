@@ -28,7 +28,7 @@ bun run db:start
 bun dev
 ```
 
-You now have a local supabase instance running and a development server. There is a default user created with the email `admin@decodifi.uk` and the password `mHMGB1uzkdfQ16xU`.
+You now have a local supabase instance running and a development server. There is a default user created with the email `admin@admin.uk` and the password `mHMGB1uzkdfQ16xU`.
 
 ## Database Management with Drizzle
 

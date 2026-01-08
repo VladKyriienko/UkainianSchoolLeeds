@@ -29,15 +29,7 @@ export function PublicLayout({
         <footer className="border-t py-8">
           <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
             <p>
-              Built with Next.js, Supabase, and ❤️ by{' '}
-              <a
-                href="https://decodifi.com"
-                className="hover:text-foreground transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Decodifi
-              </a>
+              Built with Next.js, Supabase, and ❤️ by AI Template
             </p>
           </div>
         </footer>
