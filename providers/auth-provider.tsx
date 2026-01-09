@@ -12,7 +12,6 @@ import {
 import { UserWithRoles } from '@/utils/supabase/server';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '@/utils/supabase/types';
-import { SignOut } from '@/utils/auth-helpers/server';
 import { type User } from '@supabase/supabase-js';
 
 export const AuthContext = createContext<{
@@ -25,8 +24,8 @@ export const AuthContext = createContext<{
   user: null,
   userData: null,
   loading: false,
-  signOut: async () => {},
-  refreshUserData: async () => {}
+  signOut: async () => { },
+  refreshUserData: async () => { }
 });
 
 export const AuthProvider = ({
@@ -77,7 +76,8 @@ export const AuthProvider = ({
     setUserData(null);
 
     if (supabase) {
-      const error = await SignOut();
+      // Use client-side sign out directly instead of server action
+      const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('AuthProvider: Error signing out:', error);
       }
