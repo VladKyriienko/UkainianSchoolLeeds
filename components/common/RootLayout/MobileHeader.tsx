@@ -46,7 +46,7 @@ export function MobileHeader({
 
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
-            <span className="font-semibold">Decodifi</span>
+            <span className="font-semibold">Ukrainian School</span>
           </Link>
 
           {showDarkModeToggle && burgerPosition === 'right' && (

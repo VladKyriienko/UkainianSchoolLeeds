@@ -17,19 +17,19 @@ export type AuthenticatedLayoutProps = {
   children: React.ReactNode;
   navItems?: RouteConfig[] | undefined;
   completionBannerData?:
-    | {
-        completionData: CompletionData;
-        settings: {
-          showCompletionBanner: boolean;
-        };
-        postSignupSettings: {
-          requirePostSignupCompletion: boolean;
-          postSignupCompletionPath: string;
-        };
-        fieldConfig: CompletionFieldConfig[];
-      }
-    | null
-    | undefined;
+  | {
+    completionData: CompletionData;
+    settings: {
+      showCompletionBanner: boolean;
+    };
+    postSignupSettings: {
+      requirePostSignupCompletion: boolean;
+      postSignupCompletionPath: string;
+    };
+    fieldConfig: CompletionFieldConfig[];
+  }
+  | null
+  | undefined;
   showDarkModeToggle?: boolean;
   defaultOpen?: boolean;
   mobileBurgerPosition?: 'left' | 'right';
@@ -51,7 +51,7 @@ function AuthenticatedLayoutContent({
         {/* Mobile Header */}
         {isMobile && (
           <MobileHeader
-            showDarkModeToggle={showDarkModeToggle || true}
+            showDarkModeToggle={showDarkModeToggle ?? true}
             burgerPosition={mobileBurgerPosition || 'right'}
           />
         )}

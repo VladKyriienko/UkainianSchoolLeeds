@@ -20,12 +20,10 @@ html {
 
 html,
 body {
-  font-family:
-    -apple-system, system-ui, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica',
-    sans-serif;
+  font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
-  @apply text-white dark:text-white text-zinc-900 bg-zinc-800 dark:bg-zinc-800 bg-white antialiased;
+  @apply text-foreground bg-background antialiased;
 }
 
 body {
@@ -56,134 +54,291 @@ p a {
 }
 
 @layer base {
+
+  /* ==========================================
+     BASE THEME - Main Area (Dashboard, Signup, Admin)
+     Primary: Teal/Aquamarine for buttons and actions
+     ========================================== */
   :root {
-    --background: 248 250 252;
-    --foreground: 51 65 85;
+    /* Core Colors - Light Mode */
+    --background: 250 250 250;
+    --foreground: 39 39 42;
+
+    /* Card Components */
     --card: 255 255 255;
-    --card-foreground: 51 65 85;
+    --card-foreground: 39 39 42;
+
+    /* Popover Components */
     --popover: 255 255 255;
-    --popover-foreground: 51 65 85;
-    --primary: 99 102 241;
+    --popover-foreground: 39 39 42;
+
+    /* Primary - Teal/Aquamarine (Main CTAs) */
+    --primary: 0 160 160;
     --primary-foreground: 255 255 255;
-    --secondary: 226 232 240;
-    --secondary-foreground: 71 85 105;
+
+    /* Secondary - Light Gray */
+    --secondary: 241 245 249;
+    --secondary-foreground: 39 39 42;
+
+    /* Muted Elements */
     --muted: 241 245 249;
-    --muted-foreground: 100 116 139;
-    --accent: 226 232 240;
-    --accent-foreground: 71 85 105;
+    --muted-foreground: 113 113 122;
+
+    /* Accent Elements */
+    --accent: 241 245 249;
+    --accent-foreground: 39 39 42;
+
+    /* Destructive/Error States */
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
-    --border: 203 213 225;
-    --input: 203 213 225;
-    --ring: 99 102 241;
-    --chart-1: 99 102 241;
-    --chart-2: 139 92 246;
-    --chart-3: 168 85 247;
-    --chart-4: 192 132 252;
-    --chart-5: 196 181 253;
-    --sidebar: 241 245 249;
-    --sidebar-foreground: 51 65 85;
-    --sidebar-primary: 99 102 241;
+
+    /* Borders & Inputs */
+    --border: 228 228 231;
+    --input: 228 228 231;
+    --ring: 0 160 160;
+
+    /* Charts */
+    --chart-1: 0 160 160;
+    --chart-2: 34 197 194;
+    --chart-3: 94 234 212;
+    --chart-4: 153 246 228;
+    --chart-5: 204 251 241;
+
+    /* Sidebar */
+    --sidebar: 250 250 250;
+    --sidebar-foreground: 39 39 42;
+    --sidebar-primary: 0 160 160;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 226 232 240;
-    --sidebar-accent-foreground: 71 85 105;
-    --sidebar-border: 203 213 225;
-    --sidebar-ring: 99 102 241;
-    --font-sans: Inter, sans-serif;
-    --font-serif: Merriweather, serif;
-    --font-mono: JetBrains Mono, monospace;
-    --radius: 0.5rem;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 39 39 42;
+    --sidebar-border: 228 228 231;
+    --sidebar-ring: 0 160 160;
+
+    /* Typography */
+    --font-sans: 'Quicksand', -apple-system, system-ui, sans-serif;
+    --font-serif: Merriweather, Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+    /* Border Radius */
+    --radius: 0.75rem;
+
+    /* Shadows */
     --shadow-x: 0px;
-    --shadow-y: 4px;
+    --shadow-y: 2px;
     --shadow-blur: 8px;
-    --shadow-spread: -1px;
+    --shadow-spread: 0px;
     --shadow-opacity: 0.1;
-    --shadow-color: hsl(0 0% 0%);
-    --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-    --shadow-sm:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-    --shadow:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-    --shadow-md:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 2px 4px -2px hsl(0 0% 0% / 0.1);
-    --shadow-lg:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 4px 6px -2px hsl(0 0% 0% / 0.1);
-    --shadow-xl:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 8px 10px -2px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
-    --tracking-normal: 0em;
+    --shadow-color: 0 160 160;
+    --shadow-2xs: 0px 1px 2px 0px rgb(0 160 160 / 0.05);
+    --shadow-xs: 0px 1px 3px 0px rgb(0 160 160 / 0.08);
+    --shadow-sm: 0px 2px 4px -1px rgb(0 160 160 / 0.1);
+    --shadow: 0px 2px 8px -2px rgb(0 160 160 / 0.12);
+    --shadow-md: 0px 4px 12px -2px rgb(0 160 160 / 0.15);
+    --shadow-lg: 0px 8px 16px -4px rgb(0 160 160 / 0.18);
+    --shadow-xl: 0px 12px 24px -6px rgb(0 160 160 / 0.2);
+    --shadow-2xl: 0px 16px 32px -8px rgb(0 160 160 / 0.25);
+
+    /* Spacing */
     --spacing: 0.25rem;
-    --shadow-offset-x: 0px;
-    --shadow-offset-y: 4px;
-    --letter-spacing: 0em;
+    --tracking-normal: 0em;
   }
 
+  /* ==========================================
+     DARK MODE
+     ========================================== */
   .dark {
     --background: 15 23 42;
     --foreground: 226 232 240;
+
     --card: 30 41 59;
     --card-foreground: 226 232 240;
+
     --popover: 30 41 59;
     --popover-foreground: 226 232 240;
-    --primary: 129 140 248;
+
+    --primary: 45 212 191;
     --primary-foreground: 15 23 42;
+
     --secondary: 51 65 85;
-    --secondary-foreground: 203 213 225;
-    --muted: 30 41 59;
+    --secondary-foreground: 226 232 240;
+
+    --muted: 51 65 85;
     --muted-foreground: 148 163 184;
+
     --accent: 71 85 105;
-    --accent-foreground: 203 213 225;
+    --accent-foreground: 226 232 240;
+
     --destructive: 239 68 68;
-    --destructive-foreground: 15 23 42;
+    --destructive-foreground: 248 250 252;
+
     --border: 71 85 105;
     --input: 71 85 105;
-    --ring: 129 140 248;
-    --chart-1: 129 140 248;
-    --chart-2: 99 102 241;
-    --chart-3: 139 92 246;
-    --chart-4: 168 85 247;
-    --chart-5: 192 132 252;
+    --ring: 45 212 191;
+
+    --chart-1: 45 212 191;
+    --chart-2: 34 197 194;
+    --chart-3: 20 184 166;
+    --chart-4: 13 148 136;
+    --chart-5: 15 118 110;
+
     --sidebar: 30 41 59;
     --sidebar-foreground: 226 232 240;
-    --sidebar-primary: 129 140 248;
+    --sidebar-primary: 45 212 191;
     --sidebar-primary-foreground: 15 23 42;
     --sidebar-accent: 71 85 105;
-    --sidebar-accent-foreground: 203 213 225;
+    --sidebar-accent-foreground: 226 232 240;
     --sidebar-border: 71 85 105;
-    --sidebar-ring: 129 140 248;
-    --font-sans: Inter, sans-serif;
-    --font-serif: Merriweather, serif;
-    --font-mono: JetBrains Mono, monospace;
-    --radius: 0.5rem;
-    --shadow-x: 0px;
-    --shadow-y: 4px;
-    --shadow-blur: 8px;
-    --shadow-spread: -1px;
-    --shadow-opacity: 0.1;
-    --shadow-color: hsl(0 0% 0%);
-    --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-    --shadow-sm:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-    --shadow:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-    --shadow-md:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 2px 4px -2px hsl(0 0% 0% / 0.1);
-    --shadow-lg:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 4px 6px -2px hsl(0 0% 0% / 0.1);
-    --shadow-xl:
-      0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 8px 10px -2px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
-    --shadow-offset-x: 0px;
-    --shadow-offset-y: 4px;
-    --letter-spacing: 0em;
-    --spacing: 0.25rem;
+    --sidebar-ring: 45 212 191;
+
+    --shadow-color: 0 0 0;
+    --shadow-2xs: 0px 1px 2px 0px rgb(0 0 0 / 0.2);
+    --shadow-xs: 0px 1px 3px 0px rgb(0 0 0 / 0.3);
+    --shadow-sm: 0px 2px 4px -1px rgb(0 0 0 / 0.4);
+    --shadow: 0px 2px 8px -2px rgb(0 0 0 / 0.5);
+    --shadow-md: 0px 4px 12px -2px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0px 8px 16px -4px rgb(0 0 0 / 0.7);
+    --shadow-xl: 0px 12px 24px -6px rgb(0 0 0 / 0.75);
+    --shadow-2xl: 0px 16px 32px -8px rgb(0 0 0 / 0.8);
   }
+
+  /* ==========================================
+     TRACKING THEME - Blue Variations
+     For Daily Check-ins and Progress Tracking
+     ========================================== */
+  [data-theme='tracking'] {
+    /* Light blue-tinted background */
+    --background: 240 248 252;
+    --card: 247 251 254;
+
+    --primary: 113 187 212;
+    --primary-foreground: 255 255 255;
+
+    --accent: 113 187 212;
+    --accent-foreground: 255 255 255;
+
+    --ring: 113 187 212;
+
+    --chart-1: 113 187 212;
+    --chart-2: 133 197 217;
+    --chart-3: 153 207 222;
+    --chart-4: 173 217 227;
+    --chart-5: 193 227 232;
+  }
+
+  [data-theme='tracking'].dark {
+    --background: 15 30 45;
+    --card: 25 40 55;
+
+    --primary: 113 187 212;
+    --primary-foreground: 15 23 42;
+
+    --accent: 113 187 212;
+    --accent-foreground: 248 250 252;
+  }
+
+  /* ==========================================
+     COMMUNITY THEME - Yellow/Orange
+     For User Posts and Social Features
+     ========================================== */
+  [data-theme='community'] {
+    /* Warm cream/beige background */
+    --background: 254 248 240;
+    --card: 255 252 247;
+
+    --primary: 241 186 112;
+    --primary-foreground: 255 255 255;
+
+    --accent: 241 186 112;
+    --accent-foreground: 255 255 255;
+
+    --ring: 241 186 112;
+
+    --chart-1: 241 186 112;
+    --chart-2: 244 196 132;
+    --chart-3: 247 206 152;
+    --chart-4: 250 216 172;
+    --chart-5: 253 226 192;
+  }
+
+  [data-theme='community'].dark {
+    --background: 30 25 20;
+    --card: 40 35 30;
+
+    --primary: 241 186 112;
+    --primary-foreground: 39 39 42;
+
+    --accent: 241 186 112;
+    --accent-foreground: 248 250 252;
+  }
+
+  /* ==========================================
+     EXPLORE THEME - Green/Aquamarine
+     For Blog Posts and Discovery
+     ========================================== */
+  [data-theme='explore'] {
+    /* Light green/mint background */
+    --background: 240 252 250;
+    --card: 247 254 252;
+
+    --primary: 74 166 151;
+    --primary-foreground: 255 255 255;
+
+    --accent: 74 166 151;
+    --accent-foreground: 255 255 255;
+
+    --ring: 74 166 151;
+
+    --chart-1: 74 166 151;
+    --chart-2: 94 176 161;
+    --chart-3: 114 186 171;
+    --chart-4: 134 196 181;
+    --chart-5: 154 206 191;
+  }
+
+  [data-theme='explore'].dark {
+    --background: 20 30 28;
+    --card: 30 40 38;
+
+    --primary: 74 166 151;
+    --primary-foreground: 255 255 255;
+
+    --accent: 74 166 151;
+    --accent-foreground: 248 250 252;
+  }
+
+  /* ==========================================
+     PROFILE THEME - Dark Blue/Gray
+     For User Profile and Settings
+     ========================================== */
+  [data-theme='profile'] {
+    --background: 30 41 59;
+    --foreground: 241 245 249;
+
+    --card: 51 65 85;
+    --card-foreground: 241 245 249;
+
+    --primary: 241 245 249;
+    --primary-foreground: 30 41 59;
+
+    --secondary: 71 85 105;
+    --secondary-foreground: 226 232 240;
+
+    --muted: 71 85 105;
+    --muted-foreground: 148 163 184;
+
+    --accent: 100 116 139;
+    --accent-foreground: 241 245 249;
+
+    --border: 71 85 105;
+    --input: 71 85 105;
+    --ring: 241 245 249;
+  }
+
+  /* Typography System */
   .theme {
-    --font-sans: Inter, sans-serif;
-    --font-mono: JetBrains Mono, monospace;
-    --font-serif: Merriweather, serif;
+    --font-sans: 'Quicksand', -apple-system, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --font-serif: Merriweather, Georgia, serif;
     --radius: 0.5rem;
     --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
     --tracking-tight: calc(var(--tracking-normal) - 0.025em);
@@ -191,23 +346,18 @@ p a {
     --tracking-wider: calc(var(--tracking-normal) + 0.05em);
     --tracking-widest: calc(var(--tracking-normal) + 0.1em);
   }
+
   body {
     letter-spacing: var(--tracking-normal);
   }
 }
-/* 
 
-* {
-  border-color: hsl(220 13% 91%);
-  .dark & {
-    border-color: hsl(240, 6%, 35%);
-  }
-}
----break--- */
+/* Apply border colors globally */
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

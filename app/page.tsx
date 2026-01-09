@@ -40,7 +40,7 @@ export default async function HomePage() {
         navItems={navItems}
         completionBannerData={completionBannerData}
         mobileBurgerPosition="right"
-        showDarkModeToggle={true}
+        showDarkModeToggle={false}
         defaultOpen={true}
       >
         <AuthenticatedHomeClient />
@@ -49,7 +49,7 @@ export default async function HomePage() {
   }
 
   return (
-    <PublicLayout showHeader={true} showDarkModeToggle={true} showFooter={true}>
+    <PublicLayout showHeader={true} showDarkModeToggle={false} showFooter={true}>
       <PublicHomeClient />
     </PublicLayout>
   );

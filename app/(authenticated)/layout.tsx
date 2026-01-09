@@ -45,7 +45,7 @@ export default async function Layout({ children }: PropsWithChildren) {
       navItems={navItems}
       completionBannerData={completionBannerData}
       mobileBurgerPosition="right"
-      showDarkModeToggle={true}
+      showDarkModeToggle={false}
       defaultOpen={true}
     >
       {children}
