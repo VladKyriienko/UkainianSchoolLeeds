@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
 import { Button } from '@/components/ui/button';
+import { NavItems } from '@/constants/navigation';
 
 export type PublicNavBarProps = {
   showDarkModeToggle?: boolean;
@@ -22,6 +23,15 @@ export function PublicNavBar({ showDarkModeToggle = true }: PublicNavBarProps) {
           <Logo className="h-8 w-8" />
           <span className="font-semibold">AI Template</span>
         </Link>
+
+        <div className="flex items-center gap-2">
+          {NavItems.map((item) => (
+            <Link key={item.key} href={item.href}>
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
 
         {/* Actions */}
         <div className="flex items-center gap-2">
