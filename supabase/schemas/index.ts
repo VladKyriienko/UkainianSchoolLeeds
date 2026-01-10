@@ -145,3 +145,63 @@ export const userUploads = pgTable(
   ]
 );
 
+// Messages table (contact form submissions)
+export const messages = pgTable(
+  'messages',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    phone: text('phone'),
+    subject: text('subject').notNull(),
+    message: text('message').notNull(),
+    read: boolean('read').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull()
+  },
+  (t) => {
+    // Admin check: users with roles.role = 'admin'
+    const isAdmin = sql`exists (
+      select 1
+      from roles
+      where roles.user_id = auth.uid()
+        and roles.role = 'admin'
+    )`;
+
+    return [
+      // Anyone can create messages (anon + authenticated)
+      pgPolicy('messages_public_insert_anon', {
+        for: 'insert',
+        to: anonRole,
+        withCheck: sql`true`
+      }),
+      pgPolicy('messages_public_insert_authenticated', {
+        for: 'insert',
+        to: authenticatedRole,
+        withCheck: sql`true`
+      }),
+
+      // Admins can read/update/delete all messages
+      pgPolicy('messages_admin_select', {
+        for: 'select',
+        to: authenticatedRole,
+        using: isAdmin
+      }),
+      pgPolicy('messages_admin_update', {
+        for: 'update',
+        to: authenticatedRole,
+        using: isAdmin,
+        withCheck: isAdmin
+      }),
+      pgPolicy('messages_admin_delete', {
+        for: 'delete',
+        to: authenticatedRole,
+        using: isAdmin
+      })
+    ];
+  }
+);

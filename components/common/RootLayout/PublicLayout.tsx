@@ -9,18 +9,20 @@ export type PublicLayoutProps = {
   showHeader?: boolean;
   showDarkModeToggle?: boolean;
   showFooter?: boolean;
+  showNavigation?: boolean;
 };
 
 export function PublicLayout({
   children,
   showHeader = true,
   showDarkModeToggle = true,
-  showFooter = false
+  showFooter = false,
+  showNavigation = true
 }: PublicLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      {showHeader && <PublicNavBar showDarkModeToggle={showDarkModeToggle} />}
+      {showHeader && <PublicNavBar showDarkModeToggle={showDarkModeToggle} showNavigation={showNavigation} />}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col pt-12">{children}</main>
