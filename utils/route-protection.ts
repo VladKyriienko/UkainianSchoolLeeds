@@ -19,12 +19,6 @@ export const navigationRoutes: RouteConfig[] = [
     requiresAuth: false
   },
   {
-    path: '/design-system',
-    label: 'Design System',
-    icon: 'Palette',
-    requiresAuth: false
-  },
-  {
     path: '/admin',
     label: 'Admin Panel',
     icon: 'Settings',

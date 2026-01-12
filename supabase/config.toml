@@ -10,7 +10,7 @@ enabled = true
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. `public` and `graphql_public` schemas are included by default.
-schemas = ["public", "graphql_public"]
+schemas = ["public", "storage", "graphql_public"]
 # Extra schemas to add to the search_path of every request.
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
@@ -31,7 +31,7 @@ port = 54322
 shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 17
+major_version = 15
 
 [db.pooler]
 enabled = false
@@ -48,19 +48,20 @@ max_client_conn = 100
 # [db.vault]
 # secret_key = "env(SECRET_VALUE)"
 
-[db.migrations]
-# If disabled, migrations will be skipped during a db push or reset.
-enabled = true
-# Specifies an ordered list of schema files that describe your database.
-# Supports glob patterns relative to supabase directory: "./schemas/*.sql"
-schema_paths = []
+#[db.migrations]
+## If disabled, migrations will be skipped during a db push or reset.
+#enabled = true
+## Specifies an ordered list of schema files that describe your database.
+## Supports glob patterns relative to supabase directory: "./schemas/*.sql"
+## NOTE: Leaving this empty can break older Supabase CLI versions. Prefer omitting or using defaults.
+#schema_paths = ["./schemas/*.sql"]
 
-[db.seed]
-# If enabled, seeds the database after migrations during a db reset.
-enabled = true
-# Specifies an ordered list of seed files to load during db reset.
-# Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
+#[db.seed]
+## If enabled, seeds the database after migrations during a db reset.
+#enabled = true
+## Specifies an ordered list of seed files to load during db reset.
+## Supports glob patterns relative to supabase directory: "./seeds/*.sql"
+#sql_paths = ["./seed.sql"]
 
 # [db.network_restrictions]
 # Enable management of network restrictions.

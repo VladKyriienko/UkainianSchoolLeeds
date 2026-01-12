@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createMessageAction } from './actions';
 import {
   Card,
   CardContent,
@@ -38,6 +39,13 @@ export default function ContactContent() {
     setErrorMessage(null);
 
     try {
+      await createMessageAction({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message
+      });
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
