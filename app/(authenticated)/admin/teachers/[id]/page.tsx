@@ -1,0 +1,112 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { createAdminClient } from '@/utils/supabase/admin';
+import { getTeacherById } from '@/app/(authenticated)/admin/teachers/actions';
+import { TeacherDetailsActions } from '@/app/(authenticated)/admin/components/TeacherDetailsActions';
+
+export default async function TeacherDetailsPage({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  let teacher = null;
+  try {
+    teacher = await getTeacherById(id);
+  } catch {
+    // fallthrough
+  }
+
+  if (!teacher) {
+    notFound();
+  }
+
+  const supabaseAdmin = createAdminClient();
+  const photoUrl = teacher.photo
+    ? supabaseAdmin.storage.from('teachers-photos').getPublicUrl(teacher.photo)
+        .data.publicUrl
+    : null;
+
+  return (
+    <div className="max-w-4xl mx-auto py-8 px-4">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <Link
+            href="/admin/teachers"
+            className="text-primary hover:text-primary/80 mb-3 inline-block"
+          >
+            ← Back to Teachers
+          </Link>
+          <h1 className="text-3xl font-bold">{teacher.name}</h1>
+          <p className="text-muted-foreground">{teacher.title || '—'}</p>
+        </div>
+
+        <TeacherDetailsActions teacherId={teacher.id} teacherName={teacher.name} />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="md:col-span-1">
+          <CardHeader>
+            <CardTitle>Photo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={photoUrl}
+                alt={teacher.name}
+                className="w-full rounded-md border object-cover aspect-square"
+              />
+            ) : (
+              <div className="aspect-square w-full rounded-md border bg-muted flex items-center justify-center text-muted-foreground text-sm">
+                No photo
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-muted-foreground">Category:</span>
+              <Badge variant="secondary">{teacher.category}</Badge>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Email</div>
+                <div className="font-medium break-all">{teacher.email || '—'}</div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Phone</div>
+                <div className="font-medium">{teacher.phone || '—'}</div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Description</div>
+              <div className="whitespace-pre-wrap">
+                {teacher.description || '—'}
+              </div>
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              Created:{' '}
+              {teacher.created_at
+                ? new Date(teacher.created_at).toLocaleString()
+                : '—'}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
