@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
-import { Users, Building2, Settings } from 'lucide-react';
+import { Users, Building2, Settings, GraduationCap } from 'lucide-react';
 
 export default async function AdminDashboard() {
   const supabase = createClient();
@@ -56,6 +56,22 @@ export default async function AdminDashboard() {
           </Card>
         </Link>
 
+        <Link href="/admin/teachers" className="block group">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="mb-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
+                  <GraduationCap className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold">Teachers</h3>
+                <p className="text-muted-foreground text-sm">
+                  Create and manage teacher profiles
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
         {allowOrganisations && (
           <Link href="/admin/organisations" className="block group">
             <Card className="hover:shadow-lg transition-shadow">
@@ -97,6 +113,9 @@ export default async function AdminDashboard() {
           <div className="flex flex-wrap gap-4">
             <Button asChild>
               <Link href="/admin/users/create">Create User</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/admin/teachers/create">Add Teacher</Link>
             </Button>
             {allowOrganisations && (
               <Button asChild variant="secondary">
