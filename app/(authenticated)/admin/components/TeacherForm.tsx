@@ -164,7 +164,7 @@ export function TeacherForm({ mode, teacher }: TeacherFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push('/admin/teachers')}
+          onClick={() => router.back()}
         >
           Cancel
         </Button>

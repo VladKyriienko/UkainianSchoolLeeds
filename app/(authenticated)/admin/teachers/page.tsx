@@ -8,6 +8,7 @@ import type { AdminTeacher } from '@/app/(authenticated)/admin/teachers/actions'
 import { TeacherSearchForm } from '@/app/(authenticated)/admin/components/TeacherSearchForm';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
+import { PageWrapper } from '@/components/common/PageWrapper';
 
 type AdminTeachersPageProps = {
   searchParams: Promise<{
@@ -47,21 +48,15 @@ export default async function AdminTeachersPage({
   const totalPages = Math.ceil(totalTeachers / limit);
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-8 px-4">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Teachers</h1>
-          <p className="text-muted-foreground">
-            Create and manage teacher profiles
-          </p>
-        </div>
-        <div className="flex gap-4">
-
-          <Button asChild>
-            <Link href="/admin/teachers/create">Add Teacher</Link>
-          </Button>
-        </div>
-      </div>
+    <PageWrapper
+      title="Teachers"
+      description="Create and manage teacher profiles"
+      actions={
+        <Button asChild>
+          <Link href="/admin/teachers/create">Add Teacher</Link>
+        </Button>
+      }
+    >
 
       <TeacherSearchForm
         initialSearch={search}
@@ -100,7 +95,7 @@ export default async function AdminTeachersPage({
           />
         </>
       )}
-    </div>
+    </PageWrapper>
   );
 }
 
