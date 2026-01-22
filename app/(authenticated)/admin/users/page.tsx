@@ -1,5 +1,3 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 import {
   getAllUsers,
   AdminUser
@@ -28,27 +26,6 @@ export default async function AdminUsersPage({
 }: AdminUsersPageProps) {
   // Await searchParams to fix Next.js warning
   const params = await searchParams;
-
-  const supabase = createClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return redirect('/auth/login');
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    return redirect('/');
-  }
 
   // Parse pagination and filter parameters
   const page = parseInt(params.page || '1', 10);

@@ -1,8 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/utils/supabase/admin';
-import { createClient as createServerClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
+import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
 import type { Tables } from '@/utils/supabase/types';
 import { randomUUID } from 'crypto';
@@ -10,31 +9,6 @@ import { randomUUID } from 'crypto';
 const supabaseAdmin = createAdminClient();
 
 export type AdminTeacher = Tables<'teachers'>;
-
-async function verifyAdminAccess(): Promise<string> {
-  const supabase = createServerClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    redirect('/auth/login');
-    return 'Unauthorized: Admin access required';
-  }
-
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    throw new Error('Unauthorized: Admin access required');
-  }
-
-  return user.id;
-}
 
 function normalizeTextField(value: FormDataEntryValue | null): string | null {
   if (typeof value !== 'string') return null;

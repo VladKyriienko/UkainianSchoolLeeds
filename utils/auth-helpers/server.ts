@@ -207,6 +207,78 @@ export async function updateName(formData: FormData) {
   }
 }
 
+/**
+ * Verifies that the current user has admin role.
+ * Throws an error if user is not authenticated or not an admin.
+ * Returns the user ID if successful.
+ * 
+ * This function uses getCurrentUser cache to avoid duplicate database queries.
+ */
+export async function verifyAdminAccess(): Promise<string> {
+  const { user, profileData } = await getCurrentUser();
+
+  if (!user) {
+    redirect('/auth/login');
+    throw new Error('Unauthorized: User not authenticated');
+  }
+
+  if (!profileData) {
+    redirect('/');
+    throw new Error('User profile not found');
+  }
+
+  // Check if user has admin role
+  const hasAdminRole = profileData.roles?.some(
+    (role: { role: string }) => role.role === 'admin'
+  );
+
+  if (!hasAdminRole) {
+    redirect('/');
+    throw new Error('Unauthorized: Admin access required');
+  }
+
+  return user.id;
+}
+
+/**
+ * Gets the current user and verifies admin access.
+ * Returns user and profile data if admin, otherwise redirects.
+ * Uses getCurrentUser cache to avoid duplicate queries.
+ */
+export async function getAdminUser(): Promise<{
+  userId: string;
+  user: User;
+  profileData: UserWithRoles;
+}> {
+  const { user, profileData } = await getCurrentUser();
+
+  if (!user) {
+    redirect('/auth/login');
+    throw new Error('Unauthorized: User not authenticated');
+  }
+
+  if (!profileData) {
+    redirect('/');
+    throw new Error('User profile not found');
+  }
+
+  // Check if user has admin role
+  const hasAdminRole = profileData.roles?.some(
+    (role: { role: string }) => role.role === 'admin'
+  );
+
+  if (!hasAdminRole) {
+    redirect('/');
+    throw new Error('Unauthorized: Admin access required');
+  }
+
+  return {
+    userId: user.id,
+    user,
+    profileData
+  };
+}
+
 export async function requestPasswordReset(formData: FormData) {
   const email = String(formData.get('email')).trim();
 
