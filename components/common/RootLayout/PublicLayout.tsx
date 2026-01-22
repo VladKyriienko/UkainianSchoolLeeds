@@ -25,7 +25,7 @@ export function PublicLayout({
       {showHeader && <PublicNavBar showDarkModeToggle={showDarkModeToggle} showNavigation={showNavigation} />}
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col pt-12">{children}</main>
+      <main className="flex-1 flex flex-col pt-16">{children}</main>
 
       {/* Footer */}
       {showFooter && (

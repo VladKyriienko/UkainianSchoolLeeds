@@ -1,14 +1,46 @@
 'use server';
 
+import { cache } from 'react';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, UserWithRoles } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+import type { User } from '@supabase/supabase-js';
 
 function isValidEmail(email: string) {
   const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   return regex.test(email);
 }
+
+/**
+ * Cached function to get current user with profile data.
+ * This ensures only one database query is made per request,
+ * even if called multiple times (e.g., in layout and page).
+ */
+export const getCurrentUser = cache(async (): Promise<{
+  user: User | null;
+  profileData: UserWithRoles | null;
+}> => {
+  const supabase = createClient();
+
+  // Get authenticated user
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { user: null, profileData: null };
+  }
+
+  // Get user profile data from users table
+  const { data: profileData } = await supabase
+    .from('users')
+    .select('*, roles(*)')
+    .eq('id', user.id)
+    .single();
+
+  return { user, profileData };
+});
 
 export async function redirectToPath(path: string) {
   return redirect(path);
