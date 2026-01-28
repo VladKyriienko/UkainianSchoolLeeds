@@ -77,12 +77,13 @@ export default function AuthCallbackClient() {
           if (userError) {
             console.error('Error fetching user data after OAuth:', userError);
             // Continue anyway - the user might not be in the DB yet
-          } else {
-            console.log('User found in database:', userData.id);
+          } else if (userData && typeof userData === 'object' && 'id' in userData) {
+            const user = userData as { id: string; is_active: boolean };
+            console.log('User found in database:', user.id);
 
             // Check if user is active
-            if (userData.is_active === false) {
-              console.error('OAuth user account is deactivated:', userData.id);
+            if (user.is_active === false) {
+              console.error('OAuth user account is deactivated:', user.id);
               await supabase.auth.signOut();
               window.location.href = `/auth/login?error=Account%20Deactivated&error_description=Your%20account%20has%20been%20deactivated.%20Please%20contact%20support.`;
               return;
