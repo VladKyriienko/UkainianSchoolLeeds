@@ -59,11 +59,14 @@ export function LoginForm({
 
         if (userError) {
           console.error('Error checking user status:', userError);
-        } else if (userData && userData.is_active === false) {
-          await supabase.auth.signOut();
-          throw new Error(
-            'Your account has been deactivated. Please contact an administrator.'
-          );
+        } else if (userData && typeof userData === 'object' && 'is_active' in userData) {
+          const row = userData as { is_active: boolean };
+          if (row.is_active === false) {
+            await supabase.auth.signOut();
+            throw new Error(
+              'Your account has been deactivated. Please contact an administrator.'
+            );
+          }
         }
       }
 
