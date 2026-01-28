@@ -7,6 +7,7 @@ import {
   integer,
   bigint,
   timestamp,
+  time,
   jsonb,
   pgPolicy
 } from 'drizzle-orm/pg-core';
@@ -282,8 +283,8 @@ export const events = pgTable(
     description: text('description'),
     // You requested field name "data" (likely "date"); using `date` for clarity.
     date: timestamp('date', { withTimezone: true }).defaultNow().notNull(),
-    startTime: timestamp('start_time', { withTimezone: true }),
-    endTime: timestamp('end_time', { withTimezone: true }),
+    startTime: time('start_time'),
+    endTime: time('end_time'),
     location: text('location'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

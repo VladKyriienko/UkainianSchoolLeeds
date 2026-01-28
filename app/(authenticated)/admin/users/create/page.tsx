@@ -1,5 +1,3 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 import { getAllOrganisations } from '@/app/(authenticated)/admin/users/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import CreateUserForm from '@/app/(authenticated)/admin/components/CreateUserForm';
@@ -8,26 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Tables } from '@/utils/supabase/types';
 
 export default async function CreateUserPage() {
-  const supabase = createClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return redirect('/auth/login');
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    return redirect('/');
-  }
 
   const { allowOrganisations } = getOrganisationSettings();
 

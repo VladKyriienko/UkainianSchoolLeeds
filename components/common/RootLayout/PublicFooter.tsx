@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useLanguage } from '@/providers/language-provider';
+import { FOOTER_CONTENT } from '@/content/footer';
 
 export type PublicFooterProps = {
   className?: string;
 };
 
 export function PublicFooter({ className }: PublicFooterProps) {
+  const { language } = useLanguage();
+  const content = FOOTER_CONTENT[language];
+
   return (
     <footer className={className ?? 'border-t py-8 bg-background'}>
       <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
@@ -14,33 +19,26 @@ export function PublicFooter({ className }: PublicFooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Useful Information */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Useful Information</h3>
-            <p className="text-sm leading-relaxed">
-              The Ukrainian Saturday School is the heart of the local community.
-              We serve our community with dedication and passion for the study
-              of the Ukrainian language, culture, and history.
-            </p>
+            <h3 className="font-bold text-lg mb-4">{content.usefulInfoTitle}</h3>
+            <p className="text-sm leading-relaxed">{content.usefulInfoDescription}</p>
           </div>
 
           {/* Contact Us */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Contact Us</h3>
+            <h3 className="font-bold text-lg mb-4">{content.contactTitle}</h3>
             <div className="text-sm space-y-2">
-              <p>Ukrainian School</p>
-              <p>5 Back Newton Grove</p>
-              <p>Leeds</p>
-              <p>LS7 4HW</p>
+              <p>{content.contactSchoolName}</p>
+              {content.contactAddress.map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
               <p>
-                <a
-                  href="mailto:admin@ukrainianschool.com"
-                  className="hover:underline"
-                >
-                  admin@ukrainianschool.com
+                <a href={`mailto:${content.contactEmail}`} className="hover:underline">
+                  {content.contactEmail}
                 </a>
               </p>
               <p>
-                <a href="tel:01132755883" className="hover:underline">
-                  0113 2755883
+                <a href={`tel:${content.contactPhone.replace(/\s/g, '')}`} className="hover:underline">
+                  {content.contactPhone}
                 </a>
               </p>
             </div>
@@ -48,23 +46,13 @@ export function PublicFooter({ className }: PublicFooterProps) {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Quick Links</h3>
+            <h3 className="font-bold text-lg mb-4">{content.quickLinksTitle}</h3>
             <nav className="flex flex-col space-y-2 text-sm">
-              <Link href="/parents/term-dates" className="hover:underline">
-                Term Dates
-              </Link>
-              <Link href="/children/class-pages" className="hover:underline">
-                Class Pages
-              </Link>
-              <Link href="/parents/newsletters" className="hover:underline">
-                Newsletters
-              </Link>
-              <Link href="/key-info/curriculum" className="hover:underline">
-                Curriculum
-              </Link>
-              <Link href="/contact" className="hover:underline">
-                Contact Us
-              </Link>
+              {content.quickLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="hover:underline">
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
         </div>
@@ -72,13 +60,13 @@ export function PublicFooter({ className }: PublicFooterProps) {
         {/* Bottom Section */}
         <div className="border-t border-blue-800 dark:border-blue-900 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-            <p>All website content copyright © Ukrainian School 2026</p>
+            <p>{content.copyright}</p>
             <div className="flex gap-4">
               <Link href="/cookies-policy" className="hover:underline">
-                Cookies Policy
+                {content.cookiesPolicy}
               </Link>
               <Link href="/privacy-policy" className="hover:underline">
-                Privacy Policy
+                {content.privacyPolicy}
               </Link>
             </div>
           </div>

@@ -1,4 +1,3 @@
-import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import {
@@ -22,28 +21,6 @@ export default async function ManageMembersPage({
 
   if (!allowOrganisations) {
     return redirect('/admin');
-  }
-
-  // Verify admin access
-  const supabase = createClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    redirect('/auth/login');
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    redirect('/admin');
   }
 
   // Get organisation and users data

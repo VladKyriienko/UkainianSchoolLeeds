@@ -1,5 +1,3 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,26 +6,6 @@ import { Users, Building2, Settings, GraduationCap, ArrowLeft } from 'lucide-rea
 import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function AdminDashboard() {
-  const supabase = createClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return redirect('/auth/login');
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    return redirect('/');
-  }
 
   const { allowOrganisations } = getOrganisationSettings();
 

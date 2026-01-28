@@ -1,0 +1,276 @@
+'use client';
+
+import { useState, useMemo, useEffect } from 'react';
+import { format, startOfToday, isSameDay, parseISO } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import type { CalendarEvent } from './actions';
+import { SubscribeToCalendar } from './SubscribeToCalendar';
+
+const EVENTS_PER_PAGE = 10;
+
+// Helper function to format time from HH:MM:SS to readable format
+function formatTime(timeString: string | null | undefined): string {
+  if (!timeString) return '';
+
+  const parts = timeString.split(':');
+  if (parts.length < 2) return timeString;
+
+  const hour = parseInt(parts[0] || '0', 10);
+  const minute = parts[1] || '00';
+
+  if (hour === 0) return `12:${minute} am`;
+  if (hour < 12) return `${hour}:${minute} am`;
+  if (hour === 12) return `12:${minute} pm`;
+  return `${hour - 12}:${minute} pm`;
+}
+
+type ListViewProps = {
+  events: CalendarEvent[];
+};
+
+export function ListView({ events }: ListViewProps) {
+  const [startDate, setStartDate] = useState<Date | undefined>(startOfToday());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [showSelectedDateInTitle, setShowSelectedDateInTitle] = useState(true);
+
+  // Filter events by start date
+  const filteredEvents = useMemo(() => {
+    if (!startDate) return events;
+
+    return events.filter((event) => {
+      const eventDate = parseISO(event.date);
+      return eventDate >= startDate || isSameDay(eventDate, startDate);
+    });
+  }, [events, startDate]);
+
+  // Paginate events
+  const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
+  const paginatedEvents = useMemo(() => {
+    const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
+    return filteredEvents.slice(startIndex, startIndex + EVENTS_PER_PAGE);
+  }, [filteredEvents, currentPage]);
+
+  // Calculate date range label
+  const dateRangeLabel = useMemo(() => {
+    if (paginatedEvents.length === 0) return 'No events';
+
+    const firstEvent = paginatedEvents[0];
+    const lastEvent = paginatedEvents[paginatedEvents.length - 1];
+    if (!firstEvent || !lastEvent) return 'No events';
+
+    const first = parseISO(firstEvent.date);
+    const last = parseISO(lastEvent.date);
+    const today = startOfToday();
+
+    if (isSameDay(first, last)) {
+      return format(first, 'MMMM d');
+    }
+
+    let displayStartDate: Date;
+    let showAsNow = false;
+
+    if (showSelectedDateInTitle && startDate) {
+      displayStartDate = startDate;
+      showAsNow = isSameDay(startDate, today);
+    } else {
+      displayStartDate = first;
+      showAsNow = false;
+    }
+
+    if (isSameDay(displayStartDate, last)) {
+      return format(displayStartDate, 'MMMM d');
+    }
+
+    const startLabel = showAsNow ? 'Now' : format(displayStartDate, 'MMMM d');
+    return `${startLabel} - ${format(last, 'MMMM d')}`;
+  }, [paginatedEvents, startDate, showSelectedDateInTitle]);
+
+  // Group paginated events by date
+  const groupedEvents = useMemo(() => {
+    const groups: Record<string, CalendarEvent[]> = {};
+    paginatedEvents.forEach((event) => {
+      const dateKey = event.date;
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(event);
+    });
+    return groups;
+  }, [paginatedEvents]);
+
+  const sortedDates = Object.keys(groupedEvents).sort();
+
+  // Reset to page 1 when start date changes
+  useEffect(() => {
+    setCurrentPage(1);
+    setShowSelectedDateInTitle(true);
+  }, [startDate]);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      setShowSelectedDateInTitle(false);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      setShowSelectedDateInTitle(false);
+    }
+  };
+
+  const handleToday = () => {
+    setStartDate(startOfToday());
+    setCurrentPage(1);
+    setShowSelectedDateInTitle(true);
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setStartDate(date);
+    setCurrentPage(1);
+    setDatePickerOpen(false);
+    setShowSelectedDateInTitle(true);
+  };
+
+  return (
+    <div className="w-full">
+      {/* Date Navigation */}
+      <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePrevPage}
+            disabled={currentPage <= 1}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleNextPage}
+            disabled={currentPage >= totalPages}
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" onClick={handleToday}>
+            Today
+          </Button>
+        </div>
+
+        {/* Date Range with Picker */}
+        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+          <PopoverTrigger asChild>
+            <button className="text-2xl font-normal hover:opacity-70 transition-opacity flex items-center gap-2">
+              {dateRangeLabel}
+              <ChevronDown className="h-5 w-5" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={startDate}
+              onSelect={handleDateSelect}
+              defaultMonth={startDate || startOfToday()}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Events List */}
+      <div className="space-y-8">
+        {sortedDates.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No events found
+          </div>
+        ) : (
+          (() => {
+            let lastMonth = '';
+            return sortedDates.map((dateKey) => {
+              const events = groupedEvents[dateKey];
+              if (!events || events.length === 0) return null;
+
+              const eventDate = new Date(dateKey);
+
+              if (isNaN(eventDate.getTime())) {
+                console.error('Invalid date:', dateKey);
+                return null;
+              }
+
+              const monthYear = format(eventDate, 'MMMM yyyy');
+              const showMonthHeader = monthYear !== lastMonth;
+              lastMonth = monthYear;
+
+              return (
+                <div key={dateKey}>
+                  {showMonthHeader && (
+                    <h2 className="text-base font-normal mb-6 text-muted-foreground">
+                      {monthYear}
+                    </h2>
+                  )}
+
+                  <div className="space-y-6">
+                    {events.map((event) => (
+                      <div key={event.id} className="flex gap-4">
+                        <div className="flex flex-col items-center justify-start min-w-[60px] text-center">
+                          <div className="text-xs uppercase text-muted-foreground font-medium tracking-wide">
+                            {format(eventDate, 'EEE')}
+                          </div>
+                          <div className="text-4xl font-light leading-none mt-1">
+                            {format(eventDate, 'd')}
+                          </div>
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="text-sm text-foreground/60 mb-1">
+                            {format(eventDate, 'MMMM d')}
+                            {event.start_time && (
+                              <>
+                                {' @ '}
+                                {formatTime(event.start_time)}
+                                {event.end_time && ` - ${formatTime(event.end_time)}`}
+                              </>
+                            )}
+                          </div>
+
+                          <h3 className="text-lg font-semibold mb-1">
+                            {event.title}
+                          </h3>
+
+                          {event.location && (
+                            <div className="text-sm text-muted-foreground">
+                              <span className="font-medium">Meanwood School</span> {event.location}
+                            </div>
+                          )}
+
+                          {event.description && (
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {event.description}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            });
+          })()
+        )}
+      </div>
+
+      {/* Subscribe Button - Only events shown on current page */}
+      <div className="flex justify-end mt-6">
+        <SubscribeToCalendar events={paginatedEvents} />
+      </div>
+    </div>
+  );
+}

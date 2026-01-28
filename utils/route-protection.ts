@@ -40,6 +40,13 @@ export const navigationRoutes: RouteConfig[] = [
         requiresAuth: true
       },
       {
+        path: '/admin/events',
+        label: 'Events',
+        icon: 'Calendar',
+        requiredRole: 'admin',
+        requiresAuth: true
+      },
+      {
         path: '/admin/organisations',
         label: 'Organizations',
         icon: 'Building2',
