@@ -21,6 +21,8 @@ import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { CalendarEvent } from './actions';
 import { SubscribeToCalendar } from './SubscribeToCalendar';
+import { useLanguage } from '@/providers/language-provider';
+import { CALENDAR_CONTENT } from '@/content/calendar';
 
 // Helper function to format time from HH:MM:SS to readable format
 function formatTime(timeString: string | null | undefined): string {
@@ -43,6 +45,8 @@ type MonthViewProps = {
 };
 
 export function MonthView({ events }: MonthViewProps) {
+  const { language } = useLanguage();
+  const content = CALENDAR_CONTENT[language];
   const [currentMonth, setCurrentMonth] = useState(startOfToday());
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
@@ -101,7 +105,7 @@ export function MonthView({ events }: MonthViewProps) {
             variant="outline"
             size="icon"
             onClick={handlePrevMonth}
-            aria-label="Previous month"
+            aria-label={content.navigation.previousMonth}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -109,12 +113,12 @@ export function MonthView({ events }: MonthViewProps) {
             variant="outline"
             size="icon"
             onClick={handleNextMonth}
-            aria-label="Next month"
+            aria-label={content.navigation.nextMonth}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button variant="outline" onClick={handleThisMonth}>
-            This Month
+            {content.navigation.thisMonth}
           </Button>
         </div>
 

@@ -14,11 +14,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, Phone, MapPin, Clock, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
-import { CONTACT_COPY } from '@/content/contact';
+import { CONTACT_CONTENT } from '@/content/contact';
 
 export default function ContactContent() {
   const { language } = useLanguage();
-  const copy = CONTACT_COPY[language];
+  const content = CONTACT_CONTENT[language];
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -66,12 +66,12 @@ export default function ContactContent() {
       {/* Contact Form */}
       <Card>
         <CardHeader>
-          <CardTitle>{copy.formTitle}</CardTitle>
+          <CardTitle>{content.formTitle}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{copy.fields.nameLabel}</Label>
+              <Label htmlFor="name">{content.fields.nameLabel}</Label>
               <Input
                 id="name"
                 name="name"
@@ -79,12 +79,12 @@ export default function ContactContent() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                placeholder={copy.fields.namePlaceholder}
+                placeholder={content.fields.namePlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">{copy.fields.emailLabel}</Label>
+              <Label htmlFor="email">{content.fields.emailLabel}</Label>
               <Input
                 id="email"
                 name="email"
@@ -92,24 +92,24 @@ export default function ContactContent() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder={copy.fields.emailPlaceholder}
+                placeholder={content.fields.emailPlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">{copy.fields.phoneLabel}</Label>
+              <Label htmlFor="phone">{content.fields.phoneLabel}</Label>
               <Input
                 id="phone"
                 name="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder={copy.fields.phonePlaceholder}
+                placeholder={content.fields.phonePlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subject">{copy.fields.subjectLabel}</Label>
+              <Label htmlFor="subject">{content.fields.subjectLabel}</Label>
               <Input
                 id="subject"
                 name="subject"
@@ -117,12 +117,12 @@ export default function ContactContent() {
                 required
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder={copy.fields.subjectPlaceholder}
+                placeholder={content.fields.subjectPlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="message">{copy.fields.messageLabel}</Label>
+              <Label htmlFor="message">{content.fields.messageLabel}</Label>
               <Textarea
                 id="message"
                 name="message"
@@ -130,25 +130,25 @@ export default function ContactContent() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                placeholder={copy.fields.messagePlaceholder}
+                placeholder={content.fields.messagePlaceholder}
               />
             </div>
 
             {submitStatus === 'success' && (
               <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md text-green-800 dark:text-green-200">
-                {copy.successMessage}
+                {content.successMessage}
               </div>
             )}
 
             {submitStatus === 'error' && (
               <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md text-red-800 dark:text-red-200 flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                <span>{errorMessage || copy.errorFallback}</span>
+                <span>{errorMessage || content.errorFallback}</span>
               </div>
             )}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? copy.submittingButton : copy.submitButton}
+              {isSubmitting ? content.submittingButton : content.submitButton}
             </Button>
           </form>
         </CardContent>
@@ -158,15 +158,15 @@ export default function ContactContent() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>{copy.infoTitle}</CardTitle>
+            <CardTitle>{content.infoTitle}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-4">
               <MapPin className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">{copy.addressTitle}</h3>
+                <h3 className="font-semibold mb-1">{content.addressTitle}</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">
-                  {copy.addressText}
+                  {content.addressText}
                 </p>
               </div>
             </div>
@@ -174,12 +174,12 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Phone className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">{copy.phoneTitle}</h3>
+                <h3 className="font-semibold mb-1">{content.phoneTitle}</h3>
                 <a
-                  href={`tel:${copy.phoneValue}`}
+                  href={`tel:${content.phoneValue}`}
                   className="text-sm text-muted-foreground hover:underline"
                 >
-                  {copy.phoneValue}
+                  {content.phoneValue}
                 </a>
               </div>
             </div>
@@ -187,12 +187,12 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Mail className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">{copy.emailTitle}</h3>
+                <h3 className="font-semibold mb-1">{content.emailTitle}</h3>
                 <a
-                  href={`mailto:${copy.emailValue}`}
+                  href={`mailto:${content.emailValue}`}
                   className="text-sm text-muted-foreground hover:underline"
                 >
-                  {copy.emailValue}
+                  {content.emailValue}
                 </a>
               </div>
             </div>
@@ -200,9 +200,9 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Clock className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">{copy.hoursTitle}</h3>
+                <h3 className="font-semibold mb-1">{content.hoursTitle}</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">
-                  {copy.hoursText}
+                  {content.hoursText}
                 </p>
               </div>
             </div>
@@ -211,10 +211,10 @@ export default function ContactContent() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{copy.emergencyTitle}</CardTitle>
+            <CardTitle>{content.emergencyTitle}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm">{copy.emergencyText}</p>
+            <p className="text-sm">{content.emergencyText}</p>
           </CardContent>
         </Card>
       </div>

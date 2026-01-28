@@ -21,7 +21,6 @@ export const NavItems: NavItem[] = [
         label: 'Vacancies',
         href: '/about/vacancies'
       },
-      { label: 'Contact', href: '/contact' },
       {
         label: 'School Development Plan',
         href: '/about/development-plan'

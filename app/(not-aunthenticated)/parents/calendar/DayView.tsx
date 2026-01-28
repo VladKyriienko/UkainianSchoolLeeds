@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import type { CalendarEvent } from './actions';
 import { SubscribeToCalendar } from './SubscribeToCalendar';
+import { useLanguage } from '@/providers/language-provider';
+import { CALENDAR_CONTENT } from '@/content/calendar';
 
 // Helper function to format time from HH:MM:SS to readable format
 function formatTime(timeString: string | null | undefined): string {
@@ -35,6 +37,8 @@ type DayViewProps = {
 };
 
 export function DayView({ events }: DayViewProps) {
+  const { language } = useLanguage();
+  const content = CALENDAR_CONTENT[language];
   const [currentDate, setCurrentDate] = useState(startOfToday());
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
@@ -78,7 +82,7 @@ export function DayView({ events }: DayViewProps) {
             variant="outline"
             size="icon"
             onClick={handlePrevDay}
-            aria-label="Previous day"
+            aria-label={content.navigation.previousDay}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -86,12 +90,12 @@ export function DayView({ events }: DayViewProps) {
             variant="outline"
             size="icon"
             onClick={handleNextDay}
-            aria-label="Next day"
+            aria-label={content.navigation.nextDay}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button variant="outline" onClick={handleToday}>
-            Today
+            {content.navigation.today}
           </Button>
         </div>
 
@@ -119,7 +123,7 @@ export function DayView({ events }: DayViewProps) {
       <div className="border rounded-lg">
         {dayEvents.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            No events for this day
+            {content.messages.noEventsForDay}
           </div>
         ) : (
           <div className="space-y-0">
@@ -186,14 +190,14 @@ export function DayView({ events }: DayViewProps) {
           className="text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
-          Previous Day
+          {content.navigation.previousDay}
         </Button>
         <Button
           variant="ghost"
           onClick={handleNextDay}
           className="text-muted-foreground hover:text-foreground"
         >
-          Next Day
+          {content.navigation.nextDay}
           <ChevronRight className="h-4 w-4 ml-2" />
         </Button>
       </div>

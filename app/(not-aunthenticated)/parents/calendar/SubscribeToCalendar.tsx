@@ -13,31 +13,35 @@ import { downloadICalendar } from './utils';
 import { addEventsToGoogleCalendar } from './google-calendar-utils';
 import type { CalendarEvent } from './actions';
 import { toast } from 'sonner';
+import { useLanguage } from '@/providers/language-provider';
+import { CALENDAR_CONTENT } from '@/content/calendar';
 
 type SubscribeToCalendarProps = {
   events: CalendarEvent[];
 };
 
 export function SubscribeToCalendar({ events }: SubscribeToCalendarProps) {
+  const { language } = useLanguage();
+  const content = CALENDAR_CONTENT[language];
   const [copied, setCopied] = useState(false);
 
   const handleGoogleCalendar = () => {
     try {
       addEventsToGoogleCalendar(events);
-      toast.success('Opening Google Calendar for each event');
+      toast.success(content.toasts.googleCalendarSuccess);
     } catch (error) {
       console.error('Error adding to Google Calendar:', error);
-      toast.error('Failed to open Google Calendar');
+      toast.error(content.toasts.googleCalendarError);
     }
   };
 
   const handleDownload = () => {
     try {
       downloadICalendar(events);
-      toast.success('Calendar file downloaded successfully');
+      toast.success(content.toasts.downloadSuccess);
     } catch (error) {
       console.error('Error downloading calendar:', error);
-      toast.error('Failed to download calendar');
+      toast.error(content.toasts.downloadError);
     }
   };
 
@@ -48,11 +52,11 @@ export function SubscribeToCalendar({ events }: SubscribeToCalendarProps) {
       const calendarUrl = `${window.location.origin}/parents/calendar`;
       await navigator.clipboard.writeText(calendarUrl);
       setCopied(true);
-      toast.success('Calendar link copied to clipboard');
+      toast.success(content.toasts.copySuccess);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Error copying link:', error);
-      toast.error('Failed to copy link');
+      toast.error(content.toasts.copyError);
     }
   };
 
@@ -63,7 +67,7 @@ export function SubscribeToCalendar({ events }: SubscribeToCalendarProps) {
           variant="outline"
           className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
         >
-          Subscribe to calendar
+          {content.subscribe.button}
           <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -75,11 +79,11 @@ export function SubscribeToCalendar({ events }: SubscribeToCalendarProps) {
             <path d="M6.2 14.6c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.9H2.8C2 9.4 1.5 11.1 1.5 13s.5 3.6 1.3 5.1l3.4-2.7v.2z" fill="#FBBC05" />
             <path d="M12 5.4c1.5 0 2.9.5 4 1.5l3-3C17.2 2.2 14.8 1 12 1 8 1 4.5 3.2 2.8 6.4l3.4 2.6C7 6.5 9.3 5.4 12 5.4z" fill="#EA4335" />
           </svg>
-          Google Calendar
+          {content.subscribe.googleCalendar}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleDownload} className="cursor-pointer">
           <Download className="mr-2 h-4 w-4" />
-          Export .ics file
+          {content.subscribe.exportIcs}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
           {copied ? (
@@ -87,7 +91,7 @@ export function SubscribeToCalendar({ events }: SubscribeToCalendarProps) {
           ) : (
             <Copy className="mr-2 h-4 w-4" />
           )}
-          {copied ? 'Copied!' : 'Copy calendar link'}
+          {copied ? content.subscribe.copied : content.subscribe.copyLink}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

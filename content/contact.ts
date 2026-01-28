@@ -1,6 +1,6 @@
 export type ContactLanguage = 'en' | 'uk';
 
-type ContactCopy = {
+type ContactContent = {
   pageTitle: string;
   pageDescription: string;
   formTitle: string;
@@ -33,7 +33,7 @@ type ContactCopy = {
   emergencyText: string;
 };
 
-export const CONTACT_COPY: Record<ContactLanguage, ContactCopy> = {
+export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
   en: {
     pageTitle: 'Contact Us',
     pageDescription: 'Please fill out the form below to contact us.',
