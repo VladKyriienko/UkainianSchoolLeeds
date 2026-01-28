@@ -1,9 +1,17 @@
 import ContactContent from '@/app/(not-aunthenticated)/contact/client';
 import { PageWrapper } from '@/components/common/PageWrapper';
+import { CONTACT_COPY } from '@/content/contact';
 
 export default function ContactPage() {
+  // Server component: use English copy for initial render
+  const copy = CONTACT_COPY.en;
+
   return (
-    <PageWrapper title="Contact Us" description="Please fill out the form below to contact us." className="py-8 px-4">
+    <PageWrapper
+      title={copy.pageTitle}
+      description={copy.pageDescription}
+      className="py-8"
+    >
       <ContactContent />
     </PageWrapper>
   );

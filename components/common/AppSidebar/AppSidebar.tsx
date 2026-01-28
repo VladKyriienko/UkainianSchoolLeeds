@@ -19,7 +19,10 @@ import { NavUser } from './NavUser';
 import { CompletionBanner } from '@/components/common/CompletionBanner/CompletionBanner';
 import Logo from '@/components/icons/Logo';
 import DarkModeToggle from '@/components/common/RootLayout/DarkModeToggle';
+import LanguageToggle from '@/components/common/RootLayout/LanguageToggle';
 import { cn } from '@/utils/cn';
+import { useLanguage } from '@/providers/language-provider';
+import { BRAND_NAME } from '@/content/navigation';
 import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
 import type { CompletionData } from '@/components/common/CompletionBanner/types';
 import { RouteConfig } from '@/utils/route-protection';
@@ -63,6 +66,7 @@ export function AppSidebar({
   ...props
 }: AppSidebarProps) {
   const { isMobile, setOpenMobile } = useSidebar();
+  const { language } = useLanguage();
 
   const handleMobileClose = () => {
     if (isMobile) {
@@ -87,12 +91,13 @@ export function AppSidebar({
           >
             <Logo className="h-8 w-8" />
             <span className="font-semibold text-sidebar-foreground">
-              Ukrainia School
+              {BRAND_NAME[language]}
             </span>
           </Link>
 
           {/* Controls */}
           <div className="flex items-center gap-2">
+            <LanguageToggle />
             {showDarkModeToggle && <DarkModeToggle />}
             {showSidebarTrigger && !isMobile && (
               <SidebarTrigger className="h-8 w-8" />

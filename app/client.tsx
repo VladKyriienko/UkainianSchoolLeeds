@@ -15,7 +15,7 @@ import { User, Shield, Palette, Settings } from 'lucide-react';
 export function PublicHomeClient() {
   return (
     <div className="flex items-center justify-center">
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center space-y-8">
+      <div className="max-w-4xl mx-auto py-8 text-center space-y-8">
         <div className="space-y-4">
           <h1 className="text-5xl font-bold tracking-tight">
             Welcome to Ukrainia School

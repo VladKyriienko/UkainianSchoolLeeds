@@ -6,11 +6,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
+import LanguageToggle from './LanguageToggle';
 import { NavItems, type NavItem } from '@/constants/navigation';
 import { cn } from '@/utils/cn';
 import { ChevronDown, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/providers/language-provider';
+import { BRAND_NAME, NAV_LABELS } from '@/content/navigation';
 
 export type PublicNavBarProps = {
   showDarkModeToggle?: boolean;
@@ -19,9 +22,15 @@ export type PublicNavBarProps = {
 
 export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true }: PublicNavBarProps) {
   const pathname = usePathname();
+  const { language } = useLanguage();
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpandedKey, setMobileExpandedKey] = useState<string | null>(null);
+
+  const getTranslatedLabel = (defaultLabel: string, href: string) => {
+    const labelsForLang = NAV_LABELS[language] ?? {};
+    return labelsForLang[href] ?? defaultLabel;
+  };
 
   const activeKey = useMemo(() => {
     const matchesItem = (item: NavItem) => {
@@ -53,7 +62,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <Logo className="h-8 w-8" />
-          <span className="font-semibold">Ukrainian School</span>
+          <span className="font-semibold">{BRAND_NAME[language]}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -71,7 +80,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     className={linkClass(isActive)}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    {item.label}
+                    {getTranslatedLabel(item.label, item.href)}
                   </Link>
                 );
               }
@@ -91,7 +100,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     aria-expanded={isOpen}
                     aria-haspopup="menu"
                   >
-                    {item.label}
+                    {getTranslatedLabel(item.label, item.href)}
                     <ChevronDown
                       className={cn(
                         'h-4 w-4 transition-transform',
@@ -125,7 +134,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                             role="menuitem"
                             onClick={() => setOpenKey(null)}
                           >
-                            {child.label}
+                            {getTranslatedLabel(child.label, child.href)}
                           </Link>
                         );
                       })}
@@ -140,6 +149,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           {showDarkModeToggle && <DarkModeToggle />}
 
           {/* Mobile Menu Button */}
@@ -167,7 +177,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     onClick={() => setMobileOpen(false)}
                   >
                     <Logo className="h-8 w-8" />
-                    <span className="font-semibold">Ukrainian School</span>
+                    <span className="font-semibold">{BRAND_NAME[language]}</span>
                   </Link>
 
                   {/* Mobile Navigation */}
@@ -189,7 +199,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                             )}
                             onClick={() => setMobileOpen(false)}
                           >
-                            {item.label}
+                            {getTranslatedLabel(item.label, item.href)}
                           </Link>
                         );
                       }
@@ -211,7 +221,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                             }
                             aria-expanded={isExpanded}
                           >
-                            {item.label}
+                            {getTranslatedLabel(item.label, item.href)}
                             <ChevronDown
                               className={cn(
                                 'h-4 w-4 transition-transform',
@@ -238,7 +248,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                                     )}
                                     onClick={() => setMobileOpen(false)}
                                   >
-                                    {child.label}
+                                    {getTranslatedLabel(child.label, child.href)}
                                   </Link>
                                 );
                               })}

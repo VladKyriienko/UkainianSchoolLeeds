@@ -6,15 +6,19 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, Phone, MapPin, Clock, AlertCircle } from 'lucide-react';
+import { useLanguage } from '@/providers/language-provider';
+import { CONTACT_COPY } from '@/content/contact';
 
 export default function ContactContent() {
+  const { language } = useLanguage();
+  const copy = CONTACT_COPY[language];
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -62,12 +66,12 @@ export default function ContactContent() {
       {/* Contact Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Contact Us</CardTitle>
+          <CardTitle>{copy.formTitle}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{copy.fields.nameLabel}</Label>
               <Input
                 id="name"
                 name="name"
@@ -75,12 +79,12 @@ export default function ContactContent() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter your name"
+                placeholder={copy.fields.namePlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{copy.fields.emailLabel}</Label>
               <Input
                 id="email"
                 name="email"
@@ -88,24 +92,24 @@ export default function ContactContent() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
+                placeholder={copy.fields.emailPlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{copy.fields.phoneLabel}</Label>
               <Input
                 id="phone"
                 name="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="Enter your phone number"
+                placeholder={copy.fields.phonePlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="subject">{copy.fields.subjectLabel}</Label>
               <Input
                 id="subject"
                 name="subject"
@@ -113,12 +117,12 @@ export default function ContactContent() {
                 required
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="Enter the subject of your message"
+                placeholder={copy.fields.subjectPlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
+              <Label htmlFor="message">{copy.fields.messageLabel}</Label>
               <Textarea
                 id="message"
                 name="message"
@@ -126,25 +130,25 @@ export default function ContactContent() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Enter your message"
+                placeholder={copy.fields.messagePlaceholder}
               />
             </div>
 
             {submitStatus === 'success' && (
               <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md text-green-800 dark:text-green-200">
-                Your message has been sent successfully.
+                {copy.successMessage}
               </div>
             )}
 
             {submitStatus === 'error' && (
               <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md text-red-800 dark:text-red-200 flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                <span>{errorMessage || 'Failed to submit message. Please try again.'}</span>
+                <span>{errorMessage || copy.errorFallback}</span>
               </div>
             )}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? copy.submittingButton : copy.submitButton}
             </Button>
           </form>
         </CardContent>
@@ -154,15 +158,15 @@ export default function ContactContent() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
+            <CardTitle>{copy.infoTitle}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-4">
               <MapPin className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">Address</h3>
+                <h3 className="font-semibold mb-1">{copy.addressTitle}</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">
-                  Address, City, Postcode
+                  {copy.addressText}
                 </p>
               </div>
             </div>
@@ -170,12 +174,12 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Phone className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">Phone</h3>
+                <h3 className="font-semibold mb-1">{copy.phoneTitle}</h3>
                 <a
-                  href={`tel:01234567890`}
+                  href={`tel:${copy.phoneValue}`}
                   className="text-sm text-muted-foreground hover:underline"
                 >
-                  01234567890
+                  {copy.phoneValue}
                 </a>
               </div>
             </div>
@@ -183,12 +187,12 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Mail className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">Email</h3>
+                <h3 className="font-semibold mb-1">{copy.emailTitle}</h3>
                 <a
-                  href={`mailto:info@ukrainiaschool.com`}
+                  href={`mailto:${copy.emailValue}`}
                   className="text-sm text-muted-foreground hover:underline"
                 >
-                  info@ukrainiaschool.com
+                  {copy.emailValue}
                 </a>
               </div>
             </div>
@@ -196,9 +200,9 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Clock className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">Hours</h3>
+                <h3 className="font-semibold mb-1">{copy.hoursTitle}</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">
-                  Monday to Friday, 9am to 5pm
+                  {copy.hoursText}
                 </p>
               </div>
             </div>
@@ -207,10 +211,10 @@ export default function ContactContent() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Emergency Contact</CardTitle>
+            <CardTitle>{copy.emergencyTitle}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm">In case of an emergency, please contact the school office.</p>
+            <p className="text-sm">{copy.emergencyText}</p>
           </CardContent>
         </Card>
       </div>

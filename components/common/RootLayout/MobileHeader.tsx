@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
 import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
+import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
+import { useLanguage } from '@/providers/language-provider';
+import { BRAND_NAME } from '@/content/navigation';
 
 export type MobileHeaderProps = {
   showDarkModeToggle?: boolean;
@@ -21,6 +24,7 @@ export function MobileHeader({
   className
 }: MobileHeaderProps) {
   const { toggleSidebar } = useSidebar();
+  const { language } = useLanguage();
 
   return (
     <header
@@ -46,12 +50,13 @@ export function MobileHeader({
 
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
-            <span className="font-semibold">Ukrainian School</span>
+            <span className="font-semibold">{BRAND_NAME[language]}</span>
           </Link>
 
           {showDarkModeToggle && burgerPosition === 'right' && (
             <DarkModeToggle />
           )}
+          <LanguageToggle />
         </div>
 
         {/* Right side content */}

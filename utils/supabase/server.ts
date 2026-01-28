@@ -35,7 +35,7 @@ export const createClient = (): SupabaseClient<Database> => {
     );
   }
 
-  const cookieStore = cookies();
+  const cookieStorePromise = cookies();
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,34 +43,51 @@ export const createClient = (): SupabaseClient<Database> => {
     {
       cookies: {
         async get(name: string) {
-          return (await cookieStore).get(name)?.value;
+          const cookieStore = await cookieStorePromise;
+          return cookieStore.get(name)?.value;
         },
         async set(name: string, value: string, options: CookieOptions) {
           try {
-            (await cookieStore).set({ name, value, ...options });
+            const cookieStore = await cookieStorePromise;
+            cookieStore.set({ name, value, ...options });
           } catch (error) {
-            console.error('Error setting cookie:', error);
-            // If the set method is called from a Server Component, an error may occur
-            // This can be ignored if there is middleware refreshing user sessions
+            // Silently ignore cookie set errors in Server Components
+            // Cookies can only be modified in Server Actions or Route Handlers
+            // Middleware will handle session refresh, so this is safe to ignore
+            // Only log if it's not the expected Server Component error
+            if (
+              error instanceof Error &&
+              !error.message.includes('Cookies can only be modified')
+            ) {
+              console.error('Unexpected cookie set error:', error);
+            }
           }
         },
         async remove(name: string, options: CookieOptions) {
           try {
-            (await cookieStore).set({ name, value: '', ...options });
+            const cookieStore = await cookieStorePromise;
+            cookieStore.set({ name, value: '', ...options });
           } catch (error) {
-            console.error('Error removing cookie:', error);
-            // If the remove method is called from a Server Component, an error may occur
-            // This can be ignored if there is middleware refreshing user sessions
+            // Silently ignore cookie remove errors in Server Components
+            // Cookies can only be modified in Server Actions or Route Handlers
+            // Middleware will handle session refresh, so this is safe to ignore
+            // Only log if it's not the expected Server Component error
+            if (
+              error instanceof Error &&
+              !error.message.includes('Cookies can only be modified')
+            ) {
+              console.error('Unexpected cookie remove error:', error);
+            }
           }
         }
       }
     }
-  );
+  ) as unknown as SupabaseClient<Database>;
 };
 
 // Utility function to execute a query and capture its metadata
 export async function executeWithMetadata<T extends Record<string, unknown>>(
-  query: unknown,
+  query: unknown
 ): Promise<QueryResult<T>> {
   // The Postgrest builder types from the client can be complex and vary with
   // the installed supabase/postgrest versions. For robustness we accept
@@ -78,7 +95,7 @@ export async function executeWithMetadata<T extends Record<string, unknown>>(
   // The incoming `query` is usually a thenable Postgrest builder. Cast it to
   // a Promise-like unknown and await it, then narrow the response shape.
   const resp = await (query as unknown as Promise<unknown>);
-  const { data, error } = (resp as { data?: unknown; error?: unknown });
+  const { data, error } = resp as { data?: unknown; error?: unknown };
   if (error) {
     // Handle different types of errors
     let message = 'Unknown error';
