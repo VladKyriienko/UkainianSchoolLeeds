@@ -38,7 +38,11 @@ export function CreateOrganisationForm() {
     }
 
     try {
-      await createOrganisation({ name, name_uk: nameUk, slug });
+      await createOrganisation({
+        name,
+        slug,
+        ...(nameUk && { name_uk: nameUk })
+      });
       // router.push automatically refreshes the target route in Next.js App Router
       router.push('/admin/organisations');
     } catch (error: unknown) {
