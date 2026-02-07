@@ -484,6 +484,42 @@ export const classPhotoGalery = pgTable(
   }
 );
 
+// Donations table (Stripe one-time payments)
+export const donations = pgTable(
+  'donations',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    stripeSessionId: text('stripe_session_id').notNull().unique(),
+    stripePaymentIntentId: text('stripe_payment_intent_id'),
+    amountCents: integer('amount_cents').notNull(),
+    currency: text('currency').notNull().default('gbp'),
+    status: text('status').notNull().default('pending'),
+    donorEmail: text('donor_email'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull()
+  },
+  () => {
+    const isAdmin = sql`exists (
+      select 1
+      from roles
+      where roles.user_id = auth.uid()
+        and roles.role = 'admin'
+    )`;
+
+    return [
+      pgPolicy('donations_admin_select', {
+        for: 'select',
+        to: authenticatedRole,
+        using: isAdmin
+      })
+    ];
+  }
+);
+
 // Messages table (contact form submissions)
 export const messages = pgTable(
   'messages',

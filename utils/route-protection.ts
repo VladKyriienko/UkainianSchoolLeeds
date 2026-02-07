@@ -54,6 +54,13 @@ export const navigationRoutes: RouteConfig[] = [
         requiresAuth: true
       },
       {
+        path: '/admin/donations',
+        label: 'Donations',
+        icon: 'PoundSterling',
+        requiredRole: 'admin',
+        requiresAuth: true
+      },
+      {
         path: '/admin/system',
         label: 'System',
         icon: 'Cog',

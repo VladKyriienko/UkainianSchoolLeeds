@@ -55,6 +55,7 @@ export const NAV_LABELS: Record<Language, Record<string, string>> = {
     '/safeguarding/risk-assessments': 'Risk Assessments',
     '/safeguarding/concerns': 'Safeguarding Concerns',
 
+    '/donate': 'Donate',
     '/contact': 'Contact'
   },
   uk: {
@@ -97,6 +98,7 @@ export const NAV_LABELS: Record<Language, Record<string, string>> = {
     '/safeguarding/risk-assessments': 'Оцінка ризиків',
     '/safeguarding/concerns': 'Питання щодо безпеки',
 
+    '/donate': 'Підтримати',
     '/contact': 'Контакти'
   }
 };
