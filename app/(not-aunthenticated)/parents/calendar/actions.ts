@@ -49,7 +49,7 @@ export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEven
 
   if (error) {
     console.error('Error fetching events:', error);
-    throw new Error('Failed to fetch events');
+    return [];
   }
 
   return data || [];

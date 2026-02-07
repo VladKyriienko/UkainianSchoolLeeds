@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
 import { NavItems, type NavItem } from '@/constants/navigation';
@@ -61,7 +61,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
           href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <Logo className="h-8 w-8" />
+          <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
           <span className="font-semibold">{BRAND_NAME[language]}</span>
         </Link>
 
@@ -149,7 +149,10 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <LanguageToggle />
+          {/* Language toggle - hidden on mobile, shown on desktop */}
+          <div className="hidden lg:block">
+            <LanguageToggle />
+          </div>
           {showDarkModeToggle && <DarkModeToggle />}
 
           {/* Mobile Menu Button */}
@@ -165,23 +168,28 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto px-4">
                 {/* Hidden title for accessibility */}
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-                <div className="flex flex-col gap-6 mt-8">
+                {/* Language Toggle at top */}
+
+                <div className="mt-[-17px] mb-2">
+                  <LanguageToggle />
+                </div>
+                <div className="flex flex-col gap-6">
                   {/* Logo in mobile menu */}
                   <Link
                     href="/"
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Logo className="h-8 w-8" />
+                    <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
                     <span className="font-semibold">{BRAND_NAME[language]}</span>
                   </Link>
 
                   {/* Mobile Navigation */}
-                  <nav className="flex flex-col gap-2">
+                  <nav className="flex flex-col gap-2 flex-1">
                     {NavItems.map((item) => {
                       const isActive = activeKey === item.key;
                       const hasChildren = !!item.children?.length;

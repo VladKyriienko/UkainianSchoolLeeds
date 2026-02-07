@@ -8,6 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import type { CalendarEvent } from './actions';
 import { SubscribeToCalendar } from './SubscribeToCalendar';
+import { useLanguage } from '@/providers/language-provider';
+import { CALENDAR_CONTENT } from '@/content/calendar';
 
 const EVENTS_PER_PAGE = 10;
 
@@ -32,6 +34,8 @@ type ListViewProps = {
 };
 
 export function ListView({ events }: ListViewProps) {
+  const { language } = useLanguage();
+  const content = CALENDAR_CONTENT[language];
   const [startDate, setStartDate] = useState<Date | undefined>(startOfToday());
   const [currentPage, setCurrentPage] = useState(1);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -56,11 +60,11 @@ export function ListView({ events }: ListViewProps) {
 
   // Calculate date range label
   const dateRangeLabel = useMemo(() => {
-    if (paginatedEvents.length === 0) return 'No events';
+    if (paginatedEvents.length === 0) return content.messages.noEvents;
 
     const firstEvent = paginatedEvents[0];
     const lastEvent = paginatedEvents[paginatedEvents.length - 1];
-    if (!firstEvent || !lastEvent) return 'No events';
+    if (!firstEvent || !lastEvent) return content.messages.noEvents;
 
     const first = parseISO(firstEvent.date);
     const last = parseISO(lastEvent.date);
@@ -147,7 +151,7 @@ export function ListView({ events }: ListViewProps) {
             size="icon"
             onClick={handlePrevPage}
             disabled={currentPage <= 1}
-            aria-label="Previous page"
+            aria-label={content.navigation.previousPage}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -156,12 +160,12 @@ export function ListView({ events }: ListViewProps) {
             size="icon"
             onClick={handleNextPage}
             disabled={currentPage >= totalPages}
-            aria-label="Next page"
+            aria-label={content.navigation.nextPage}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button variant="outline" onClick={handleToday}>
-            Today
+            {content.navigation.today}
           </Button>
         </div>
 
@@ -189,7 +193,7 @@ export function ListView({ events }: ListViewProps) {
       <div className="space-y-8">
         {sortedDates.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            No events found
+            {content.messages.noEventsFound}
           </div>
         ) : (
           (() => {

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { User } from '@supabase/supabase-js';
 import {
   Sidebar,
@@ -17,7 +18,6 @@ import { X } from 'lucide-react';
 import { NavMain } from './NavMain';
 import { NavUser } from './NavUser';
 import { CompletionBanner } from '@/components/common/CompletionBanner/CompletionBanner';
-import Logo from '@/components/icons/Logo';
 import DarkModeToggle from '@/components/common/RootLayout/DarkModeToggle';
 import LanguageToggle from '@/components/common/RootLayout/LanguageToggle';
 import { cn } from '@/utils/cn';
@@ -89,7 +89,7 @@ export function AppSidebar({
             href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <Logo className="h-8 w-8" />
+            <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
             <span className="font-semibold text-sidebar-foreground">
               {BRAND_NAME[language]}
             </span>
@@ -121,7 +121,7 @@ export function AppSidebar({
         {!isMobile && (
           <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-2 p-2">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <Logo className="h-8 w-8" />
+              <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
             </Link>
             {showSidebarTrigger && <SidebarTrigger className="h-8 w-8" />}
           </div>
