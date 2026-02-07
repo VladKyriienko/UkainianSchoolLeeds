@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import {
   Sidebar,
@@ -67,6 +68,8 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const { isMobile, setOpenMobile } = useSidebar();
   const { language } = useLanguage();
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin') ?? false;
 
   const handleMobileClose = () => {
     if (isMobile) {
@@ -98,7 +101,7 @@ export function AppSidebar({
 
           {/* Controls */}
           <div className="flex items-center gap-2">
-            <LanguageToggle />
+            {!isAdmin && <LanguageToggle />}
             {showDarkModeToggle && <DarkModeToggle />}
             {showSidebarTrigger && !isMobile && (
               <SidebarTrigger className="h-8 w-8" />

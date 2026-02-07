@@ -11,8 +11,6 @@ export type WhosWhoContent = {
   aboutMeButtonUk: string;
   bioPlaceholder: string;
   bioPlaceholderUk: string;
-  inspiresTitle: string;
-  inspiresTitleUk: string;
 };
 
 export const WHOS_WHO_CONTENT: WhosWhoContent = {
@@ -27,7 +25,5 @@ export const WHOS_WHO_CONTENT: WhosWhoContent = {
   aboutMeButton: 'About me',
   aboutMeButtonUk: 'Про мене',
   bioPlaceholder: 'Biography will be added soon.',
-  bioPlaceholderUk: 'Біографія скоро буде додана.',
-  inspiresTitle: 'What inspires me',
-  inspiresTitleUk: 'Що додає мені наснаги'
+  bioPlaceholderUk: 'Біографія скоро буде додана.'
 };

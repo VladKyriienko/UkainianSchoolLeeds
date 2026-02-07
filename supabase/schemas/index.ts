@@ -89,6 +89,7 @@ export const organisations = pgTable(
       .notNull()
       .default(sql`gen_random_uuid()`),
     name: text('name').notNull(),
+    nameUk: text('name_uk'),
     slug: text('slug').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
@@ -177,11 +178,14 @@ export const teachers = pgTable(
       .notNull()
       .default(sql`gen_random_uuid()`),
     name: text('name').notNull(),
+    nameUk: text('name_uk'),
     title: text('title'),
+    titleUk: text('title_uk'),
     photo: text('photo'),
     phone: text('phone'),
     email: text('email'),
     description: text('description'),
+    descriptionUk: text('description_uk'),
     category: teacherCategoryEnum('category').notNull().default('TEACHER'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
@@ -229,7 +233,9 @@ export const news = pgTable(
       .notNull()
       .default(sql`gen_random_uuid()`),
     title: text('title').notNull(),
+    titleUk: text('title_uk'),
     description: text('description'),
+    descriptionUk: text('description_uk'),
     // You requested field name "data" (likely "date"); using `date` for clarity.
     date: timestamp('date', { withTimezone: true }).defaultNow().notNull(),
     order: integer('order').notNull().default(0),
@@ -280,12 +286,15 @@ export const events = pgTable(
       .notNull()
       .default(sql`gen_random_uuid()`),
     title: text('title').notNull(),
+    titleUk: text('title_uk'),
     description: text('description'),
+    descriptionUk: text('description_uk'),
     // You requested field name "data" (likely "date"); using `date` for clarity.
     date: timestamp('date', { withTimezone: true }).defaultNow().notNull(),
     startTime: time('start_time'),
     endTime: time('end_time'),
     location: text('location'),
+    locationUk: text('location_uk'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -332,7 +341,9 @@ export const documents = pgTable(
       .notNull()
       .default(sql`gen_random_uuid()`),
     title: text('title').notNull(),
+    titleUk: text('title_uk'),
     content: text('content').notNull(),
+    contentUk: text('content_uk'),
     type: typeDocumentEnum('type').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
@@ -380,7 +391,9 @@ export const classes = pgTable(
       .notNull()
       .default(sql`gen_random_uuid()`),
     title: text('title').notNull(),
+    titleUk: text('title_uk'),
     description: text('description'),
+    descriptionUk: text('description_uk'),
     order: integer('order').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

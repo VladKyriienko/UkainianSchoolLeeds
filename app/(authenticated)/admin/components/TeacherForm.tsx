@@ -83,12 +83,32 @@ export function TeacherForm({ mode, teacher }: TeacherFormProps) {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="name_uk">Name (Ukrainian)</Label>
+          <Input
+            id="name_uk"
+            name="name_uk"
+            defaultValue={teacher?.name_uk || ''}
+            placeholder="Ім'я українською"
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="title">Title</Label>
           <Input
             id="title"
             name="title"
             defaultValue={teacher?.title || ''}
             placeholder="e.g. Math Teacher"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="title_uk">Title (Ukrainian)</Label>
+          <Input
+            id="title_uk"
+            name="title_uk"
+            defaultValue={teacher?.title_uk || ''}
+            placeholder="e.g. Вчитель математики"
           />
         </div>
       </div>
@@ -142,15 +162,28 @@ export function TeacherForm({ mode, teacher }: TeacherFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          defaultValue={teacher?.description || ''}
-          placeholder="Short bio / description"
-          rows={5}
-        />
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            defaultValue={teacher?.description || ''}
+            placeholder="Short bio / description"
+            rows={5}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description_uk">Description (Ukrainian)</Label>
+          <Textarea
+            id="description_uk"
+            name="description_uk"
+            defaultValue={teacher?.description_uk || ''}
+            placeholder="Коротка біографія українською"
+            rows={5}
+          />
+        </div>
       </div>
 
       <div className="flex gap-4">

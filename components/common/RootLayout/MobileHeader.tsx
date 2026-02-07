@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -25,6 +26,8 @@ export function MobileHeader({
 }: MobileHeaderProps) {
   const { toggleSidebar } = useSidebar();
   const { language } = useLanguage();
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin') ?? false;
 
   return (
     <header
@@ -59,7 +62,7 @@ export function MobileHeader({
           {showDarkModeToggle && burgerPosition === 'right' && (
             <DarkModeToggle />
           )}
-          <LanguageToggle />
+          {!isAdmin && <LanguageToggle />}
         </div>
 
         {/* Right side content */}

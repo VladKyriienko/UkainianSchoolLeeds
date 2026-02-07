@@ -26,13 +26,14 @@ function DecorativeIcon() {
 
 export default function MemberDetailClient({ teacher }: Props) {
   const { language } = useLanguage();
-  const inspiresTitle =
-    language === 'uk' ? WHOS_WHO_CONTENT.inspiresTitleUk : WHOS_WHO_CONTENT.inspiresTitle;
-  const description = teacher.description;
+  const name = language === 'uk' && teacher.name_uk ? teacher.name_uk : teacher.name;
+  const description =
+    language === 'uk' && teacher.description_uk
+      ? teacher.description_uk
+      : (teacher.description ?? '');
   const placeholder =
     language === 'uk' ? WHOS_WHO_CONTENT.bioPlaceholderUk : WHOS_WHO_CONTENT.bioPlaceholder;
-  const name = teacher.name;
-  const initials = (teacher.name.split(' ').map((n) => n[0]) || ['?']).join('').slice(0, 2);
+  const initials = (name.split(' ').map((n) => n[0]) || ['?']).join('').slice(0, 2);
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -46,7 +47,7 @@ export default function MemberDetailClient({ teacher }: Props) {
             <img
               src={teacher.photoUrl}
               alt={name}
-              className="w-full aspect-[3/4] object-cover rounded-lg"
+              className="w-full aspect-[3/4] object-cover object-top rounded-lg"
             />
           ) : (
             <div className="aspect-[3/4] rounded-lg overflow-hidden bg-muted flex items-center justify-center">
@@ -59,7 +60,6 @@ export default function MemberDetailClient({ teacher }: Props) {
         <div className="flex-1 min-w-0">
           {description ? (
             <section>
-              <h3 className="font-bold text-foreground mb-3">{inspiresTitle}:</h3>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                 {description}
               </p>

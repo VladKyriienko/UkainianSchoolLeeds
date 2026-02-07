@@ -76,26 +76,51 @@ export function EventForm({ mode, event }: EventFormProps) {
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="title">Title *</Label>
-        <Input
-          id="title"
-          name="title"
-          required
-          defaultValue={event?.title || ''}
-          placeholder="Event title"
-        />
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="title">Title *</Label>
+          <Input
+            id="title"
+            name="title"
+            required
+            defaultValue={event?.title || ''}
+            placeholder="Event title"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="title_uk">Title (Ukrainian)</Label>
+          <Input
+            id="title_uk"
+            name="title_uk"
+            defaultValue={event?.title_uk || ''}
+            placeholder="Назва події українською"
+          />
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          defaultValue={event?.description || ''}
-          placeholder="Event description"
-          rows={4}
-        />
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            defaultValue={event?.description || ''}
+            placeholder="Event description"
+            rows={4}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description_uk">Description (Ukrainian)</Label>
+          <Textarea
+            id="description_uk"
+            name="description_uk"
+            defaultValue={event?.description_uk || ''}
+            placeholder="Опис події українською"
+            rows={4}
+          />
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -117,6 +142,16 @@ export function EventForm({ mode, event }: EventFormProps) {
             name="location"
             defaultValue={event?.location || ''}
             placeholder="e.g. School Hall, Sports Field"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="location_uk">Location (Ukrainian)</Label>
+          <Input
+            id="location_uk"
+            name="location_uk"
+            defaultValue={event?.location_uk || ''}
+            placeholder="Місце проведення українською"
           />
         </div>
       </div>

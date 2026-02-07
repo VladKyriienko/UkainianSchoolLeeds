@@ -46,9 +46,13 @@ type ProfileCardProps = {
 };
 
 function ProfileCard({ teacher, aboutMeLabel, compact }: ProfileCardProps) {
-  const name = teacher.name;
-  const title = teacher.title ?? '';
-  const initials = (teacher.name.split(' ').map((n) => n[0]) || ['?']).join('').slice(0, 2);
+  const { language } = useLanguage();
+  const name = language === 'uk' && teacher.name_uk ? teacher.name_uk : teacher.name;
+  const title =
+    language === 'uk' && teacher.title_uk
+      ? teacher.title_uk
+      : (teacher.title ?? '');
+  const initials = (name.split(' ').map((n) => n[0]) || ['?']).join('').slice(0, 2);
 
   return (
     <Card className="relative overflow-visible rounded-xl border shadow-md">
@@ -60,7 +64,11 @@ function ProfileCard({ teacher, aboutMeLabel, compact }: ProfileCardProps) {
           )}
         >
           {teacher.photoUrl ? (
-            <AvatarImage src={teacher.photoUrl} alt={name} />
+            <AvatarImage
+              src={teacher.photoUrl}
+              alt={name}
+              className="object-cover object-top"
+            />
           ) : null}
           <AvatarFallback className="rounded-full bg-primary/10 text-primary text-lg font-semibold">
             {initials}
@@ -102,13 +110,13 @@ export default function WhosWhoContent({ teachers }: WhosWhoContentProps) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {featured.length > 0 && (
+      {featured[0] ? (
         <div className="flex justify-center mb-12">
           <div className="w-full max-w-md">
             <ProfileCard teacher={featured[0]} aboutMeLabel={aboutMeLabel} />
           </div>
         </div>
-      )}
+      ) : null}
 
       {coreTeam.length > 0 && (
         <>

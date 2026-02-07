@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import MemberDetailClient from './client';
-import BackToWhosWho from './BackToWhosWho';
-import { getTeacherById } from '../actions';
+import MemberDetailClient from '@/app/(not-aunthenticated)/about/whos-who/[id]/client';
+import BackToWhosWho from '@/app/(not-aunthenticated)/about/whos-who/[id]/BackToWhosWho';
+import { getTeacherById } from '@/app/(not-aunthenticated)/about/whos-who/actions';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -15,8 +15,14 @@ export default async function MemberDetailPage({ params }: Props) {
 
   return (
     <PageWrapper
-      title={teacher.name}
-      description={teacher.title ?? ''}
+      title={{
+        en: teacher.name,
+        uk: teacher.name_uk ?? teacher.name
+      }}
+      description={{
+        en: teacher.title ?? '',
+        uk: teacher.title_uk ?? teacher.title ?? ''
+      }}
       goBackButton={<BackToWhosWho />}
     >
       <MemberDetailClient teacher={teacher} />

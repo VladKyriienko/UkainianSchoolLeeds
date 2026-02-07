@@ -127,10 +127,13 @@ export async function createTeacher(formData: FormData) {
   await verifyAdminAccess();
 
   const name = normalizeTextField(formData.get('name'));
+  const nameUk = normalizeTextField(formData.get('name_uk'));
   const title = normalizeTextField(formData.get('title'));
+  const titleUk = normalizeTextField(formData.get('title_uk'));
   const phone = normalizeTextField(formData.get('phone'));
   const email = normalizeTextField(formData.get('email'));
   const description = normalizeTextField(formData.get('description'));
+  const descriptionUk = normalizeTextField(formData.get('description_uk'));
   const categoryRaw = normalizeTextField(formData.get('category'));
 
   if (!name) {
@@ -151,10 +154,13 @@ export async function createTeacher(formData: FormData) {
   const { error } = await supabaseAdmin.from('teachers').insert([
     {
       name,
+      name_uk: nameUk,
       title,
+      title_uk: titleUk,
       phone,
       email,
       description,
+      description_uk: descriptionUk,
       category,
       ...(photoPath && { photo: photoPath })
     }
@@ -172,10 +178,13 @@ export async function updateTeacher(id: string, formData: FormData) {
   await verifyAdminAccess();
 
   const name = normalizeTextField(formData.get('name'));
+  const nameUk = normalizeTextField(formData.get('name_uk'));
   const title = normalizeTextField(formData.get('title'));
+  const titleUk = normalizeTextField(formData.get('title_uk'));
   const phone = normalizeTextField(formData.get('phone'));
   const email = normalizeTextField(formData.get('email'));
   const description = normalizeTextField(formData.get('description'));
+  const descriptionUk = normalizeTextField(formData.get('description_uk'));
   const categoryRaw = normalizeTextField(formData.get('category'));
 
   if (!name) {
@@ -195,10 +204,13 @@ export async function updateTeacher(id: string, formData: FormData) {
 
   const updatePayload: Record<string, unknown> = {
     name,
+    name_uk: nameUk,
     title,
+    title_uk: titleUk,
     phone,
     email,
     description,
+    description_uk: descriptionUk,
     category
   };
   if (photoPath) updatePayload.photo = photoPath;

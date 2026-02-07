@@ -65,11 +65,13 @@ type AuthUpdateData = {
 
 export type CreateOrganisationData = {
   name: string;
+  name_uk?: string;
   slug: string;
 };
 
 export type UpdateOrganisationData = {
   name?: string;
+  name_uk?: string;
   slug?: string;
 };
 
@@ -530,6 +532,7 @@ export async function createOrganisation(data: CreateOrganisationData) {
       .insert([
         {
           name: data.name,
+          name_uk: data.name_uk || null,
           slug: data.slug
         }
       ])
