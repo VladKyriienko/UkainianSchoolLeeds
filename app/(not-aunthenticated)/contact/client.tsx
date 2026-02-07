@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, Phone, MapPin, Clock, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, AlertCircle, Navigation } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
 import { CONTACT_CONTENT } from '@/content/contact';
 
@@ -218,6 +218,39 @@ export default function ContactContent() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Map */}
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            {content.addressTitle}
+          </CardTitle>
+          <div className="flex items-start gap-4 pt-2">
+            <Navigation className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <h3 className="font-semibold mb-1 text-sm">{content.directionsTitle}</h3>
+              <p className="text-sm text-muted-foreground whitespace-pre-line">
+                {content.directionsText}
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-b-lg overflow-hidden">
+            <iframe
+              title={content.addressTitle}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(
+                content.addressText.replace(/\n/g, ', ')
+              )}&output=embed`}
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -93,7 +93,10 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
     }
 
     const description = normalizeTextField(formData.get('description'));
+    const descriptionUk = normalizeTextField(formData.get('description_uk'));
     const location = normalizeTextField(formData.get('location'));
+    const locationUk = normalizeTextField(formData.get('location_uk'));
+    const titleUk = normalizeTextField(formData.get('title_uk'));
     const startTime = normalizeTimeField(formData.get('start_time'));
     const endTime = normalizeTimeField(formData.get('end_time'));
 
@@ -105,11 +108,14 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
 
     const { error: insertError } = await supabaseAdmin.from('events').insert({
       title: title.trim(),
+      title_uk: titleUk,
       description,
+      description_uk: descriptionUk,
       date: dateObj.toISOString(),
       start_time: startTime || null,
       end_time: endTime || null,
-      location: location || null
+      location: location || null,
+      location_uk: locationUk
     });
 
     if (insertError) {
@@ -142,7 +148,10 @@ export async function updateEvent(
     }
 
     const description = normalizeTextField(formData.get('description'));
+    const descriptionUk = normalizeTextField(formData.get('description_uk'));
     const location = normalizeTextField(formData.get('location'));
+    const locationUk = normalizeTextField(formData.get('location_uk'));
+    const titleUk = normalizeTextField(formData.get('title_uk'));
     const startTime = normalizeTimeField(formData.get('start_time'));
     const endTime = normalizeTimeField(formData.get('end_time'));
 
@@ -156,11 +165,14 @@ export async function updateEvent(
       .from('events')
       .update({
         title: title.trim(),
+        title_uk: titleUk,
         description,
+        description_uk: descriptionUk,
         date: dateObj.toISOString(),
         start_time: startTime || null,
         end_time: endTime || null,
-        location: location || null
+        location: location || null,
+        location_uk: locationUk
       })
       .eq('id', id);
 

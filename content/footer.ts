@@ -25,7 +25,12 @@ export const FOOTER_CONTENT: Record<FooterLanguage, FooterContent> = {
       'The Ukrainian Saturday School is the heart of the local community. We serve our community with dedication and passion for the study of the Ukrainian language, culture, and history.',
     contactTitle: 'Contact Us',
     contactSchoolName: 'Ukrainian School',
-    contactAddress: ['5 Back Newton Grove', 'Leeds', 'LS7 4HW'],
+    contactAddress: [
+      'The Association of Ukrainians in Great Britain',
+      '5 Back Newton Grove',
+      'Leeds',
+      'LS7 4HW'
+    ],
     contactEmail: 'admin@ukrainianschool.com',
     contactPhone: '0113 2755883',
     quickLinksTitle: 'Quick Links',
@@ -46,7 +51,12 @@ export const FOOTER_CONTENT: Record<FooterLanguage, FooterContent> = {
       'Українська суботня школа є серцем місцевої громади. Ми служимо нашій громаді з відданістю та пристрастю до вивчення української мови, культури та історії.',
     contactTitle: 'Зв’яжіться з нами',
     contactSchoolName: 'Українська школа',
-    contactAddress: ['5 Back Newton Grove', 'Лідс', 'LS7 4HW'],
+    contactAddress: [
+      'The Association of Ukrainians in Great Britain',
+      '5 Back Newton Grove',
+      'Leeds',
+      'LS7 4HW'
+    ],
     contactEmail: 'admin@ukrainianschool.com',
     contactPhone: '0113 2755883',
     quickLinksTitle: 'Швидкі посилання',

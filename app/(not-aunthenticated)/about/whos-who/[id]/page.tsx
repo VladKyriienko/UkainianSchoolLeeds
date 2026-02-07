@@ -1,0 +1,31 @@
+import { notFound } from 'next/navigation';
+import { PageWrapper } from '@/components/common/PageWrapper';
+import MemberDetailClient from '@/app/(not-aunthenticated)/about/whos-who/[id]/client';
+import BackToWhosWho from '@/app/(not-aunthenticated)/about/whos-who/[id]/BackToWhosWho';
+import { getTeacherById } from '@/app/(not-aunthenticated)/about/whos-who/actions';
+
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function MemberDetailPage({ params }: Props) {
+  const { id } = await params;
+  const teacher = await getTeacherById(id);
+  if (!teacher) notFound();
+
+  return (
+    <PageWrapper
+      title={{
+        en: teacher.name,
+        uk: teacher.name_uk ?? teacher.name
+      }}
+      description={{
+        en: teacher.title ?? '',
+        uk: teacher.title_uk ?? teacher.title ?? ''
+      }}
+      goBackButton={<BackToWhosWho />}
+    >
+      <MemberDetailClient teacher={teacher} />
+    </PageWrapper>
+  );
+}

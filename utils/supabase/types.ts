@@ -45,46 +45,58 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          description_uk: string | null
           id: string
           order: number
           title: string
+          title_uk: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
+          description_uk?: string | null
           id?: string
           order?: number
           title: string
+          title_uk?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
+          description_uk?: string | null
           id?: string
           order?: number
           title?: string
+          title_uk?: string | null
         }
         Relationships: []
       }
       documents: {
         Row: {
           content: string
+          content_uk: string | null
           created_at: string
           id: string
           title: string
+          title_uk: string | null
           type: Database["public"]["Enums"]["typeDocumentEnum"]
         }
         Insert: {
           content: string
+          content_uk?: string | null
           created_at?: string
           id?: string
           title: string
+          title_uk?: string | null
           type: Database["public"]["Enums"]["typeDocumentEnum"]
         }
         Update: {
           content?: string
+          content_uk?: string | null
           created_at?: string
           id?: string
           title?: string
+          title_uk?: string | null
           type?: Database["public"]["Enums"]["typeDocumentEnum"]
         }
         Relationships: []
@@ -94,31 +106,40 @@ export type Database = {
           created_at: string
           date: string
           description: string | null
+          description_uk: string | null
           end_time: string | null
           id: string
           location: string | null
+          location_uk: string | null
           start_time: string | null
           title: string
+          title_uk: string | null
         }
         Insert: {
           created_at?: string
           date?: string
           description?: string | null
+          description_uk?: string | null
           end_time?: string | null
           id?: string
           location?: string | null
+          location_uk?: string | null
           start_time?: string | null
           title: string
+          title_uk?: string | null
         }
         Update: {
           created_at?: string
           date?: string
           description?: string | null
+          description_uk?: string | null
           end_time?: string | null
           id?: string
           location?: string | null
+          location_uk?: string | null
           start_time?: string | null
           title?: string
+          title_uk?: string | null
         }
         Relationships: []
       }
@@ -160,28 +181,34 @@ export type Database = {
           created_at: string
           date: string
           description: string | null
+          description_uk: string | null
           id: string
           order: number
           photo: string | null
           title: string
+          title_uk: string | null
         }
         Insert: {
           created_at?: string
           date?: string
           description?: string | null
+          description_uk?: string | null
           id?: string
           order?: number
           photo?: string | null
           title: string
+          title_uk?: string | null
         }
         Update: {
           created_at?: string
           date?: string
           description?: string | null
+          description_uk?: string | null
           id?: string
           order?: number
           photo?: string | null
           title?: string
+          title_uk?: string | null
         }
         Relationships: []
       }
@@ -226,6 +253,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          name_uk: string | null
           slug: string
           updated_at: string
         }
@@ -233,6 +261,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          name_uk?: string | null
           slug: string
           updated_at?: string
         }
@@ -240,6 +269,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          name_uk?: string | null
           slug?: string
           updated_at?: string
         }
@@ -276,34 +306,43 @@ export type Database = {
           category: Database["public"]["Enums"]["teacherCategoryEnum"]
           created_at: string
           description: string | null
+          description_uk: string | null
           email: string | null
           id: string
           name: string
+          name_uk: string | null
           phone: string | null
           photo: string | null
           title: string | null
+          title_uk: string | null
         }
         Insert: {
           category?: Database["public"]["Enums"]["teacherCategoryEnum"]
           created_at?: string
           description?: string | null
+          description_uk?: string | null
           email?: string | null
           id?: string
           name: string
+          name_uk?: string | null
           phone?: string | null
           photo?: string | null
           title?: string | null
+          title_uk?: string | null
         }
         Update: {
           category?: Database["public"]["Enums"]["teacherCategoryEnum"]
           created_at?: string
           description?: string | null
+          description_uk?: string | null
           email?: string | null
           id?: string
           name?: string
+          name_uk?: string | null
           phone?: string | null
           photo?: string | null
           title?: string | null
+          title_uk?: string | null
         }
         Relationships: []
       }
@@ -371,7 +410,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      keep_db_active: { Args: never; Returns: undefined }
     }
     Enums: {
       rolesEnum: "admin" | "user"

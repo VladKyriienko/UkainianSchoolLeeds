@@ -27,6 +27,8 @@ export function CreateOrganisationForm() {
 
     const formData = new FormData(e.currentTarget);
     const name = String(formData.get('name')).trim();
+    const nameUkRaw = String(formData.get('name_uk') ?? '').trim();
+    const nameUk = nameUkRaw || undefined;
     const slug = String(formData.get('slug')).trim();
 
     if (!name || !slug) {
@@ -36,7 +38,7 @@ export function CreateOrganisationForm() {
     }
 
     try {
-      await createOrganisation({ name, slug });
+      await createOrganisation({ name, name_uk: nameUk, slug });
       // router.push automatically refreshes the target route in Next.js App Router
       router.push('/admin/organisations');
     } catch (error: unknown) {
@@ -58,15 +60,16 @@ export function CreateOrganisationForm() {
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="name">Organisation Name</Label>
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          required
-          placeholder="Acme Corporation"
-          onChange={(e) => {
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Organisation Name</Label>
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="Acme Corporation"
+            onChange={(e) => {
             const slugInput = document.getElementById(
               'slug'
             ) as HTMLInputElement;
@@ -74,7 +77,18 @@ export function CreateOrganisationForm() {
               slugInput.value = generateSlug(e.target.value);
             }
           }}
-        />
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="name_uk">Organisation Name (Ukrainian)</Label>
+          <Input
+            type="text"
+            id="name_uk"
+            name="name_uk"
+            placeholder="Назва організації українською"
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
