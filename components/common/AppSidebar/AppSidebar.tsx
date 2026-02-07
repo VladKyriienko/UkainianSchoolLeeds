@@ -22,7 +22,7 @@ import DarkModeToggle from '@/components/common/RootLayout/DarkModeToggle';
 import LanguageToggle from '@/components/common/RootLayout/LanguageToggle';
 import { cn } from '@/utils/cn';
 import { useLanguage } from '@/providers/language-provider';
-import { BRAND_NAME } from '@/content/navigation';
+import { BRAND_NAME_LINES } from '@/content/navigation';
 import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
 import type { CompletionData } from '@/components/common/CompletionBanner/types';
 import { RouteConfig } from '@/utils/route-protection';
@@ -90,8 +90,9 @@ export function AppSidebar({
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
-            <span className="font-semibold text-sidebar-foreground">
-              {BRAND_NAME[language]}
+            <span className="flex flex-col text-xs font-semibold leading-tight text-sidebar-foreground">
+              <span>{BRAND_NAME_LINES[language].line1}</span>
+              <span>{BRAND_NAME_LINES[language].line2}</span>
             </span>
           </Link>
 

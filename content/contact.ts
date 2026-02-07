@@ -23,6 +23,8 @@ type ContactContent = {
   infoTitle: string;
   addressTitle: string;
   addressText: string;
+  directionsTitle: string;
+  directionsText: string;
   phoneTitle: string;
   phoneValue: string;
   emailTitle: string;
@@ -55,14 +57,17 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     successMessage: 'Your message has been sent successfully.',
     errorFallback: 'Failed to submit message. Please try again.',
     infoTitle: 'Contact Information',
-    addressTitle: 'Address',
-    addressText: 'Address, City, Postcode',
+    addressTitle: 'Find us',
+    addressText: 'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
+    directionsTitle: 'How to get here',
+    directionsText:
+      'Located in Leeds, easily accessible by public transport and car. Several bus routes stop nearby. Free parking available on site.',
     phoneTitle: 'Phone',
     phoneValue: '01234567890',
     emailTitle: 'Email',
     emailValue: 'info@ukrainiaschool.com',
     hoursTitle: 'Hours',
-    hoursText: 'Monday to Friday, 9am to 5pm',
+    hoursText: 'Saturday, 2:00 pm to 5:30 pm',
     emergencyTitle: 'Emergency Contact',
     emergencyText: 'In case of an emergency, please contact the school office.'
   },
@@ -88,14 +93,17 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     successMessage: 'Ваше повідомлення було успішно надіслано.',
     errorFallback: 'Не вдалося надіслати повідомлення. Спробуйте ще раз.',
     infoTitle: 'Контактна інформація',
-    addressTitle: 'Адреса',
-    addressText: 'Адреса, Місто, Поштовий індекс',
+    addressTitle: 'Знайдіть нас',
+    addressText: 'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
+    directionsTitle: 'Як до нас дістатися',
+    directionsText:
+      'Розташовано в Лідсі, зручно дістатися громадським транспортом або автомобілем. Поруч зупиняються кілька автобусних маршрутів. Безкоштовна парковка на території.',
     phoneTitle: 'Телефон',
     phoneValue: '01234567890',
     emailTitle: 'Електронна пошта',
     emailValue: 'info@ukrainiaschool.com',
     hoursTitle: 'Години роботи',
-    hoursText: 'Понеділок – П’ятниця, з 9:00 до 17:00',
+    hoursText: 'Субота, з 14:00 до 17:30',
     emergencyTitle: 'Екстрений зв’язок',
     emergencyText:
       'У разі надзвичайної ситуації, будь ласка, зв’яжіться з офісом школи.'

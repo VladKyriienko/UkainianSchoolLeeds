@@ -2,10 +2,15 @@
 
 import type { Language } from '@/providers/language-provider';
 
-// Brand name per language
+// Brand name per language (two lines for header display)
 export const BRAND_NAME: Record<Language, string> = {
-  en: 'Ukrainian School',
-  uk: 'Українська школа'
+  en: 'Ukrainian Saturday School of Leeds',
+  uk: 'Українська суботня школа Лідсу'
+};
+
+export const BRAND_NAME_LINES: Record<Language, { line1: string; line2: string }> = {
+  en: { line1: 'Ukrainian Saturday School', line2: 'of Leeds' },
+  uk: { line1: 'Українська суботня школа', line2: 'Лідсу' }
 };
 
 // Navigation labels per route and language

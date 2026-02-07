@@ -13,7 +13,7 @@ import { ChevronDown, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
-import { BRAND_NAME, NAV_LABELS } from '@/content/navigation';
+import { BRAND_NAME_LINES, NAV_LABELS } from '@/content/navigation';
 
 export type PublicNavBarProps = {
   showDarkModeToggle?: boolean;
@@ -48,21 +48,24 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
   const linkClass = (isActive: boolean) =>
     cn(
       'inline-flex items-center gap-1 px-1 pb-2 text-sm font-medium transition-colors',
-      'text-muted-foreground hover:text-foreground',
-      'border-b-2 border-transparent hover:border-primary/50',
-      isActive && 'text-foreground border-primary'
+      'text-ukraine-header-muted hover:text-ukraine-header-fg',
+      'border-b-2 border-transparent hover:border-ukraine-yellow/50',
+      isActive && 'text-ukraine-header-fg border-ukraine-yellow'
     );
 
   return (
-    <header className="border-b bg-background fixed top-0 left-0 right-0 z-50">
+    <header className="border-b-[3px] border-ukraine-yellow bg-ukraine-header-bg text-ukraine-header-fg fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity text-ukraine-header-fg"
         >
-          <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
-          <span className="font-semibold">{BRAND_NAME[language]}</span>
+          <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
+          <span className="flex flex-col text-xs font-semibold leading-tight">
+            <span>{BRAND_NAME_LINES[language].line1}</span>
+            <span>{BRAND_NAME_LINES[language].line2}</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -113,7 +116,8 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     <div
                       className={cn(
                         'absolute left-1/2 top-5 z-50 mt-3 w-80 -translate-x-1/2',
-                        'rounded-xl border bg-background p-2 shadow-lg'
+                        'rounded-xl border border-ukraine-blue/40 p-2 shadow-lg',
+                        'bg-[rgb(var(--ukraine-blue)/0.8)] backdrop-blur-sm'
                       )}
                       role="menu"
                     >
@@ -126,10 +130,10 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              'block rounded-lg px-4 py-3 text-sm transition-colors',
+                              'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
                               childActive
-                                ? 'bg-muted text-foreground'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
+                                : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
                             )}
                             role="menuitem"
                             onClick={() => setOpenKey(null)}
@@ -162,7 +166,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="lg:hidden"
+                  className="lg:hidden text-ukraine-header-fg hover:bg-white/10 hover:text-ukraine-header-fg"
                   aria-label="Open menu"
                 >
                   <Menu className="h-6 w-6" />
@@ -184,8 +188,11 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
-                    <span className="font-semibold">{BRAND_NAME[language]}</span>
+                    <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
+                    <span className="flex flex-col text-xs font-semibold leading-tight">
+                      <span>{BRAND_NAME_LINES[language].line1}</span>
+                      <span>{BRAND_NAME_LINES[language].line2}</span>
+                    </span>
                   </Link>
 
                   {/* Mobile Navigation */}

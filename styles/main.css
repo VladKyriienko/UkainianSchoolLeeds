@@ -60,32 +60,32 @@ p a {
      Primary: Teal/Aquamarine for buttons and actions
      ========================================== */
   :root {
-    /* Core Colors - Light Mode */
-    --background: 250 250 250;
+    /* Core Colors - Light Mode (warm/yellowish) */
+    --background: 255 251 235;
     --foreground: 39 39 42;
 
     /* Card Components */
-    --card: 255 255 255;
+    --card: 255 253 240;
     --card-foreground: 39 39 42;
 
     /* Popover Components */
-    --popover: 255 255 255;
+    --popover: 255 253 240;
     --popover-foreground: 39 39 42;
 
-    /* Primary - Teal/Aquamarine (Main CTAs) */
-    --primary: 0 160 160;
+    /* Primary - Ukrainian Blue (Main CTAs) */
+    --primary: 30 120 210;
     --primary-foreground: 255 255 255;
 
-    /* Secondary - Light Gray */
-    --secondary: 241 245 249;
+    /* Secondary - Light warm */
+    --secondary: 253 249 235;
     --secondary-foreground: 39 39 42;
 
     /* Muted Elements */
-    --muted: 241 245 249;
+    --muted: 253 249 235;
     --muted-foreground: 113 113 122;
 
     /* Accent Elements */
-    --accent: 241 245 249;
+    --accent: 253 249 235;
     --accent-foreground: 39 39 42;
 
     /* Destructive/Error States */
@@ -93,31 +93,38 @@ p a {
     --destructive-foreground: 255 255 255;
 
     /* Borders & Inputs */
-    --border: 228 228 231;
-    --input: 228 228 231;
-    --ring: 0 160 160;
+    --border: 240 230 210;
+    --input: 240 230 210;
+    --ring: 30 120 210;
 
     /* Charts */
-    --chart-1: 0 160 160;
+    --chart-1: 30 120 210;
     --chart-2: 34 197 194;
     --chart-3: 94 234 212;
     --chart-4: 153 246 228;
     --chart-5: 204 251 241;
 
     /* Sidebar */
-    --sidebar: 250 250 250;
+    --sidebar: 255 251 235;
     --sidebar-foreground: 39 39 42;
-    --sidebar-primary: 0 160 160;
+    --sidebar-primary: 30 120 210;
     --sidebar-primary-foreground: 255 255 255;
     --sidebar-accent: 241 245 249;
     --sidebar-accent-foreground: 39 39 42;
-    --sidebar-border: 228 228 231;
-    --sidebar-ring: 0 160 160;
+    --sidebar-border: 240 230 210;
+    --sidebar-ring: 30 120 210;
 
     /* Typography */
     --font-sans: 'Quicksand', -apple-system, system-ui, sans-serif;
     --font-serif: Merriweather, Georgia, serif;
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+    /* Ukrainian colors (reusable for header, footer, accents) */
+    --ukraine-blue: 30 120 210;
+    --ukraine-yellow: 255 215 0;
+    --ukraine-header-bg: 30 120 210;
+    --ukraine-header-fg: 255 255 255;
+    --ukraine-header-muted: 235 245 255;
 
     /* Border Radius */
     --radius: 0.75rem;
@@ -147,17 +154,17 @@ p a {
      DARK MODE
      ========================================== */
   .dark {
-    --background: 15 23 42;
+    --background: 22 24 35;
     --foreground: 226 232 240;
 
-    --card: 30 41 59;
+    --card: 28 30 42;
     --card-foreground: 226 232 240;
 
-    --popover: 30 41 59;
+    --popover: 28 30 42;
     --popover-foreground: 226 232 240;
 
-    --primary: 45 212 191;
-    --primary-foreground: 15 23 42;
+    --primary: 40 140 220;
+    --primary-foreground: 255 255 255;
 
     --secondary: 51 65 85;
     --secondary-foreground: 226 232 240;
@@ -175,20 +182,24 @@ p a {
     --input: 71 85 105;
     --ring: 45 212 191;
 
+    --ukraine-header-bg: 40 100 180;
+    --ukraine-header-fg: 255 255 255;
+    --ukraine-header-muted: 226 232 240;
+
     --chart-1: 45 212 191;
     --chart-2: 34 197 194;
     --chart-3: 20 184 166;
     --chart-4: 13 148 136;
     --chart-5: 15 118 110;
 
-    --sidebar: 30 41 59;
+    --sidebar: 28 30 42;
     --sidebar-foreground: 226 232 240;
-    --sidebar-primary: 45 212 191;
+    --sidebar-primary: 40 140 220;
     --sidebar-primary-foreground: 15 23 42;
     --sidebar-accent: 71 85 105;
     --sidebar-accent-foreground: 226 232 240;
     --sidebar-border: 71 85 105;
-    --sidebar-ring: 45 212 191;
+    --sidebar-ring: 40 140 220;
 
     --shadow-color: 0 0 0;
     --shadow-2xs: 0px 1px 2px 0px rgb(0 0 0 / 0.2);

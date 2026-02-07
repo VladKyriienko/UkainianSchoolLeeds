@@ -10,7 +10,7 @@ import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
 import { useLanguage } from '@/providers/language-provider';
-import { BRAND_NAME } from '@/content/navigation';
+import { BRAND_NAME_LINES } from '@/content/navigation';
 
 export type MobileHeaderProps = {
   showDarkModeToggle?: boolean;
@@ -49,8 +49,11 @@ export function MobileHeader({
           )}
 
           <Link href="/" className="flex items-center space-x-2">
-            <Logo className="h-8 w-8" />
-            <span className="font-semibold">{BRAND_NAME[language]}</span>
+            <Logo className="h-8 w-8 shrink-0" />
+            <span className="flex flex-col text-xs font-semibold leading-tight">
+              <span>{BRAND_NAME_LINES[language].line1}</span>
+              <span>{BRAND_NAME_LINES[language].line2}</span>
+            </span>
           </Link>
 
           {showDarkModeToggle && burgerPosition === 'right' && (
