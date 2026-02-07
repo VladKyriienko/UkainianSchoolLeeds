@@ -45,7 +45,11 @@ export function EditOrganisationForm({
     }
 
     try {
-      await updateOrganisation(organisation.id, { name, name_uk: nameUk, slug });
+      await updateOrganisation(organisation.id, {
+        name,
+        slug,
+        ...(nameUk && { name_uk: nameUk })
+      });
       // router.push automatically refreshes the target route in Next.js App Router
       router.push('/admin/organisations');
     } catch (error: unknown) {
