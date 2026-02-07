@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
 import { NavItems, type NavItem } from '@/constants/navigation';
@@ -61,7 +61,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
           href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <Logo className="h-8 w-8" />
+          <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
           <span className="font-semibold">{BRAND_NAME[language]}</span>
         </Link>
 
@@ -184,7 +184,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Logo className="h-8 w-8" />
+                    <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
                     <span className="font-semibold">{BRAND_NAME[language]}</span>
                   </Link>
 

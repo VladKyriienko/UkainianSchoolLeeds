@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: title,
   description: description,
+  icons: {
+    icon: '/logo.png'
+  },
   openGraph: {
     title: title,
     description: description

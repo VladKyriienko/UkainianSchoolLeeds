@@ -126,31 +126,13 @@ export const NavItems: NavItem[] = [
     ]
   },
   {
-    label: 'Safeguarding',
-    href: '/safeguarding',
-    key: 'safeguarding',
-    children: [
-      {
-        label: 'Safeguarding Leads',
-        href: '/safeguarding/leads'
-      },
-      {
-        label: 'Safeguarding Policies',
-        href: '/safeguarding/policies'
-      },
-      {
-        label: 'Risk Assessments',
-        href: '/safeguarding/risk-assessments'
-      },
-      {
-        label: 'Safeguarding Concerns',
-        href: '/safeguarding/concerns'
-      }
-    ]
-  },
-  {
     label: 'Contact',
     href: '/contact',
     key: 'contact'
+  },
+  {
+    label: 'Cookies Policy',
+    href: '/cookies-policy',
+    key: 'cookiesPolicy'
   }
 ];
