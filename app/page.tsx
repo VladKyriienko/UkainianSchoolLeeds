@@ -1,4 +1,4 @@
-import { createClient, UserWithRoles } from '@/utils/supabase/server';
+import { getCurrentUser } from '@/utils/auth-helpers/server';
 import { AuthenticatedHomeClient, PublicHomeClient } from './client';
 import { AuthenticatedLayout } from '@/app/(authenticated)/AuthenticatedLayout';
 import { PublicLayout } from '@/components/common/RootLayout/PublicLayout';
@@ -9,21 +9,11 @@ import {
 } from '@/utils/route-protection';
 
 export default async function HomePage() {
-  const supabase = createClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  // Get user data (cached, deduplicated with layout.tsx)
+  const { user, profileData } = await getCurrentUser();
 
   // Show different content based on authentication status
   if (user) {
-    // Get user profile data
-    const profileData: UserWithRoles | null = (
-      await supabase
-        .from('users')
-        .select('*, roles(*)')
-        .eq('id', user.id)
-        .single()
-    ).data;
 
     // Get completion banner data
     const completionBannerData = await getCompletionBannerData(user.id);

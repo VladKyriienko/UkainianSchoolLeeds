@@ -38,7 +38,10 @@ export type UseSupabaseStoreReturn<T = Record<string, unknown>> = {
   error: string | null;
   updateFilters: (newFilters: Record<string, unknown>) => void;
   refetch: () => Promise<void>;
-  setRpcParams: (rpcName: string | null, params?: Record<string, unknown>) => void;
+  setRpcParams: (
+    rpcName: string | null,
+    params?: Record<string, unknown>
+  ) => void;
 };
 
 // Hook return type for mutations
@@ -154,17 +157,33 @@ const getClientStore = () => {
   // making the problem obvious if code tries to run mutations on server.
   if (typeof window === 'undefined') {
     const dummy = {
-      insert: async () => ({ data: null, error: new Error('Supabase client not available on server') }),
-      update: async () => ({ data: null, error: new Error('Supabase client not available on server') }),
-      delete: async () => ({ data: null, error: new Error('Supabase client not available on server') }),
-      upsert: async () => ({ data: null, error: new Error('Supabase client not available on server') }),
-      getClient: () => { throw new Error('Supabase client not available on server'); }
+      insert: async () => ({
+        data: null,
+        error: new Error('Supabase client not available on server')
+      }),
+      update: async () => ({
+        data: null,
+        error: new Error('Supabase client not available on server')
+      }),
+      delete: async () => ({
+        data: null,
+        error: new Error('Supabase client not available on server')
+      }),
+      upsert: async () => ({
+        data: null,
+        error: new Error('Supabase client not available on server')
+      }),
+      getClient: () => {
+        throw new Error('Supabase client not available on server');
+      }
     } as unknown as ClientSupabaseStore;
     return dummy;
   }
 
   if (!clientStore) {
-    clientStore = new ClientSupabaseStore(createClient());
+    clientStore = new ClientSupabaseStore(
+      createClient() as unknown as SupabaseClient<Database>
+    );
   }
   return clientStore;
 };
@@ -232,25 +251,33 @@ export function useSupabaseStore<T = Record<string, unknown>>(
   // Track the query URL to detect when server provides completely new query
   const queryUrl = initialQuery?.url;
   const lastQueryUrl = useRef<string | undefined>(queryUrl);
-  
+
   const [data, setData] = useState<T[]>(initialQuery?.data || []);
   // Initialize filters with user-modifiable filters from server query
   const extractedFilters = extractUserFilters(initialQuery?.searchParams || {});
-  
-  const [filters, setFilters] = useState<Record<string, unknown>>(extractedFilters);
+
+  const [filters, setFilters] =
+    useState<Record<string, unknown>>(extractedFilters);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // State for dynamic RPC queries
-  const [rpcName, setRpcName] = useState<string | null>(initialQuery?.rpcName || null);
-  const [rpcParams, setRpcParamsState] = useState<Record<string, unknown>>(initialQuery?.rpcParams || {});
+  const [rpcName, setRpcName] = useState<string | null>(
+    initialQuery?.rpcName || null
+  );
+  const [rpcParams, setRpcParamsState] = useState<Record<string, unknown>>(
+    initialQuery?.rpcParams || {}
+  );
 
   // Ref to prevent initial fetch
   const isInitial = useRef(true);
-  
+
   // Reset filters when query URL changes (server provided new query with different filters)
   useEffect(() => {
-    if (queryUrl !== lastQueryUrl.current && lastQueryUrl.current !== undefined) {
+    if (
+      queryUrl !== lastQueryUrl.current &&
+      lastQueryUrl.current !== undefined
+    ) {
       const newFilters = extractUserFilters(initialQuery?.searchParams || {});
       setFilters(newFilters);
       setData(initialQuery?.data || []);
@@ -260,12 +287,15 @@ export function useSupabaseStore<T = Record<string, unknown>>(
   }, [queryUrl, initialQuery]);
 
   // Function to update RPC parameters dynamically
-  const setRpcParams = useCallback((newRpcName: string | null, newParams?: Record<string, unknown>) => {
-    setRpcName(newRpcName);
-    if (newParams) {
-      setRpcParamsState(newParams);
-    }
-  }, []);
+  const setRpcParams = useCallback(
+    (newRpcName: string | null, newParams?: Record<string, unknown>) => {
+      setRpcName(newRpcName);
+      if (newParams) {
+        setRpcParamsState(newParams);
+      }
+    },
+    []
+  );
 
   // Function to execute a query based on current filters
   const executeQuery = useCallback(
@@ -276,7 +306,8 @@ export function useSupabaseStore<T = Record<string, unknown>>(
       // client auth/session (common when SSR didn't have a session cookie).
       if (isInitial.current) {
         isInitial.current = false;
-        const hasServerData = Array.isArray(initialQuery?.data) && initialQuery!.data.length > 0;
+        const hasServerData =
+          Array.isArray(initialQuery?.data) && initialQuery!.data.length > 0;
         if (hasServerData) {
           return;
         }
@@ -350,13 +381,20 @@ export function useSupabaseStore<T = Record<string, unknown>>(
             if (Array.isArray(value)) {
               // flatten any nested arrays and coerce all entries to string
               vals = (value as unknown[])
-                .flatMap((v) => (v == null ? [] : (typeof v === 'string' ? [v] : [String(v)])))
-                .map(s => s.trim())
+                .flatMap((v) =>
+                  v == null ? [] : typeof v === 'string' ? [v] : [String(v)]
+                )
+                .map((s) => s.trim())
                 .filter(Boolean);
             } else if (typeof value === 'string') {
               // If comma-separated, split; otherwise treat the whole string
               // as one value (wrap it).
-              vals = value.includes(',') ? value.split(',').map(s => s.trim()).filter(Boolean) : [value.trim()];
+              vals = value.includes(',')
+                ? value
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                : [value.trim()];
             } else if (value != null) {
               vals = [String(value).trim()];
             }
@@ -371,7 +409,12 @@ export function useSupabaseStore<T = Record<string, unknown>>(
           } else if (key === 'limit') {
             query = query.limit(value as number);
           } else if (key === 'offset') {
-            query = query.range(value as number, currentFilters['limit'] as number ? (value as number) + (currentFilters['limit'] as number) - 1 : undefined);
+            query = query.range(
+              value as number,
+              (currentFilters['limit'] as number)
+                ? (value as number) + (currentFilters['limit'] as number) - 1
+                : undefined
+            );
           } else {
             // Default to equality - key can include dots for relational filters
             query = query.eq(key, value as never);
@@ -437,7 +480,15 @@ export function useSupabaseStore<T = Record<string, unknown>>(
     }
   }, [filters, executeQuery, initialQuery?.data, rpcParams, rpcName]);
 
-  return { data, filters, loading, error, updateFilters, refetch, setRpcParams };
+  return {
+    data,
+    filters,
+    loading,
+    error,
+    updateFilters,
+    refetch,
+    setRpcParams
+  };
 }
 
 // Hook for insert mutations
@@ -605,7 +656,10 @@ export type UseInfiniteSupabaseReturn<T = Record<string, unknown>> = {
   hasMore: boolean;
   updateFilters: (newFilters: Record<string, unknown>) => void;
   refetch: () => Promise<void>;
-  setRpcParams: (rpcName: string | null, params?: Record<string, unknown>) => void;
+  setRpcParams: (
+    rpcName: string | null,
+    params?: Record<string, unknown>
+  ) => void;
   loadMore: () => Promise<void>;
 };
 
@@ -620,20 +674,23 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
   initialQuery: QueryResult<T> | undefined,
   options: UseInfiniteSupabaseOptions = {}
 ): UseInfiniteSupabaseReturn<T> {
-  const { pageSize = initialQuery?.data.length || 20, initialPage = 0 } = options;
-  
+  const { pageSize = initialQuery?.data.length || 20, initialPage = 0 } =
+    options;
+
   // Track the query identity to detect when server provides a completely new query
   const queryIdentity = useMemo(() => {
     if (!initialQuery) return null;
     // Use the URL as the identity since it includes all the filters from the server
     return initialQuery.url;
   }, [initialQuery?.url]); // eslint-disable-line react-hooks/exhaustive-deps
-  
+
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [allData, setAllData] = useState<T[]>(initialQuery?.data || []);
-  const [hasMore, setHasMore] = useState(initialQuery?.data ? initialQuery.data.length >= pageSize : true);
+  const [hasMore, setHasMore] = useState(
+    initialQuery?.data ? initialQuery.data.length >= pageSize : true
+  );
   const [loadingMore, setLoadingMore] = useState(false);
-  
+
   // Track the last page we loaded to prevent duplicate appends
   // Start at initialPage since we already have that data loaded
   const lastLoadedPage = useRef(initialPage);
@@ -650,24 +707,30 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
   const lastQueryIdentity = useRef<string | null>(queryIdentity);
 
   // Use the regular hook with the original initialQuery
-  const { 
-    data: pageData, 
-    filters, 
-    loading, 
-    error, 
-    updateFilters, 
-    refetch, 
-    setRpcParams 
+  const {
+    data: pageData,
+    filters,
+    loading,
+    error,
+    updateFilters,
+    refetch,
+    setRpcParams
   } = useSupabaseStore(initialQuery);
 
   // CRITICAL: Reset everything when the server provides a new query (e.g., tab change)
   // This must run BEFORE the pageData effect to ensure clean state
   useEffect(() => {
-    if (queryIdentity !== lastQueryIdentity.current && lastQueryIdentity.current !== null) {
-      console.log('[InfiniteScroll] Server query changed, resetting completely:', {
-        oldQuery: lastQueryIdentity.current,
-        newQuery: queryIdentity
-      });
+    if (
+      queryIdentity !== lastQueryIdentity.current &&
+      lastQueryIdentity.current !== null
+    ) {
+      console.log(
+        '[InfiniteScroll] Server query changed, resetting completely:',
+        {
+          oldQuery: lastQueryIdentity.current,
+          newQuery: queryIdentity
+        }
+      );
       // Complete reset - server provided new filtered data
       setAllData(initialQuery?.data || []);
       setHasMore((initialQuery?.data?.length || 0) >= pageSize);
@@ -698,11 +761,11 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
       console.log('[InfiniteScroll] No pageData, skipping');
       return;
     }
-    
-  // Check if this is actually new data by comparing the full page snapshot
-  const currentPageSnapshot = JSON.stringify(pageData);
-  const isNewData = currentPageSnapshot !== lastSeenPageSnapshot.current;
-    
+
+    // Check if this is actually new data by comparing the full page snapshot
+    const currentPageSnapshot = JSON.stringify(pageData);
+    const isNewData = currentPageSnapshot !== lastSeenPageSnapshot.current;
+
     console.log('[InfiniteScroll] Effect triggered:', {
       currentPage,
       lastLoadedPage: lastLoadedPage.current,
@@ -712,23 +775,25 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
       pageDataLength: pageData.length,
       isNewData
     });
-    
+
     // Check if we're on the initial page
     const isInitialPage = currentPage === initialPage;
-    
+
     // If we're on page 0 AND we've already set initial data AND the data is new,
     // it means we switched query modes (e.g., from table to RPC) - do a full reset
     if (isInitialPage && hasSetInitialData.current && isNewData && !loading) {
-      console.log('[InfiniteScroll] Query mode changed (e.g., RPC switch), resetting with new data');
+      console.log(
+        '[InfiniteScroll] Query mode changed (e.g., RPC switch), resetting with new data'
+      );
       setAllData(pageData);
       setHasMore(pageData.length >= pageSize);
       lastLoadedPage.current = initialPage;
       isLoadingPage.current = false;
       setLoadingMore(false);
-  lastSeenPageSnapshot.current = currentPageSnapshot;
+      lastSeenPageSnapshot.current = currentPageSnapshot;
       return;
     }
-    
+
     // Skip initial data if we're still loading the first page
     if (isInitialPage && !hasSetInitialData.current) {
       if (loading) {
@@ -736,38 +801,71 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
         return; // Wait for initial load to complete
       }
       // First page - replace all data (only once on initial load)
-      console.log('[InfiniteScroll] Setting initial page data:', pageData.length, 'items');
+      console.log(
+        '[InfiniteScroll] Setting initial page data:',
+        pageData.length,
+        'items'
+      );
       setAllData(pageData);
       setHasMore(pageData.length >= pageSize);
       lastLoadedPage.current = initialPage;
       hasSetInitialData.current = true;
       isLoadingPage.current = false;
       setLoadingMore(false);
-  lastSeenPageSnapshot.current = currentPageSnapshot;
-    } else if (currentPage > lastLoadedPage.current && isLoadingPage.current && !loading && isNewData) {
+      lastSeenPageSnapshot.current = currentPageSnapshot;
+    } else if (
+      currentPage > lastLoadedPage.current &&
+      isLoadingPage.current &&
+      !loading &&
+      isNewData
+    ) {
       // New page loaded - append data only if:
       // 1. We're on a new page (currentPage > lastLoadedPage)
       // 2. We initiated a page load (isLoadingPage)
       // 3. Loading is complete (!loading)
       // 4. The data is actually different (isNewData)
-      console.log('[InfiniteScroll] Appending page', currentPage, 'data:', pageData.length, 'items');
-      setAllData(prev => {
+      console.log(
+        '[InfiniteScroll] Appending page',
+        currentPage,
+        'data:',
+        pageData.length,
+        'items'
+      );
+      setAllData((prev) => {
         console.log('[InfiniteScroll] Previous data length:', prev.length);
         // Check for duplicates before appending
-        const existingIds = new Set(prev.map((item: T) => (item as { id?: unknown }).id));
-        const newItems = pageData.filter((item: T) => !existingIds.has((item as { id?: unknown }).id));
+        const existingIds = new Set(
+          prev.map((item: T) => (item as { id?: unknown }).id)
+        );
+        const newItems = pageData.filter(
+          (item: T) => !existingIds.has((item as { id?: unknown }).id)
+        );
         console.log('[InfiniteScroll] New items to add:', newItems.length);
         const result = [...prev, ...newItems];
-        console.log('[InfiniteScroll] Total items after append:', result.length);
+        console.log(
+          '[InfiniteScroll] Total items after append:',
+          result.length
+        );
         return result;
       });
       setHasMore(pageData.length >= pageSize);
       lastLoadedPage.current = currentPage;
       isLoadingPage.current = false;
       setLoadingMore(false);
-  lastSeenPageSnapshot.current = currentPageSnapshot;
+      lastSeenPageSnapshot.current = currentPageSnapshot;
     } else {
-      console.log('[InfiniteScroll] Conditions not met for update - currentPage:', currentPage, 'lastLoadedPage:', lastLoadedPage.current, 'isLoadingPage:', isLoadingPage.current, 'loading:', loading, 'isNewData:', isNewData);
+      console.log(
+        '[InfiniteScroll] Conditions not met for update - currentPage:',
+        currentPage,
+        'lastLoadedPage:',
+        lastLoadedPage.current,
+        'isLoadingPage:',
+        isLoadingPage.current,
+        'loading:',
+        loading,
+        'isNewData:',
+        isNewData
+      );
     }
   }, [pageData, loading, currentPage, initialPage, pageSize]);
 
@@ -778,21 +876,25 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
     );
     return JSON.stringify(filtered);
   }, [filters]);
-  
+
   const prevNonPaginationFilters = useRef(nonPaginationFilters);
   useEffect(() => {
     // Check if non-pagination filters changed
-    const filtersChanged = prevNonPaginationFilters.current !== nonPaginationFilters && prevNonPaginationFilters.current !== '{}';
-    
+    const filtersChanged =
+      prevNonPaginationFilters.current !== nonPaginationFilters &&
+      prevNonPaginationFilters.current !== '{}';
+
     if (filtersChanged) {
-      console.log('[InfiniteScroll] Non-pagination filters changed, resetting pagination');
+      console.log(
+        '[InfiniteScroll] Non-pagination filters changed, resetting pagination'
+      );
       setCurrentPage(initialPage);
       setAllData([]);
       setHasMore(true);
       lastLoadedPage.current = initialPage - 1; // Set to before initial so first page loads
       hasSetInitialData.current = false; // Reset initial data flag
       isLoadingPage.current = false;
-  lastSeenPageSnapshot.current = '[]'; // Reset seen IDs
+      lastSeenPageSnapshot.current = '[]'; // Reset seen IDs
       updateFilters({ limit: pageSize, offset: 0 });
     }
     prevNonPaginationFilters.current = nonPaginationFilters;
@@ -801,10 +903,15 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
   // Load more function
   const loadMore = useCallback(async () => {
     if (loading || loadingMore || !hasMore || isLoadingPage.current) {
-      console.log('Skipping loadMore:', { loading, loadingMore, hasMore, isLoadingPage: isLoadingPage.current });
+      console.log('Skipping loadMore:', {
+        loading,
+        loadingMore,
+        hasMore,
+        isLoadingPage: isLoadingPage.current
+      });
       return;
     }
-    
+
     console.log('Loading more, current page:', currentPage);
     isLoadingPage.current = true;
     setLoadingMore(true);
@@ -815,22 +922,25 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
   }, [loading, loadingMore, hasMore, currentPage, pageSize, updateFilters]);
 
   // Custom updateFilters that preserves pagination state
-  const customUpdateFilters = useCallback((newFilters: Record<string, unknown>) => {
-    // If we're updating pagination filters, just pass through
-    if ('offset' in newFilters || 'limit' in newFilters) {
-      updateFilters(newFilters);
-    } else {
-      // For other filters, reset pagination
-      console.log('Updating non-pagination filters:', newFilters);
-      setCurrentPage(initialPage);
-      setAllData([]);
-      setHasMore(true);
-      lastLoadedPage.current = initialPage - 1;
-      hasSetInitialData.current = false; // Reset initial data flag
-      isLoadingPage.current = false;
-      updateFilters({ ...newFilters, limit: pageSize, offset: 0 });
-    }
-  }, [updateFilters, initialPage, pageSize]);
+  const customUpdateFilters = useCallback(
+    (newFilters: Record<string, unknown>) => {
+      // If we're updating pagination filters, just pass through
+      if ('offset' in newFilters || 'limit' in newFilters) {
+        updateFilters(newFilters);
+      } else {
+        // For other filters, reset pagination
+        console.log('Updating non-pagination filters:', newFilters);
+        setCurrentPage(initialPage);
+        setAllData([]);
+        setHasMore(true);
+        lastLoadedPage.current = initialPage - 1;
+        hasSetInitialData.current = false; // Reset initial data flag
+        isLoadingPage.current = false;
+        updateFilters({ ...newFilters, limit: pageSize, offset: 0 });
+      }
+    },
+    [updateFilters, initialPage, pageSize]
+  );
 
   return {
     data: allData,

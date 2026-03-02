@@ -87,7 +87,7 @@ export const AuthProvider = ({
   useEffect(() => {
     // Initialize Supabase client only on the client side
     const client = createClient();
-    setSupabase(client);
+    setSupabase(client as unknown as SupabaseClient<Database>);
 
     // Subscribe to auth state changes
     const {

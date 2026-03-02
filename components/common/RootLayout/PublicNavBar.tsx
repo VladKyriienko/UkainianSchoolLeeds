@@ -3,12 +3,17 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
+import LanguageToggle from './LanguageToggle';
 import { NavItems, type NavItem } from '@/constants/navigation';
 import { cn } from '@/utils/cn';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/providers/language-provider';
+import { BRAND_NAME_LINES, NAV_LABELS } from '@/content/navigation';
 
 export type PublicNavBarProps = {
   showDarkModeToggle?: boolean;
@@ -17,7 +22,15 @@ export type PublicNavBarProps = {
 
 export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true }: PublicNavBarProps) {
   const pathname = usePathname();
+  const { language } = useLanguage();
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileExpandedKey, setMobileExpandedKey] = useState<string | null>(null);
+
+  const getTranslatedLabel = (defaultLabel: string, href: string) => {
+    const labelsForLang = NAV_LABELS[language] ?? {};
+    return labelsForLang[href] ?? defaultLabel;
+  };
 
   const activeKey = useMemo(() => {
     const matchesItem = (item: NavItem) => {
@@ -35,21 +48,24 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
   const linkClass = (isActive: boolean) =>
     cn(
       'inline-flex items-center gap-1 px-1 pb-2 text-sm font-medium transition-colors',
-      'text-muted-foreground hover:text-foreground',
-      'border-b-2 border-transparent hover:border-primary/50',
-      isActive && 'text-foreground border-primary'
+      'text-ukraine-header-muted hover:text-ukraine-header-fg',
+      'border-b-2 border-transparent hover:border-ukraine-yellow/50',
+      isActive && 'text-ukraine-header-fg border-ukraine-yellow'
     );
 
   return (
-    <header className="border-b bg-background fixed top-0 left-0 right-0 z-50">
+    <header className="border-b-[3px] border-ukraine-yellow bg-ukraine-header-bg text-ukraine-header-fg fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity text-ukraine-header-fg"
         >
-          <Logo className="h-8 w-8" />
-          <span className="font-semibold">Ukrainian School</span>
+          <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
+          <span className="flex flex-col text-xs font-semibold leading-tight">
+            <span>{BRAND_NAME_LINES[language].line1}</span>
+            <span>{BRAND_NAME_LINES[language].line2}</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -67,7 +83,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     className={linkClass(isActive)}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    {item.label}
+                    {getTranslatedLabel(item.label, item.href)}
                   </Link>
                 );
               }
@@ -87,7 +103,7 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     aria-expanded={isOpen}
                     aria-haspopup="menu"
                   >
-                    {item.label}
+                    {getTranslatedLabel(item.label, item.href)}
                     <ChevronDown
                       className={cn(
                         'h-4 w-4 transition-transform',
@@ -100,7 +116,8 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                     <div
                       className={cn(
                         'absolute left-1/2 top-5 z-50 mt-3 w-80 -translate-x-1/2',
-                        'rounded-xl border bg-background p-2 shadow-lg'
+                        'rounded-xl border border-ukraine-blue/40 p-2 shadow-lg',
+                        'bg-[rgb(var(--ukraine-blue)/0.8)] backdrop-blur-sm'
                       )}
                       role="menu"
                     >
@@ -113,15 +130,15 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              'block rounded-lg px-4 py-3 text-sm transition-colors',
+                              'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
                               childActive
-                                ? 'bg-muted text-foreground'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
+                                : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
                             )}
                             role="menuitem"
                             onClick={() => setOpenKey(null)}
                           >
-                            {child.label}
+                            {getTranslatedLabel(child.label, child.href)}
                           </Link>
                         );
                       })}
@@ -136,8 +153,130 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Language toggle - hidden on mobile, shown on desktop */}
+          <div className="hidden lg:block">
+            <LanguageToggle />
+          </div>
           {showDarkModeToggle && <DarkModeToggle />}
 
+          {/* Mobile Menu Button */}
+          {showNavigation && (
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden text-ukraine-header-fg hover:bg-white/10 hover:text-ukraine-header-fg"
+                  aria-label="Open menu"
+                >
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto px-4">
+                {/* Hidden title for accessibility */}
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+
+                {/* Language Toggle at top */}
+
+                <div className="mt-[-17px] mb-2">
+                  <LanguageToggle />
+                </div>
+                <div className="flex flex-col gap-6">
+                  {/* Logo in mobile menu */}
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
+                    <span className="flex flex-col text-xs font-semibold leading-tight">
+                      <span>{BRAND_NAME_LINES[language].line1}</span>
+                      <span>{BRAND_NAME_LINES[language].line2}</span>
+                    </span>
+                  </Link>
+
+                  {/* Mobile Navigation */}
+                  <nav className="flex flex-col gap-2 flex-1">
+                    {NavItems.map((item) => {
+                      const isActive = activeKey === item.key;
+                      const hasChildren = !!item.children?.length;
+
+                      if (!hasChildren) {
+                        return (
+                          <Link
+                            key={item.key}
+                            href={item.href}
+                            className={cn(
+                              'block rounded-lg px-4 py-3 text-sm font-medium transition-colors',
+                              isActive
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            )}
+                            onClick={() => setMobileOpen(false)}
+                          >
+                            {getTranslatedLabel(item.label, item.href)}
+                          </Link>
+                        );
+                      }
+
+                      const isExpanded = mobileExpandedKey === item.key;
+
+                      return (
+                        <div key={item.key}>
+                          <button
+                            type="button"
+                            className={cn(
+                              'w-full flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors',
+                              isActive
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            )}
+                            onClick={() =>
+                              setMobileExpandedKey(isExpanded ? null : item.key)
+                            }
+                            aria-expanded={isExpanded}
+                          >
+                            {getTranslatedLabel(item.label, item.href)}
+                            <ChevronDown
+                              className={cn(
+                                'h-4 w-4 transition-transform',
+                                isExpanded && 'rotate-180'
+                              )}
+                            />
+                          </button>
+
+                          {isExpanded && (
+                            <div className="ml-4 mt-1 flex flex-col gap-1">
+                              {item.children!.map((child) => {
+                                const childActive =
+                                  pathname === child.href ||
+                                  pathname.startsWith(`${child.href}/`);
+                                return (
+                                  <Link
+                                    key={child.href}
+                                    href={child.href}
+                                    className={cn(
+                                      'block rounded-lg px-4 py-2 text-sm transition-colors',
+                                      childActive
+                                        ? 'bg-muted text-foreground font-medium'
+                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                    )}
+                                    onClick={() => setMobileOpen(false)}
+                                  >
+                                    {getTranslatedLabel(child.label, child.href)}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
     </header>

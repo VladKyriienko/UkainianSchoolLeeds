@@ -1,43 +1,20 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
-import { Users, Building2, Settings, GraduationCap } from 'lucide-react';
+import { Users, Building2, Settings, GraduationCap, ArrowLeft } from 'lucide-react';
+import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function AdminDashboard() {
-  const supabase = createClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return redirect('/auth/login');
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    return redirect('/');
-  }
 
   const { allowOrganisations } = getOrganisationSettings();
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Manage users, organisations, and system settings
-        </p>
-      </div>
+    <PageWrapper
+      title="Admin Dashboard"
+      description="Manage users, organisations, and system settings"
+      goBackButton={<Button asChild><Link href="/"><ArrowLeft className="w-4 h-4 mr-2" />Back</Link></Button>}
+    >
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Link href="/admin/users" className="block group">
@@ -127,6 +104,6 @@ export default async function AdminDashboard() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageWrapper>
   );
 }

@@ -4,7 +4,7 @@ import { getURL } from '@/utils/helpers';
 import { cookies } from 'next/headers';
 import Providers from '@/providers/providers';
 import 'styles/main.css';
-import { createClient, UserWithRoles } from '@/utils/supabase/server';
+import { getCurrentUser } from '@/utils/auth-helpers/server';
 
 const title = 'Ukrainia School';
 const description = 'Ukrainia School is a school for Ukrainian children.';
@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: title,
   description: description,
+  icons: {
+    icon: '/logo.png'
+  },
   openGraph: {
     title: title,
     description: description
@@ -23,24 +26,8 @@ export default async function Layout({ children }: PropsWithChildren) {
   const cookieStore = await cookies();
   const theme = cookieStore.get('theme')?.value;
 
-  const supabase = createClient();
-  let profileData: UserWithRoles | null = null;
-
-  // Get user data for providers
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    // Get user profile data from users table
-    profileData = (
-      await supabase
-        .from('users')
-        .select('*, roles(*)')
-        .eq('id', user.id)
-        .single()
-    ).data;
-  }
+  // Get user data for providers (cached, deduplicated with page.tsx)
+  const { user, profileData } = await getCurrentUser();
 
   return (
     <html lang="en" className={theme || 'light'}>

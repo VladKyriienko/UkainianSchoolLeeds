@@ -6,7 +6,7 @@ export default function Layout({ children }: PropsWithChildren) {
   return (
     <>
       <PublicLayout showHeader={true} showNavigation={false} showDarkModeToggle={false}>
-        <div className="flex flex-1 h-full items-center justify-center p-6 md:p-10">
+        <div className="flex flex-1 h-full items-center justify-center md:p-10">
           <div className="w-full max-w-md">{children}</div>
         </div>
       </PublicLayout>

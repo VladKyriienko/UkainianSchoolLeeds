@@ -2,7 +2,7 @@
 
 import { createAdminClient } from '@/utils/supabase/admin';
 import { createClient as createServerClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
+import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
 import { getURL } from '@/utils/helpers';
 import { format } from 'date-fns';
@@ -65,44 +65,19 @@ type AuthUpdateData = {
 
 export type CreateOrganisationData = {
   name: string;
+  name_uk?: string;
   slug: string;
 };
 
 export type UpdateOrganisationData = {
   name?: string;
+  name_uk?: string;
   slug?: string;
 };
 
 export type AdminOrganisation = {
   organisation_memberships?: OrganisationMembership[];
 } & Tables<'organisations'>;
-
-// Check if current user is admin
-async function verifyAdminAccess(): Promise<string> {
-  const supabase = createServerClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    redirect('/auth/login');
-    return 'Unauthorized: Admin access required';
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    throw new Error('Unauthorized: Admin access required');
-  }
-
-  return user.id;
-}
 
 // Get all users with their roles and organisations
 export async function getAllUsers(options?: {
@@ -557,6 +532,7 @@ export async function createOrganisation(data: CreateOrganisationData) {
       .insert([
         {
           name: data.name,
+          name_uk: data.name_uk || null,
           slug: data.slug
         }
       ])

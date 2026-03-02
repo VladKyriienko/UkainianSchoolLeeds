@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import {
   Sidebar,
@@ -17,9 +19,11 @@ import { X } from 'lucide-react';
 import { NavMain } from './NavMain';
 import { NavUser } from './NavUser';
 import { CompletionBanner } from '@/components/common/CompletionBanner/CompletionBanner';
-import Logo from '@/components/icons/Logo';
 import DarkModeToggle from '@/components/common/RootLayout/DarkModeToggle';
+import LanguageToggle from '@/components/common/RootLayout/LanguageToggle';
 import { cn } from '@/utils/cn';
+import { useLanguage } from '@/providers/language-provider';
+import { BRAND_NAME_LINES } from '@/content/navigation';
 import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
 import type { CompletionData } from '@/components/common/CompletionBanner/types';
 import { RouteConfig } from '@/utils/route-protection';
@@ -63,6 +67,9 @@ export function AppSidebar({
   ...props
 }: AppSidebarProps) {
   const { isMobile, setOpenMobile } = useSidebar();
+  const { language } = useLanguage();
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin') ?? false;
 
   const handleMobileClose = () => {
     if (isMobile) {
@@ -85,14 +92,16 @@ export function AppSidebar({
             href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <Logo className="h-8 w-8" />
-            <span className="font-semibold text-sidebar-foreground">
-              Ukrainia School
+            <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
+            <span className="flex flex-col text-xs font-semibold leading-tight text-sidebar-foreground">
+              <span>{BRAND_NAME_LINES[language].line1}</span>
+              <span>{BRAND_NAME_LINES[language].line2}</span>
             </span>
           </Link>
 
           {/* Controls */}
           <div className="flex items-center gap-2">
+            {!isAdmin && <LanguageToggle />}
             {showDarkModeToggle && <DarkModeToggle />}
             {showSidebarTrigger && !isMobile && (
               <SidebarTrigger className="h-8 w-8" />
@@ -116,7 +125,7 @@ export function AppSidebar({
         {!isMobile && (
           <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-2 p-2">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <Logo className="h-8 w-8" />
+              <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
             </Link>
             {showSidebarTrigger && <SidebarTrigger className="h-8 w-8" />}
           </div>

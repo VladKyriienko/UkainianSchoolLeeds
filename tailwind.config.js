@@ -81,6 +81,13 @@ export default {
           DEFAULT: 'rgb(var(--card))',
           foreground: 'rgb(var(--card-foreground))'
         },
+        ukraine: {
+          blue: 'rgb(var(--ukraine-blue))',
+          yellow: 'rgb(var(--ukraine-yellow))',
+          'header-bg': 'rgb(var(--ukraine-header-bg))',
+          'header-fg': 'rgb(var(--ukraine-header-fg))',
+          'header-muted': 'rgb(var(--ukraine-header-muted))'
+        },
         sidebar: {
           DEFAULT: 'rgb(var(--sidebar))',
           foreground: 'rgb(var(--sidebar-foreground))',

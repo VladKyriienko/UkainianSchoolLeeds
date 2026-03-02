@@ -1,5 +1,3 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 import {
   getAllUsers,
   getAllOrganisations,
@@ -17,26 +15,6 @@ export default async function EditUserPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = createClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return redirect('/auth/login');
-  }
-
-  // Check if user has admin role
-  const { data: roleData, error: roleError } = await supabase
-    .from('roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (roleError || roleData?.role !== 'admin') {
-    return redirect('/');
-  }
 
   let users: AdminUser[] = [];
   let organisations: Tables<'organisations'>[] = [];

@@ -34,6 +34,8 @@ export function EditOrganisationForm({
 
     const formData = new FormData(e.currentTarget);
     const name = String(formData.get('name')).trim();
+    const nameUkRaw = String(formData.get('name_uk') ?? '').trim();
+    const nameUk = nameUkRaw || undefined;
     const slug = String(formData.get('slug')).trim();
 
     if (!name || !slug) {
@@ -43,7 +45,11 @@ export function EditOrganisationForm({
     }
 
     try {
-      await updateOrganisation(organisation.id, { name, slug });
+      await updateOrganisation(organisation.id, {
+        name,
+        slug,
+        ...(nameUk && { name_uk: nameUk })
+      });
       // router.push automatically refreshes the target route in Next.js App Router
       router.push('/admin/organisations');
     } catch (error: unknown) {
@@ -65,24 +71,37 @@ export function EditOrganisationForm({
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="name">Organisation Name</Label>
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          required
-          defaultValue={organisation.name}
-          placeholder="Acme Corporation"
-          onChange={(e) => {
-            const slugInput = document.getElementById(
-              'slug'
-            ) as HTMLInputElement;
-            if (slugInput) {
-              slugInput.value = generateSlug(e.target.value);
-            }
-          }}
-        />
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Organisation Name</Label>
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            required
+            defaultValue={organisation.name}
+            placeholder="Acme Corporation"
+            onChange={(e) => {
+              const slugInput = document.getElementById(
+                'slug'
+              ) as HTMLInputElement;
+              if (slugInput) {
+                slugInput.value = generateSlug(e.target.value);
+              }
+            }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="name_uk">Organisation Name (Ukrainian)</Label>
+          <Input
+            type="text"
+            id="name_uk"
+            name="name_uk"
+            defaultValue={organisation.name_uk ?? ''}
+            placeholder="Назва організації українською"
+          />
+        </div>
       </div>
 
       <div className="space-y-2">

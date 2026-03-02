@@ -1,11 +1,13 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getTeacherById } from '@/app/(authenticated)/admin/teachers/actions';
 import { TeacherDetailsActions } from '@/app/(authenticated)/admin/components/TeacherDetailsActions';
+import { PageWrapper } from '@/components/common/PageWrapper';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export default async function TeacherDetailsPage({
   params
@@ -28,26 +30,16 @@ export default async function TeacherDetailsPage({
   const supabaseAdmin = createAdminClient();
   const photoUrl = teacher.photo
     ? supabaseAdmin.storage.from('teachers-photos').getPublicUrl(teacher.photo)
-        .data.publicUrl
+      .data.publicUrl
     : null;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <Link
-            href="/admin/teachers"
-            className="text-primary hover:text-primary/80 mb-3 inline-block"
-          >
-            ← Back to Teachers
-          </Link>
-          <h1 className="text-3xl font-bold">{teacher.name}</h1>
-          <p className="text-muted-foreground">{teacher.title || '—'}</p>
-        </div>
-
-        <TeacherDetailsActions teacherId={teacher.id} teacherName={teacher.name} />
-      </div>
-
+    <PageWrapper
+      title={teacher.name}
+      description={teacher.title || '—'}
+      goBackButton={<Button asChild><Link href="/admin/teachers"><ArrowLeft className="w-4 h-4 mr-2" />Back</Link></Button>}
+      actions={<TeacherDetailsActions teacherId={teacher.id} teacherName={teacher.name} />}
+    >
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1">
           <CardHeader>
@@ -106,7 +98,7 @@ export default async function TeacherDetailsPage({
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 

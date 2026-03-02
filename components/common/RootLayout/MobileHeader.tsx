@@ -2,12 +2,16 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
 import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
+import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
+import { useLanguage } from '@/providers/language-provider';
+import { BRAND_NAME_LINES } from '@/content/navigation';
 
 export type MobileHeaderProps = {
   showDarkModeToggle?: boolean;
@@ -21,6 +25,9 @@ export function MobileHeader({
   className
 }: MobileHeaderProps) {
   const { toggleSidebar } = useSidebar();
+  const { language } = useLanguage();
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin') ?? false;
 
   return (
     <header
@@ -45,13 +52,17 @@ export function MobileHeader({
           )}
 
           <Link href="/" className="flex items-center space-x-2">
-            <Logo className="h-8 w-8" />
-            <span className="font-semibold">Ukrainian School</span>
+            <Logo className="h-8 w-8 shrink-0" />
+            <span className="flex flex-col text-xs font-semibold leading-tight">
+              <span>{BRAND_NAME_LINES[language].line1}</span>
+              <span>{BRAND_NAME_LINES[language].line2}</span>
+            </span>
           </Link>
 
           {showDarkModeToggle && burgerPosition === 'right' && (
             <DarkModeToggle />
           )}
+          {!isAdmin && <LanguageToggle />}
         </div>
 
         {/* Right side content */}
