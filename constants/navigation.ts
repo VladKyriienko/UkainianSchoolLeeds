@@ -126,13 +126,13 @@ export const NavItems: NavItem[] = [
     ]
   },
   {
+    label: 'Donate',
+    href: '/donate',
+    key: 'donate'
+  },
+  {
     label: 'Contact',
     href: '/contact',
     key: 'contact'
-  },
-  {
-    label: 'Cookies Policy',
-    href: '/cookies-policy',
-    key: 'cookiesPolicy'
   }
 ];
