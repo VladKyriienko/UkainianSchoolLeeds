@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -9,7 +9,7 @@ import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
 import { NavItems, type NavItem } from '@/constants/navigation';
 import { cn } from '@/utils/cn';
-import { ChevronDown, Menu } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
@@ -18,14 +18,39 @@ import { BRAND_NAME_LINES, NAV_LABELS } from '@/content/navigation';
 export type PublicNavBarProps = {
   showDarkModeToggle?: boolean;
   showNavigation?: boolean;
+  /** Container for mobile sheet portal so overlay renders below header (z-index) */
+  sheetPortalContainer?: HTMLDivElement | null;
+  /** Called when mobile menu open state changes (for custom overlay in layout) */
+  onMobileMenuOpenChange?: (open: boolean) => void;
 };
 
-export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true }: PublicNavBarProps) {
+export function PublicNavBar({
+  showDarkModeToggle = true,
+  showNavigation = true,
+  sheetPortalContainer = null,
+  onMobileMenuOpenChange
+}: PublicNavBarProps) {
   const pathname = usePathname();
   const { language } = useLanguage();
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpandedKey, setMobileExpandedKey] = useState<string | null>(null);
+
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
+    onMobileMenuOpenChange?.(false);
+  };
+
+  // Lock body scroll and ensure overlay dims content when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileOpen]);
 
   const getTranslatedLabel = (defaultLabel: string, href: string) => {
     const labelsForLang = NAV_LABELS[language] ?? {};
@@ -54,8 +79,8 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
     );
 
   return (
-    <header className="border-b-[3px] border-ukraine-yellow bg-ukraine-header-bg text-ukraine-header-fg fixed top-0 left-0 right-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b-[3px] border-ukraine-yellow bg-ukraine-header-bg text-ukraine-header-fg fixed top-0 left-0 right-0 z-[200] min-h-[4.5rem] flex items-center isolate">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between w-full">
         {/* Logo */}
         <Link
           href="/"
@@ -153,49 +178,81 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Language toggle - hidden on mobile, shown on desktop */}
-          <div className="hidden lg:block">
+          {/* Language toggle - same colors as burger on mobile */}
+          <div className="[&_button]:text-ukraine-header-fg [&_button]:hover:bg-white/10 [&_button]:hover:text-ukraine-header-fg">
             <LanguageToggle />
           </div>
           {showDarkModeToggle && <DarkModeToggle />}
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - burger animates to X when open */}
           {showNavigation && (
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <Sheet
+              open={mobileOpen}
+              onOpenChange={(open) => {
+                setMobileOpen(open);
+                onMobileMenuOpenChange?.(open);
+              }}
+              modal={false}
+            >
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="lg:hidden text-ukraine-header-fg hover:bg-white/10 hover:text-ukraine-header-fg"
-                  aria-label="Open menu"
+                  className="lg:hidden relative w-10 h-10 text-ukraine-header-fg hover:bg-white/10 hover:text-ukraine-header-fg"
+                  aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                  aria-expanded={mobileOpen}
                 >
-                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">{mobileOpen ? 'Close menu' : 'Open menu'}</span>
+                  <span
+                    className={cn(
+                      'absolute inset-0 flex flex-col justify-center items-center gap-1.5 transition-transform duration-300 ease-out',
+                      mobileOpen && 'gap-0'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'block w-5 h-0.5 bg-current rounded-full transition-all duration-300 ease-out origin-center',
+                        mobileOpen && 'rotate-45 translate-y-0.5'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'block w-5 h-0.5 bg-current rounded-full transition-all duration-300 ease-out',
+                        mobileOpen && 'opacity-0 scale-0'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'block w-5 h-0.5 bg-current rounded-full transition-all duration-300 ease-out origin-center',
+                        mobileOpen && '-rotate-45 -translate-y-0.5'
+                      )}
+                    />
+                  </span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto px-4">
-                {/* Hidden title for accessibility */}
+              <SheetContent
+                side="right"
+                showCloseButton={false}
+                portalContainer={sheetPortalContainer}
+                className={cn(
+                  'w-[300px] sm:w-[400px] overflow-y-auto px-4 bg-ukraine-header-bg text-ukraine-header-fg border-0 shadow-none',
+                  '!top-[4.5rem] h-[calc(100vh-4.5rem)]'
+                )}
+                overlayClassName="!top-[4.5rem] h-[calc(100vh-4.5rem)]"
+                overlayStyle={{
+                  top: '4.5rem',
+                  height: 'calc(100vh - 4.5rem)',
+                  left: 0,
+                  right: 0,
+                  pointerEvents: 'auto',
+                  touchAction: 'none'
+                }}
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onInteractOutside={(e) => e.preventDefault()}
+              >
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-                {/* Language Toggle at top */}
-
-                <div className="mt-[-17px] mb-2">
-                  <LanguageToggle />
-                </div>
-                <div className="flex flex-col gap-6">
-                  {/* Logo in mobile menu */}
-                  <Link
-                    href="/"
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
-                    <span className="flex flex-col text-xs font-semibold leading-tight">
-                      <span>{BRAND_NAME_LINES[language].line1}</span>
-                      <span>{BRAND_NAME_LINES[language].line2}</span>
-                    </span>
-                  </Link>
-
-                  {/* Mobile Navigation */}
+                <div className="flex flex-col gap-6 pt-2">
                   <nav className="flex flex-col gap-2 flex-1">
                     {NavItems.map((item) => {
                       const isActive = activeKey === item.key;
@@ -207,12 +264,12 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                             key={item.key}
                             href={item.href}
                             className={cn(
-                              'block rounded-lg px-4 py-3 text-sm font-medium transition-colors',
+                              'block rounded-lg px-4 py-3 text-sm font-medium transition-colors text-ukraine-header-fg',
                               isActive
-                                ? 'bg-primary text-primary-foreground'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
+                                : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
                             )}
-                            onClick={() => setMobileOpen(false)}
+                            onClick={closeMobileMenu}
                           >
                             {getTranslatedLabel(item.label, item.href)}
                           </Link>
@@ -226,10 +283,10 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                           <button
                             type="button"
                             className={cn(
-                              'w-full flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors',
+                              'w-full flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors text-ukraine-header-fg',
                               isActive
-                                ? 'bg-primary text-primary-foreground'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
+                                : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
                             )}
                             onClick={() =>
                               setMobileExpandedKey(isExpanded ? null : item.key)
@@ -258,10 +315,10 @@ export function PublicNavBar({ showDarkModeToggle = true, showNavigation = true 
                                     className={cn(
                                       'block rounded-lg px-4 py-2 text-sm transition-colors',
                                       childActive
-                                        ? 'bg-muted text-foreground font-medium'
-                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                        ? 'bg-ukraine-yellow/20 text-ukraine-yellow font-medium'
+                                        : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
                                     )}
-                                    onClick={() => setMobileOpen(false)}
+                                    onClick={closeMobileMenu}
                                   >
                                     {getTranslatedLabel(child.label, child.href)}
                                   </Link>
