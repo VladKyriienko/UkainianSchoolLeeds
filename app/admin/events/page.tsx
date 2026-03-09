@@ -63,8 +63,8 @@ export default async function AdminEventsPage({
       <EventSearchForm
         initialSearch={search}
         initialLimit={limit}
-        initialDateFrom={dateFrom || undefined}
-        initialDateTo={dateTo || undefined}
+        {...(dateFrom && { initialDateFrom: dateFrom })}
+        {...(dateTo && { initialDateTo: dateTo })}
       />
 
       {error ? (
