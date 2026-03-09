@@ -25,12 +25,16 @@ export async function listEvents(options?: {
   page?: number;
   limit?: number;
   search?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }): Promise<{ events: AdminEvent[]; total: number }> {
   await verifyAdminAccess();
 
   const page = options?.page || 1;
   const limit = options?.limit || 20;
   const search = options?.search?.trim();
+  const dateFrom = options?.dateFrom?.trim();
+  const dateTo = options?.dateTo?.trim();
 
   let query = supabaseAdmin
     .from('events')
@@ -42,7 +46,16 @@ export async function listEvents(options?: {
     );
   }
 
-  query = query.order('date', { ascending: true }).order('start_time', { ascending: true });
+  if (dateFrom) {
+    const fromStart = `${dateFrom}T00:00:00.000Z`;
+    query = query.gte('date', fromStart);
+  }
+  if (dateTo) {
+    const toEnd = `${dateTo}T23:59:59.999Z`;
+    query = query.lte('date', toEnd);
+  }
+
+  query = query.order('date', { ascending: false }).order('start_time', { ascending: false });
 
   const from = (page - 1) * limit;
   const to = from + limit - 1;

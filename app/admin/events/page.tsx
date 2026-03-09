@@ -15,6 +15,8 @@ type AdminEventsPageProps = {
     search?: string;
     page?: string;
     limit?: string;
+    dateFrom?: string;
+    dateTo?: string;
   }>;
 };
 
@@ -25,6 +27,8 @@ export default async function AdminEventsPage({
   const search = params.search || '';
   const page = parseInt(params.page || '1', 10);
   const limit = parseInt(params.limit || '20', 10);
+  const dateFrom = params.dateFrom || '';
+  const dateTo = params.dateTo || '';
 
   let events: AdminEvent[] = [];
   let totalEvents = 0;
@@ -34,7 +38,9 @@ export default async function AdminEventsPage({
     const result = await listEvents({
       page,
       limit,
-      search
+      search,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined
     });
     events = result.events;
     totalEvents = result.total;
@@ -54,7 +60,12 @@ export default async function AdminEventsPage({
         </Button>
       }
     >
-      <EventSearchForm initialSearch={search} initialLimit={limit} />
+      <EventSearchForm
+        initialSearch={search}
+        initialLimit={limit}
+        initialDateFrom={dateFrom || undefined}
+        initialDateTo={dateTo || undefined}
+      />
 
       {error ? (
         <Alert variant="destructive" className="mb-6">
@@ -77,7 +88,11 @@ export default async function AdminEventsPage({
             totalPages={totalPages}
             baseUrl="/admin/events"
             limit={limit}
-            searchParams={{ search }}
+            searchParams={{
+            ...(search && { search }),
+            ...(dateFrom && { dateFrom }),
+            ...(dateTo && { dateTo })
+          }}
             className="mt-6"
           />
         </>
