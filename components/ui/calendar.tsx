@@ -23,6 +23,7 @@ function Calendar({
 
   return (
     <DayPicker
+      weekStartsOn={1}
       showOutsideDays={showOutsideDays}
       fixedWeeks={fixedWeeks}
       className={cn(
