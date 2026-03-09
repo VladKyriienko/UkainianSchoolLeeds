@@ -13,7 +13,7 @@ function Calendar({
   captionLayout = 'label',
   buttonVariant = 'ghost',
   formatters,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  fixedWeeks = false,
   components: _components, // Consume but don't use deprecated components prop
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
@@ -24,6 +24,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      fixedWeeks={fixedWeeks}
       className={cn(
         'bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -37,7 +38,10 @@ function Calendar({
         ...formatters
       }}
       classNames={{
-        root: cn('w-fit', defaultClassNames.root),
+        root: cn(
+          'w-fit min-w-[calc(7*var(--cell-size))]',
+          defaultClassNames.root
+        ),
         months: cn(
           'relative flex flex-col gap-4 md:flex-row',
           defaultClassNames.months
@@ -86,7 +90,11 @@ function Calendar({
           'text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal',
           defaultClassNames.weekday
         ),
-        week: cn('mt-2 flex w-full', defaultClassNames.week),
+        weeks: defaultClassNames.weeks,
+        week: cn(
+          'mt-0 flex w-full h-[var(--cell-size)] min-h-[var(--cell-size)]',
+          defaultClassNames.week
+        ),
         week_number_header: cn(
           'w-[--cell-size] select-none',
           defaultClassNames.week_number_header
@@ -96,8 +104,12 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          'group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md',
+          'group/day relative flex items-center justify-center select-none p-0 text-center h-[var(--cell-size)] w-[var(--cell-size)] min-h-[var(--cell-size)] min-w-[var(--cell-size)] max-h-[var(--cell-size)] max-w-[var(--cell-size)] [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md',
           defaultClassNames.day
+        ),
+        day_button: cn(
+          'flex size-full items-center justify-center rounded-md',
+          defaultClassNames.day_button
         ),
         range_start: cn(
           'bg-accent rounded-l-md',
@@ -105,8 +117,12 @@ function Calendar({
         ),
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
         range_end: cn('bg-accent rounded-r-md', defaultClassNames.range_end),
+        selected: cn(
+          'bg-primary text-primary-foreground rounded-md hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
+          defaultClassNames.selected
+        ),
         today: cn(
-          'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
+          'bg-accent text-accent-foreground rounded-md',
           defaultClassNames.today
         ),
         outside: cn(

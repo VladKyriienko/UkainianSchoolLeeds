@@ -234,6 +234,7 @@ export function PublicNavBar({
                 side="right"
                 showCloseButton={false}
                 portalContainer={sheetPortalContainer}
+                aria-describedby={undefined}
                 className={cn(
                   'w-[300px] sm:w-[400px] overflow-y-auto px-4 bg-ukraine-header-bg text-ukraine-header-fg border-0 shadow-none',
                   '!top-[4.5rem] h-[calc(100vh-4.5rem)]'
