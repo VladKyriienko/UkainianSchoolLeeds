@@ -36,7 +36,7 @@ const userMenuGroups: { items: NavUserMenuItem[]; separator?: boolean }[] = [
     items: [
       {
         title: 'Profile',
-        href: '/profile',
+        href: '/admin/profile',
         iconName: 'User'
       }
     ],

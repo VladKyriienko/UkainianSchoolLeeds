@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import {
   Sidebar,
@@ -26,7 +25,7 @@ import { useLanguage } from '@/providers/language-provider';
 import { BRAND_NAME_LINES } from '@/content/navigation';
 import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
 import type { CompletionData } from '@/components/common/CompletionBanner/types';
-import { RouteConfig } from '@/utils/route-protection';
+import type { RouteConfig } from '@/utils/route-protection';
 
 export type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user?: User | null | undefined;
@@ -51,6 +50,7 @@ export type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   | null
   | undefined;
   showDarkModeToggle?: boolean;
+  showLanguageToggle?: boolean;
   showSidebarTrigger?: boolean;
   className?: string;
   mobileBurgerPosition?: 'left' | 'right';
@@ -62,14 +62,13 @@ export function AppSidebar({
   showDarkModeToggle = true,
   showSidebarTrigger = false,
   className,
+  showLanguageToggle = true,
   mobileBurgerPosition = 'right',
   side: desktopSidebarPosition = 'left',
   ...props
 }: AppSidebarProps) {
   const { isMobile, setOpenMobile } = useSidebar();
   const { language } = useLanguage();
-  const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin') ?? false;
 
   const handleMobileClose = () => {
     if (isMobile) {
@@ -101,7 +100,7 @@ export function AppSidebar({
 
           {/* Controls */}
           <div className="flex items-center gap-2">
-            {!isAdmin && <LanguageToggle />}
+            {showLanguageToggle && <LanguageToggle />}
             {showDarkModeToggle && <DarkModeToggle />}
             {showSidebarTrigger && !isMobile && (
               <SidebarTrigger className="h-8 w-8" />

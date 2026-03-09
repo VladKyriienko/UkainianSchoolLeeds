@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/hooks';
+import { getCurrentUserActiveStatus } from '@/utils/auth-helpers/server';
 
 export default function AuthCallbackClient() {
   const searchParams = useSearchParams();
@@ -67,27 +68,13 @@ export default function AuthCallbackClient() {
 
           console.log('OAuth session established for user:', data.user.id);
 
-          // Check if user exists and is active
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id, full_name, is_active')
-            .eq('id', data.user.id)
-            .single();
-
-          if (userError) {
-            console.error('Error fetching user data after OAuth:', userError);
-            // Continue anyway - the user might not be in the DB yet
-          } else if (userData && typeof userData === 'object' && 'id' in userData) {
-            const user = userData as { id: string; is_active: boolean };
-            console.log('User found in database:', user.id);
-
-            // Check if user is active
-            if (user.is_active === false) {
-              console.error('OAuth user account is deactivated:', user.id);
-              await supabase.auth.signOut();
-              window.location.href = `/auth/login?error=Account%20Deactivated&error_description=Your%20account%20has%20been%20deactivated.%20Please%20contact%20support.`;
-              return;
-            }
+          // Check if user is active (server-side only, no DB access from browser)
+          const status = await getCurrentUserActiveStatus();
+          if (status && status.active === false) {
+            console.error('OAuth user account is deactivated:', data.user.id);
+            await supabase.auth.signOut();
+            window.location.href = `/auth/login?error=Account%20Deactivated&error_description=Your%20account%20has%20been%20deactivated.%20Please%20contact%20support.`;
+            return;
           }
 
           // Check if this is an invite - redirect to password setup

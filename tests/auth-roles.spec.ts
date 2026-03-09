@@ -12,10 +12,9 @@ test.describe('Authentication with User Roles', () => {
     // Verify we're on home page
     await expect(page).toHaveURL('/');
     
-    // Admin-specific elements should not be visible
-    // Note: Update these selectors based on your actual admin UI elements
-    await expect(page.getByRole('link', { name: /admin/i })).not.toBeVisible();
-    await expect(page.getByText(/admin panel|manage users/i)).not.toBeVisible();
+    // Admin-specific elements should not be visible (sidebar has "User Management", "Teachers", etc.)
+    await expect(page.getByRole('link', { name: /user management/i })).not.toBeVisible();
+    await expect(page.getByText(/manage users|teachers/i)).not.toBeVisible();
   });
 
   test('admin user should see admin features', async ({ page }) => {
@@ -35,50 +34,26 @@ test.describe('Authentication with User Roles', () => {
   });
 
   test('regular user should not be able to access admin routes', async ({ page }) => {
-    // Sign in as regular user
     await signIn(page, REGULAR_USER.email, REGULAR_USER.password);
-    
-    // Try to access admin route directly
-    await page.goto('/admin');
-    
-    // Should be redirected or shown access denied
-    // This could be either a redirect to home or an access denied message
-    // For now, just check that we don't stay on the admin route
-    await page.waitForTimeout(1000); // Give time for any redirects
-    
-    // The exact behavior depends on your app's implementation
-    // It might redirect to home, show 404, or show access denied
+
+    await page.goto('/admin/users');
+    await page.waitForTimeout(1000);
+
     const currentUrl = page.url();
-    const isOnAdminPage = currentUrl.includes('/admin');
-    
-    if (isOnAdminPage) {
-      // If still on admin page, check for access denied message
+    const isOnAdminArea = /^\/(users|teachers|events|donations|messages|organisations)(\/|$)/.test(new URL(currentUrl).pathname);
+
+    if (isOnAdminArea) {
       await expect(page.getByText(/access denied|unauthorized|not authorized|403|forbidden/i)).toBeVisible();
     }
-    // If redirected, that's also acceptable behavior
   });
 
   test('admin user should be able to access admin routes', async ({ page }) => {
-    // Sign in as admin user
     await signIn(page, ADMIN_USER.email, ADMIN_USER.password);
-    
-    // Access admin route directly
-    await page.goto('/admin');
-    
-    // Wait for page to load
+
+    await page.goto('/admin/users');
     await page.waitForTimeout(1000);
-    
-    // Should be able to access the admin page or be redirected appropriately
-    const currentUrl = page.url();
-    
-    if (currentUrl.includes('/admin')) {
-      // If on admin page, verify admin content
-      await expect(page).toHaveURL(/\/admin/);
-    } else {
-      // If redirected, that might be normal behavior too
-      // Just verify we're authenticated and on a valid page
-      await expect(page).toHaveURL('/');
-    }
+
+    await expect(page).toHaveURL(/\/admin\/users/);
   });
 
   test('user role changes should be reflected immediately', async ({ page }) => {
@@ -92,7 +67,7 @@ test.describe('Authentication with User Roles', () => {
     
     // Verify regular user UI (no admin features)
     await page.goto('/');
-    await expect(page.getByRole('link', { name: /admin/i })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: /user management/i })).not.toBeVisible();
     
     // Here you would typically:
     // 1. Make an API call to change the user's role to admin

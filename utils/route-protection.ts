@@ -13,63 +13,55 @@ export type RouteConfig = {
 
 export const navigationRoutes: RouteConfig[] = [
   {
-    path: '/',
+    path: '/admin',
     label: 'Home',
     icon: 'Home',
-    requiresAuth: false
+    requiredRole: 'admin',
+    requiresAuth: true
   },
   {
-    path: '/admin',
-    label: 'Admin Panel',
-    icon: 'Settings',
+    path: '/admin/users',
+    label: 'User Management',
+    icon: 'Users',
     requiredRole: 'admin',
-    requiresAuth: true,
-    children: [
-      {
-        path: '/admin/users',
-        label: 'User Management',
-        icon: 'Users',
-        requiredRole: 'admin',
-        requiresAuth: true
-      },
-      {
-        path: '/admin/teachers',
-        label: 'Teachers',
-        icon: 'GraduationCap',
-        requiredRole: 'admin',
-        requiresAuth: true
-      },
-      {
-        path: '/admin/events',
-        label: 'Events',
-        icon: 'Calendar',
-        requiredRole: 'admin',
-        requiresAuth: true
-      },
-      {
-        path: '/admin/organisations',
-        label: 'Organizations',
-        icon: 'Building2',
-        requiredRole: 'admin',
-        requiresAuth: true
-      },
-      {
-        path: '/admin/donations',
-        label: 'Donations',
-        icon: 'PoundSterling',
-        requiredRole: 'admin',
-        requiresAuth: true
-      },
-      {
-        path: '/admin/system',
-        label: 'System',
-        icon: 'Cog',
-        requiredRole: 'admin',
-        requiresAuth: true
-      }
-    ]
+    requiresAuth: true
+  },
+  {
+    path: '/admin/teachers',
+    label: 'Teachers',
+    icon: 'GraduationCap',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/events',
+    label: 'Events',
+    icon: 'Calendar',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/donations',
+    label: 'Donations',
+    icon: 'PoundSterling',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/messages',
+    label: 'Messages',
+    icon: 'MessageSquare',
+    requiredRole: 'admin',
+    requiresAuth: true
   }
 ];
+
+export const adminPathPrefixes = ['/admin'] as const;
+
+export function isAdminPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return pathname === '/admin' || pathname.startsWith('/admin/');
+}
 
 export function getAccessibleRoutes(
   routes: RouteConfig[],
