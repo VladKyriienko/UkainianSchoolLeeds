@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Mail,
   Calendar,
@@ -23,11 +22,13 @@ import {
   CheckCircle,
   AlertCircle,
   ArrowLeft,
-  Edit,
   Settings,
   Activity
 } from 'lucide-react';
 import UserActionButtons from '@/app/admin/components/UserActionButtons';
+import { UserDetailsActions } from '@/app/admin/components/UserDetailsActions';
+import { PageWrapper } from '@/components/common/PageWrapper';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default async function UserDetailsPage({
   params
@@ -52,17 +53,18 @@ export default async function UserDetailsPage({
 
   if (!currentUser) {
     return (
-      <div className="max-w-6xl mx-auto py-8 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">User Not Found</h1>
-          <p className="text-muted-foreground mb-6">
-            The user you're looking for doesn't exist.
-          </p>
+      <PageWrapper
+        title="User Not Found"
+        description="The user you're looking for doesn't exist."
+        goBackButton={
           <Button asChild>
-            <Link href="/admin/users">Back to Users</Link>
+            <Link href="/admin/users">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
@@ -128,48 +130,42 @@ export default async function UserDetailsPage({
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      {/* Header */}
-      <div className="mb-8">
-        <Button variant="ghost" asChild className="mb-4">
+    <PageWrapper
+      title={currentUser.full_name || 'Unnamed User'}
+      description={
+        <span className="flex items-center gap-3 mt-1">
+          <Avatar className="w-10 h-10">
+            <AvatarImage
+              src={currentUser.avatar_url || ''}
+              alt={currentUser.full_name || 'User'}
+            />
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm">
+              {currentUser.full_name?.charAt(0) ||
+                currentUser.email?.charAt(0) ||
+                '?'}
+            </AvatarFallback>
+          </Avatar>
+          <span className="flex items-center gap-2 text-muted-foreground">
+            <Mail className="w-4 h-4" />
+            {currentUser.email}
+          </span>
+        </span>
+      }
+      goBackButton={
+        <Button asChild>
           <Link href="/admin/users">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Users
+            Back
           </Link>
         </Button>
-
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar className="w-16 h-16">
-              <AvatarImage
-                src={currentUser.avatar_url || ''}
-                alt={currentUser.full_name || 'User'}
-              />
-              <AvatarFallback className="text-lg bg-gradient-to-br from-blue-500 to-purple-600">
-                {currentUser.full_name?.charAt(0) ||
-                  currentUser.email?.charAt(0) ||
-                  '?'}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-3xl font-bold">
-                {currentUser.full_name || 'Unnamed User'}
-              </h1>
-              <p className="text-muted-foreground text-lg flex items-center gap-2">
-                <Mail className="w-5 h-5" />
-                {currentUser.email}
-              </p>
-            </div>
-          </div>
-          <Button asChild>
-            <Link href={`/admin/users/${currentUser.id}/edit`}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit User
-            </Link>
-          </Button>
-        </div>
-      </div>
-
+      }
+      actions={
+        <UserDetailsActions
+          userId={currentUser.id}
+          userEmail={currentUser.email}
+        />
+      }
+    >
       {error ? (
         <Card className="border-destructive">
           <CardContent className="pt-6">
@@ -355,6 +351,6 @@ export default async function UserDetailsPage({
           </div>
         </div>
       )}
-    </div>
+    </PageWrapper>
   );
 }

@@ -79,6 +79,16 @@ export type AdminOrganisation = {
   organisation_memberships?: OrganisationMembership[];
 } & Tables<'organisations'>;
 
+/** Lightweight count for dashboard stats. */
+export async function getUsersCount(): Promise<number> {
+  await verifyAdminAccess();
+  const { count, error } = await supabaseAdmin
+    .from('users')
+    .select('*', { count: 'exact', head: true });
+  if (error) return 0;
+  return count ?? 0;
+}
+
 // Get all users with their roles and organisations
 export async function getAllUsers(options?: {
   page?: number;

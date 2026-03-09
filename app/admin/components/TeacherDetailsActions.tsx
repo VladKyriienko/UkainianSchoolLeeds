@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { deleteTeacher } from '@/app/admin/teachers/actions';
 
 export function TeacherDetailsActions({
@@ -42,7 +42,10 @@ export function TeacherDetailsActions({
   return (
     <div className="flex gap-3">
       <Button asChild variant="outline">
-        <Link href={`/admin/teachers/${teacherId}/edit`}>Edit</Link>
+        <Link href={`/admin/teachers/${teacherId}/edit`}>
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Link>
       </Button>
       <Button
         type="button"
