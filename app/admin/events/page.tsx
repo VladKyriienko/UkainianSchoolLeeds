@@ -39,8 +39,8 @@ export default async function AdminEventsPage({
       page,
       limit,
       search,
-      dateFrom: dateFrom || undefined,
-      dateTo: dateTo || undefined
+      ...(dateFrom && { dateFrom }),
+      ...(dateTo && { dateTo })
     });
     events = result.events;
     totalEvents = result.total;
