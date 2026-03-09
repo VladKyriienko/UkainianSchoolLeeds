@@ -64,7 +64,9 @@ export default async function UserDetailsPage({
             </Link>
           </Button>
         }
-      />
+      >
+        {null}
+      </PageWrapper>
     );
   }
 
