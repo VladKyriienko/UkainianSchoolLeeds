@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUploadField } from '@/components/ui/image-upload-field';
 import {
   Select,
   SelectContent,
@@ -22,12 +23,14 @@ import {
 type TeacherFormProps = {
   mode: 'create' | 'edit';
   teacher?: AdminTeacher | null;
+  currentPhotoUrl?: string | null;
 };
 
-export function TeacherForm({ mode, teacher }: TeacherFormProps) {
+export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const [category, setCategory] = useState<string>(
     teacher?.category || 'TEACHER'
@@ -40,6 +43,7 @@ export function TeacherForm({ mode, teacher }: TeacherFormProps) {
 
     const formData = new FormData(e.currentTarget);
     formData.set('category', category);
+    if (photoFile) formData.set('photo', photoFile);
 
     try {
       if (mode === 'create') {
@@ -151,15 +155,14 @@ export function TeacherForm({ mode, teacher }: TeacherFormProps) {
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="photo">Photo</Label>
-          <Input id="photo" name="photo" type="file" accept="image/*" />
-          {teacher?.photo && (
-            <p className="text-sm text-muted-foreground break-all">
-              Current: {teacher.photo}
-            </p>
-          )}
-        </div>
+        <ImageUploadField
+          id="photo"
+          name="photo"
+          label="Photo"
+          currentImageUrl={currentPhotoUrl}
+          removePhotoFieldName="remove_photo"
+          onFileChange={setPhotoFile}
+        />
       </div>
 
       <div className="space-y-4">

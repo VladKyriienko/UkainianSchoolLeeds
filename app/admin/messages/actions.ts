@@ -12,18 +12,30 @@ export type AdminMessage = Tables<'messages'>;
 export async function listMessages(options?: {
   page?: number;
   limit?: number;
+  search?: string;
 }): Promise<{ messages: AdminMessage[]; total: number }> {
   await verifyAdminAccess();
 
   const page = options?.page || 1;
   const limit = options?.limit || 20;
+  const search = options?.search?.trim();
 
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  const { data, error, count } = await supabaseAdmin
+  let query = supabaseAdmin
     .from('messages')
-    .select('*', { count: 'exact' })
+    .select('*', { count: 'exact' });
+
+  if (search) {
+    const safe = search.replace(/,/g, ' ');
+    const term = `%${safe}%`;
+    query = query.or(
+      `email.ilike.${term},name.ilike.${term},subject.ilike.${term},message.ilike.${term}`
+    );
+  }
+
+  const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(from, to);
 

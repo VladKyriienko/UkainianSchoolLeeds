@@ -1,13 +1,16 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import MessagesManagementTable from '@/app/admin/components/MessagesManagementTable';
-import { MessagesSearchForm } from '@/app/admin/components/MessagesSearchForm';
-import { listMessages } from '@/app/admin/messages/actions';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import ClassesManagementTable from '@/app/admin/components/ClassesManagementTable';
+import { ClassesSearchForm } from '@/app/admin/components/ClassesSearchForm';
+import { listClasses } from '@/app/admin/classes/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
 import { PageWrapper } from '@/components/common/PageWrapper';
 
-type AdminMessagesPageProps = {
+type AdminClassesPageProps = {
   searchParams: Promise<{
     page?: string;
     limit?: string;
@@ -15,55 +18,66 @@ type AdminMessagesPageProps = {
   }>;
 };
 
-export default async function AdminMessagesPage({
+export default async function AdminClassesPage({
   searchParams
-}: AdminMessagesPageProps) {
+}: AdminClassesPageProps) {
   const params = await searchParams;
   const page = parseInt(params.page || '1', 10);
   const limit = parseInt(params.limit || '20', 10);
   const search = params.search || '';
 
-  let messages: Awaited<ReturnType<typeof listMessages>>['messages'] = [];
-  let totalMessages = 0;
+  let classes: Awaited<ReturnType<typeof listClasses>>['classes'] = [];
+  let totalClasses = 0;
   let error: string | null = null;
 
   try {
-    const result = await listMessages({
+    const result = await listClasses({
       page,
       limit,
       ...(search && { search })
     });
-    messages = result.messages;
-    totalMessages = result.total;
+    classes = result.classes;
+    totalClasses = result.total;
   } catch (err: unknown) {
     error = err instanceof Error ? err.message : 'Unknown error occurred';
   }
 
-  const totalPages = Math.ceil(totalMessages / limit) || 1;
+  const totalPages = Math.ceil(totalClasses / limit) || 1;
 
   return (
-    <PageWrapper title="Messages" description="View contact form messages">
-      <MessagesSearchForm initialSearch={search} />
+    <PageWrapper
+      title="Classes"
+      description="Create and manage classes."
+      actions={
+        <Button asChild>
+          <Link href="/admin/classes/create">
+            <Plus className="h-4 w-4 mr-2" />
+            Add class
+          </Link>
+        </Button>
+      }
+    >
+      <ClassesSearchForm initialSearch={search} />
       {error ? (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Error loading messages: {error}</AlertDescription>
+          <AlertDescription>Error loading classes: {error}</AlertDescription>
         </Alert>
       ) : (
         <>
           <PaginationInfo
             currentPage={page}
             totalPages={totalPages}
-            totalItems={totalMessages}
+            totalItems={totalClasses}
             itemsPerPage={limit}
-            itemName="messages"
+            itemName="classes"
             className="mb-4 mt-6"
           />
-          <MessagesManagementTable messages={messages} />
+          <ClassesManagementTable classes={classes} />
           <PaginationComponent
             currentPage={page}
             totalPages={totalPages}
-            baseUrl="/admin/messages"
+            baseUrl="/admin/classes"
             limit={limit}
             {...(search ? { searchParams: { search } } : {})}
             className="mt-6"

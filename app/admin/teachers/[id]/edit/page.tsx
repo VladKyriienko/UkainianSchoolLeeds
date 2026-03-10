@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { TeacherForm } from '@/app/admin/components/TeacherForm';
 import { getTeacherById } from '@/app/admin/teachers/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
@@ -21,12 +22,17 @@ export default async function EditTeacherPage({
     notFound();
   }
 
+  const supabaseAdmin = createAdminClient();
+  const currentPhotoUrl = teacher.photo
+    ? supabaseAdmin.storage.from('teachers-photos').getPublicUrl(teacher.photo).data.publicUrl
+    : null;
+
   return (
     <PageWrapper
       title="Edit Teacher"
       description="Update teacher details"
     >
-      <TeacherForm mode="edit" teacher={teacher} />
+      <TeacherForm mode="edit" teacher={teacher} currentPhotoUrl={currentPhotoUrl} />
     </PageWrapper>
   );
 }

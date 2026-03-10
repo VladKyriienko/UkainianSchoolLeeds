@@ -36,6 +36,7 @@ import {
   deactivateUser,
   reactivateUser
 } from '@/app/admin/users/actions';
+import { format } from 'date-fns';
 
 type UserManagementTableProps = {
   users: AdminUser[];
@@ -49,12 +50,20 @@ export default function UserManagementTable({
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString();
+    try {
+      return format(new Date(dateString), 'MMM d, yyyy');
+    } catch {
+      return 'Never';
+    }
   };
 
   const formatDateTime = (dateString?: string) => {
     if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleString();
+    try {
+      return format(new Date(dateString), 'MMM d, yyyy HH:mm');
+    } catch {
+      return 'Never';
+    }
   };
 
   const handleDelete = async (userId: string, email: string) => {

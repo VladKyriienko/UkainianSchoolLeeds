@@ -32,7 +32,7 @@
     "db:restart": "bunx supabase@2.72.7 stop && bunx supabase@2.72.7 start",
     "db:reset": "bunx supabase@2.72.7 db reset",
     "db:diff": "drizzle-kit generate",
-    "db:migrate": "bunx supabase@2.72.7 db push --local",
+    "db:migrate": "bunx supabase@2.72.7 db push --local --include-all",
     "db:generate-types": "bunx supabase@2.72.7 gen types typescript --local --schema public > utils/supabase/types.ts",
     "db:studio": "drizzle-kit studio"
   },

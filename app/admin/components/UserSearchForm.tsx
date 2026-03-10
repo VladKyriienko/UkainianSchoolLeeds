@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -9,9 +8,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Search, Filter, X } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { Search, Filter } from 'lucide-react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 type UserSearchFormProps = {
   initialSearch?: string;
@@ -23,55 +22,36 @@ export function UserSearchForm({
   initialRole = 'all'
 }: UserSearchFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
+  const lastUrlRef = useRef<string | null>(null);
   const [search, setSearch] = useState(initialSearch);
   const [role, setRole] = useState(initialRole);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateFilters();
-  };
+  useEffect(() => {
+    setSearch(initialSearch);
+    setRole(initialRole);
+  }, [initialSearch, initialRole]);
 
-  const updateFilters = () => {
-    startTransition(() => {
-      const params = new URLSearchParams(searchParams);
-
-      // Reset to page 1 when filtering
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const limit = searchParams.get('limit') || '20';
+      const params = new URLSearchParams();
       params.set('page', '1');
-
-      if (search.trim()) {
-        params.set('search', search.trim());
-      } else {
-        params.delete('search');
-      }
-
-      if (role !== 'all') {
-        params.set('role', role);
-      } else {
-        params.delete('role');
-      }
-
-      router.push(`/admin/users?${params.toString()}`);
-    });
-  };
-
-  const clearFilters = () => {
-    setSearch('');
-    setRole('all');
-    startTransition(() => {
-      router.push('/admin/users');
-    });
-  };
-
-  const hasActiveFilters = search.trim() || role !== 'all';
+      params.set('limit', limit);
+      if (search.trim()) params.set('search', search.trim());
+      if (role !== 'all') params.set('role', role);
+      const q = params.toString();
+      const nextUrl = `${pathname}?${q}`;
+      if (lastUrlRef.current === nextUrl) return;
+      lastUrlRef.current = nextUrl;
+      router.replace(nextUrl);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [router, pathname, search, role, searchParams]);
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:items-end"
-    >
+    <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:items-end">
       <div className="flex-1">
         <label
           htmlFor="search"
@@ -113,29 +93,6 @@ export function UserSearchForm({
           </Select>
         </div>
       </div>
-
-      <div className="flex gap-2">
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="flex-1 sm:flex-none"
-        >
-          {isPending ? 'Searching...' : 'Search'}
-        </Button>
-
-        {hasActiveFilters && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={clearFilters}
-            disabled={isPending}
-            className="flex-1 sm:flex-none"
-          >
-            <X className="w-4 h-4 mr-1" />
-            Clear
-          </Button>
-        )}
-      </div>
-    </form>
+    </div>
   );
 }

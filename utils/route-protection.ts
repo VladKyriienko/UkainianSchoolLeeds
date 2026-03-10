@@ -1,15 +1,6 @@
-import type { ValidLucideIconName } from './lucide-icons';
+import type { UserRole, RouteConfig } from '@/types';
 
-export type UserRole = 'admin' | 'user' | null;
-
-export type RouteConfig = {
-  path: string;
-  label: string;
-  icon: ValidLucideIconName;
-  requiredRole?: UserRole;
-  requiresAuth?: boolean;
-  children?: RouteConfig[];
-};
+export type { UserRole, RouteConfig };
 
 export const navigationRoutes: RouteConfig[] = [
   {
@@ -51,6 +42,34 @@ export const navigationRoutes: RouteConfig[] = [
     path: '/admin/messages',
     label: 'Messages',
     icon: 'MessageSquare',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/documents',
+    label: 'Documents',
+    icon: 'FileText',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/news',
+    label: 'News',
+    icon: 'Newspaper',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/classes',
+    label: 'Classes',
+    icon: 'BookOpen',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
+    path: '/admin/class-gallery',
+    label: 'Class Gallery',
+    icon: 'Images',
     requiredRole: 'admin',
     requiresAuth: true
   }

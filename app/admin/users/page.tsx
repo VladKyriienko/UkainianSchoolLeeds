@@ -81,7 +81,7 @@ export default async function AdminUsersPage({
             currentPage={page}
             totalPages={totalPages}
             totalItems={totalUsers}
-            itemsPerPage={users.length}
+            itemsPerPage={limit}
             itemName="users"
             className="mb-4 mt-6"
           />

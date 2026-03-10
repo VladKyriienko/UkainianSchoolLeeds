@@ -8,40 +8,23 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/utils/auth-helpers/server';
-import { getUsersCount } from '@/app/admin/users/actions';
-import { listTeachers } from '@/app/admin/teachers/actions';
-import { listEvents } from '@/app/admin/events/actions';
-import { listMessages } from '@/app/admin/messages/actions';
-import { listDonations } from '@/app/admin/donations/actions';
+import { AdminDashboardStats } from '@/app/admin/components/AdminDashboardStats';
 import {
   User,
+  Users,
   GraduationCap,
   CalendarDays,
   MessageSquare,
   PoundSterling,
-  Users
+  FileText,
+  Newspaper,
+  BookOpen,
+  Images
 } from 'lucide-react';
 
 export default async function AdminHomePage() {
   const { profileData } = await getCurrentUser();
   const name = profileData?.full_name ?? 'there';
-
-  const [usersCount, teachersResult, eventsResult, messagesResult, donationsResult] =
-    await Promise.all([
-      getUsersCount(),
-      listTeachers({ page: 1, limit: 1 }),
-      listEvents({ page: 1, limit: 1 }),
-      listMessages({ page: 1, limit: 1 }),
-      listDonations({ page: 1, limit: 1 })
-    ]);
-
-  const stats = [
-    { label: 'Users', value: usersCount, href: '/admin/users', icon: Users },
-    { label: 'Teachers', value: teachersResult.total, href: '/admin/teachers', icon: GraduationCap },
-    { label: 'Events', value: eventsResult.total, href: '/admin/events', icon: CalendarDays },
-    { label: 'Messages', value: messagesResult.total, href: '/admin/messages', icon: MessageSquare },
-    { label: 'Donations', value: donationsResult.total, href: '/admin/donations', icon: PoundSterling }
-  ];
 
   const quickLinks = [
     { title: 'Profile', description: 'Manage your profile', href: '/admin/profile', icon: User },
@@ -49,7 +32,11 @@ export default async function AdminHomePage() {
     { title: 'Teachers', description: 'Manage teachers', href: '/admin/teachers', icon: GraduationCap },
     { title: 'Events', description: 'Manage school events', href: '/admin/events', icon: CalendarDays },
     { title: 'Messages', description: 'View contact form messages', href: '/admin/messages', icon: MessageSquare },
-    { title: 'Donations', description: 'View donation records', href: '/admin/donations', icon: PoundSterling }
+    { title: 'Donations', description: 'View donation records', href: '/admin/donations', icon: PoundSterling },
+    { title: 'Documents', description: 'Manage documents', href: '/admin/documents', icon: FileText },
+    { title: 'News', description: 'Manage news', href: '/admin/news', icon: Newspaper },
+    { title: 'Classes', description: 'Manage classes', href: '/admin/classes', icon: BookOpen },
+    { title: 'Class Gallery', description: 'Manage class photo gallery', href: '/admin/class-gallery', icon: Images }
   ];
 
   return (
@@ -65,26 +52,7 @@ export default async function AdminHomePage() {
 
       <div>
         <h2 className="text-2xl font-semibold mb-4">Statistics</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Link key={stat.href} href={stat.href}>
-                <Card className="hover:shadow-md transition-shadow h-full">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-5 w-5 text-muted-foreground" />
-                      <CardDescription>{stat.label}</CardDescription>
-                    </div>
-                    <CardTitle className="text-3xl font-bold mt-1">
-                      {stat.value}
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
+        <AdminDashboardStats />
       </div>
 
       <div>

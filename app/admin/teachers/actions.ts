@@ -198,6 +198,7 @@ export async function updateTeacher(id: string, formData: FormData) {
     ? ((categoryRaw || 'TEACHER') as (typeof allowedCategories)[number])
     : 'TEACHER';
 
+  const removePhoto = formData.get('remove_photo') === '1';
   const photoEntry = formData.get('photo');
   const photoFile = photoEntry instanceof File ? photoEntry : null;
   const photoPath = await uploadTeacherPhotoIfPresent(photoFile);
@@ -213,7 +214,19 @@ export async function updateTeacher(id: string, formData: FormData) {
     description_uk: descriptionUk,
     category
   };
-  if (photoPath) updatePayload.photo = photoPath;
+  if (removePhoto) {
+    const { data: existing } = await supabaseAdmin
+      .from('teachers')
+      .select('photo')
+      .eq('id', id)
+      .single();
+    if (existing?.photo) {
+      await supabaseAdmin.storage.from('teachers-photos').remove([existing.photo]);
+    }
+    updatePayload.photo = null;
+  } else if (photoPath) {
+    updatePayload.photo = photoPath;
+  }
 
   const { error } = await supabaseAdmin
     .from('teachers')
