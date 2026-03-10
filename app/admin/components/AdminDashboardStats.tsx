@@ -57,7 +57,7 @@ export function AdminDashboardStats() {
 
   if (!stats) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {STATS_CONFIG.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href}>
             <Card className="h-full animate-pulse">
@@ -76,7 +76,7 @@ export function AdminDashboardStats() {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {STATS_CONFIG.map(({ key, label, href, icon: Icon }) => {
         const value = stats[key];
         return (
