@@ -1,17 +1,23 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { unstable_noStore as noStore } from 'next/cache';
 
 export type CalendarEvent = {
   id: string;
   title: string;
   description: string | null;
-  date: string; // Date in YYYY-MM-DD format
-  start_time: string | null; // Time in HH:MM:SS format
-  end_time: string | null; // Time in HH:MM:SS format
+  date: string;
+  start_time: string | null;
+  end_time: string | null;
   location: string | null;
   created_at: string;
+};
+
+export type CalendarEventDetail = CalendarEvent & {
+  title_uk: string | null;
+  description_uk: string | null;
+  location_uk: string | null;
 };
 
 export type EventsFilter = {
@@ -24,7 +30,7 @@ export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEven
   noStore();
 
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     let query = supabase
       .from('events')
       .select('*')
@@ -53,10 +59,27 @@ export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEven
       return [];
     }
 
-    return data || [];
+    return (data as CalendarEvent[]) || [];
   } catch (err) {
-    // Network errors (e.g. fetch failed, connection refused) or missing env
     console.error('Error fetching events:', err);
     return [];
+  }
+}
+
+export async function getEventById(id: string): Promise<CalendarEventDetail | null> {
+  noStore();
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return data as unknown as CalendarEventDetail;
+  } catch (err) {
+    console.error('Error fetching event:', err);
+    return null;
   }
 }

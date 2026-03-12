@@ -5,9 +5,7 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { getTeacherById } from '@/app/admin/teachers/actions';
 import { TeacherDetailsActions } from '@/app/admin/components/TeacherDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 
 export default async function TeacherDetailsPage({
   params
@@ -37,7 +35,7 @@ export default async function TeacherDetailsPage({
     <PageWrapper
       title={teacher.name}
       description={teacher.title || '—'}
-      goBackButton={<Button asChild><Link href="/admin/teachers"><ArrowLeft className="w-4 h-4 mr-2" />Back</Link></Button>}
+      goBackButton={<BackButton />}
       actions={<TeacherDetailsActions teacherId={teacher.id} teacherName={teacher.name} />}
     >
       <div className="grid gap-6 md:grid-cols-3">

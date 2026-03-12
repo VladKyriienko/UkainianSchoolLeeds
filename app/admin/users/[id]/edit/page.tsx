@@ -5,8 +5,7 @@ import {
 } from '@/app/admin/users/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import UserForm from '@/app/admin/components/UserForm';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/common/BackButton';
 import { Tables } from '@/utils/supabase/types';
 
 export default async function EditUserPage({
@@ -43,9 +42,7 @@ export default async function EditUserPage({
           <p className="text-muted-foreground mb-6">
             The user you're looking for doesn't exist.
           </p>
-          <Button asChild>
-            <Link href="/admin/users">Back to Users</Link>
-          </Button>
+          <BackButton />
         </div>
       </div>
     );
@@ -58,9 +55,7 @@ export default async function EditUserPage({
           <h1 className="text-3xl font-bold mb-2">Edit User</h1>
           <p className="text-muted-foreground">Update user information</p>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/admin/users">← Back to Users</Link>
-        </Button>
+        <BackButton />
       </div>
 
       {error ? (

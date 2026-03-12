@@ -48,18 +48,16 @@ export function PageWrapper({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{translatedTitle}</h1>
-          {translatedDescription ? (
-            <p className="text-muted-foreground">{translatedDescription}</p>
-          ) : null}
+      {(goBackButton || actions) ? (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="order-1">{goBackButton}</div>
+          <div className="order-2">{actions}</div>
         </div>
-        {hasHeaderActions ? (
-          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-            {goBackButton}
-            {actions}
-          </div>
+      ) : null}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">{translatedTitle}</h1>
+        {translatedDescription ? (
+          <p className="text-muted-foreground">{translatedDescription}</p>
         ) : null}
       </div>
 

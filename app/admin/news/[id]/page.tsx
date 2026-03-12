@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getNewsById } from '@/app/admin/news/actions';
 import { NewsDetailsActions } from '@/app/admin/components/NewsDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { format } from 'date-fns';
 
@@ -46,14 +44,7 @@ export default async function NewsViewPage({
     <PageWrapper
       title={item.title}
       description={formatDate(item.date)}
-      goBackButton={
-        <Button asChild>
-          <Link href="/admin/news">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Link>
-        </Button>
-      }
+      goBackButton={<BackButton />}
       actions={<NewsDetailsActions newsId={item.id} newsTitle={item.title} />}
     >
       <Card>

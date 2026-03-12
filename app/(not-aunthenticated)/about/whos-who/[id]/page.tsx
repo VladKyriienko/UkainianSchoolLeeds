@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import MemberDetailClient from '@/app/(not-aunthenticated)/about/whos-who/[id]/client';
-import BackToWhosWho from '@/app/(not-aunthenticated)/about/whos-who/[id]/BackToWhosWho';
+import { BackButton } from '@/components/common/BackButton';
 import { getTeacherById } from '@/app/(not-aunthenticated)/about/whos-who/actions';
 
 type Props = {
@@ -23,7 +23,7 @@ export default async function MemberDetailPage({ params }: Props) {
         en: teacher.title ?? '',
         uk: teacher.title_uk ?? teacher.title ?? ''
       }}
-      goBackButton={<BackToWhosWho />}
+      goBackButton={<BackButton />}
     >
       <MemberDetailClient teacher={teacher} />
     </PageWrapper>

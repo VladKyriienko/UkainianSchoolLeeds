@@ -2,8 +2,7 @@ import {
   getAllUsers,
   AdminUser
 } from '@/app/admin/users/actions';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/common/BackButton';
 import {
   Card,
   CardContent,
@@ -21,7 +20,6 @@ import {
   User,
   CheckCircle,
   AlertCircle,
-  ArrowLeft,
   Settings,
   Activity
 } from 'lucide-react';
@@ -56,14 +54,7 @@ export default async function UserDetailsPage({
       <PageWrapper
         title="User Not Found"
         description="The user you're looking for doesn't exist."
-        goBackButton={
-          <Button asChild>
-            <Link href="/admin/users">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Link>
-          </Button>
-        }
+        goBackButton={<BackButton />}
       >
         {null}
       </PageWrapper>
@@ -153,14 +144,7 @@ export default async function UserDetailsPage({
           </span>
         </span>
       }
-      goBackButton={
-        <Button asChild>
-          <Link href="/admin/users">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Link>
-        </Button>
-      }
+      goBackButton={<BackButton />}
       actions={
         <UserDetailsActions
           userId={currentUser.id}

@@ -1,10 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Home } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 
 export default function AdminNotFound() {
   return (
@@ -24,12 +22,7 @@ export default function AdminNotFound() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full">
-            <Button asChild className="flex-1">
-              <Link href="/admin">
-                <Home className="mr-2 h-4 w-4" />
-                Back to dashboard
-              </Link>
-            </Button>
+            <BackButton href="/admin" variant="default" size="default" className="flex-1" />
           </div>
         </CardContent>
       </Card>
