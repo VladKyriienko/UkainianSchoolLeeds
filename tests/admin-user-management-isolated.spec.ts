@@ -117,8 +117,8 @@ async function signInAsAdmin(page: import('@playwright/test').Page) {
   await expect(page).toHaveURL('/');
   
   // Verify admin access by checking we can access admin area
-  await page.goto('/admin');
-  await expect(page).toHaveURL('/admin');
+  await page.goto('/admin/users');
+  await expect(page).toHaveURL('/admin/users');
   await expect(page.getByText('Admin Dashboard')).toBeVisible({ timeout: 10000 });
   
   // Give a moment for the session and roles to be properly loaded
@@ -144,8 +144,8 @@ test.describe('Admin User Management (Isolated)', () => {
       await signInAsAdmin(page);
       
       // Navigate to admin dashboard first
-      await page.goto('/admin');
-      await expect(page).toHaveURL('/admin');
+      await page.goto('/admin/users');
+      await expect(page).toHaveURL('/admin/users');
       await expect(page.getByText('Admin Dashboard')).toBeVisible();
       
       // Navigate to create user page via the quick action button
@@ -240,7 +240,7 @@ test.describe('Admin User Management (Isolated)', () => {
       await signInAsAdmin(page);
       
       // Navigate to admin dashboard and create user
-      await page.goto('/admin');
+      await page.goto('/admin/users');
       await page.getByRole('link', { name: /create user/i }).click();
       await page.getByLabel('Email Address').fill(testUser.email);
       await page.getByLabel('Full Name').fill(testUser.full_name);
@@ -404,7 +404,7 @@ test.describe('Admin User Management (Isolated)', () => {
       await signInAsAdmin(page);
       
       // Create user first
-      await page.goto('/admin');
+      await page.goto('/admin/users');
       await page.getByRole('link', { name: /create user/i }).click();
       await page.getByLabel('Email Address').fill(testUser.email);
       await page.getByLabel('Full Name').fill(testUser.full_name);
@@ -464,7 +464,7 @@ test.describe('Admin User Management (Isolated)', () => {
       await signInAsAdmin(page);
       
       // Create user first (will be unverified)
-      await page.goto('/admin');
+      await page.goto('/admin/users');
       await page.getByRole('link', { name: /create user/i }).click();
       await page.getByLabel('Email Address').fill(testUser.email);
       await page.getByLabel('Full Name').fill(testUser.full_name);
@@ -519,7 +519,7 @@ test.describe('Admin User Management (Isolated)', () => {
       await signInAsAdmin(page);
       
       // First create and verify the user by completing the full invite flow
-      await page.goto('/admin');
+      await page.goto('/admin/users');
       await page.getByRole('link', { name: /create user/i }).click();
       await page.getByLabel('Email Address').fill(testUser.email);
       await page.getByLabel('Full Name').fill(testUser.full_name);

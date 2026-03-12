@@ -23,34 +23,40 @@ export type EventsFilter = {
 export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEvent[]> {
   noStore();
 
-  const supabase = await createClient();
-  let query = supabase
-    .from('events')
-    .select('*')
-    .order('date', { ascending: true })
-    .order('start_time', { ascending: true });
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from('events')
+      .select('*')
+      .order('date', { ascending: true })
+      .order('start_time', { ascending: true });
 
-  // Apply date range filter
-  if (filter.startDate) {
-    query = query.gte('date', filter.startDate);
-  }
-  if (filter.endDate) {
-    query = query.lte('date', filter.endDate);
-  }
+    // Apply date range filter
+    if (filter.startDate) {
+      query = query.gte('date', filter.startDate);
+    }
+    if (filter.endDate) {
+      query = query.lte('date', filter.endDate);
+    }
 
-  // Apply search filter
-  if (filter.search && filter.search.trim()) {
-    query = query.or(
-      `title.ilike.%${filter.search}%,description.ilike.%${filter.search}%,location.ilike.%${filter.search}%`
-    );
-  }
+    // Apply search filter
+    if (filter.search && filter.search.trim()) {
+      query = query.or(
+        `title.ilike.%${filter.search}%,description.ilike.%${filter.search}%,location.ilike.%${filter.search}%`
+      );
+    }
 
-  const { data, error } = await query;
+    const { data, error } = await query;
 
-  if (error) {
-    console.error('Error fetching events:', error);
+    if (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    // Network errors (e.g. fetch failed, connection refused) or missing env
+    console.error('Error fetching events:', err);
     return [];
   }
-
-  return data || [];
 }

@@ -44,6 +44,8 @@ export function PageWrapper({
   const translatedTitle = typeof title === 'string' ? title : title[language];
   const translatedDescription = getTranslatedText(description, language);
 
+  const hasHeaderActions = goBackButton || actions;
+
   return (
     <div className={cn('w-full', className)}>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -53,10 +55,12 @@ export function PageWrapper({
             <p className="text-muted-foreground">{translatedDescription}</p>
           ) : null}
         </div>
-        <div className="flex flex-wrap gap-4">
-          {goBackButton ? goBackButton : null}
-          {actions ? actions : null}
-        </div>
+        {hasHeaderActions ? (
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            {goBackButton}
+            {actions}
+          </div>
+        ) : null}
       </div>
 
       {children}

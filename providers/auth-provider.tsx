@@ -13,6 +13,7 @@ import { UserWithRoles } from '@/utils/supabase/server';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '@/utils/supabase/types';
 import { type User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 export const AuthContext = createContext<{
   user?: User | null;
@@ -37,6 +38,7 @@ export const AuthProvider = ({
   userResponse?: User | null | undefined;
   userWithRoles?: UserWithRoles | null | undefined;
 }) => {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(userResponse || null);
   const [userData, setUserData] = useState<UserWithRoles | null>(
     userWithRoles || null
@@ -46,37 +48,22 @@ export const AuthProvider = ({
     null
   );
 
-  // Function to refresh user data from the database
+  // Sync state from server-passed props when they change
+  useEffect(() => {
+    setUser(userResponse ?? null);
+    setUserData(userWithRoles ?? null);
+  }, [userResponse, userWithRoles]);
+
+  // Refresh user data by re-fetching on the server (no DB access from browser)
   const refreshUserData = useCallback(async () => {
-    if (!supabase || !user) {
-      return;
-    }
+    router.refresh();
+  }, [router]);
 
-    try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('*, roles(*)')
-        .eq('id', user.id)
-        .limit(1)
-        .single();
-
-      if (error) {
-        console.error('AuthProvider: Error refreshing user data:', error);
-      } else {
-        setUserData(userData as UserWithRoles);
-      }
-    } catch (error) {
-      console.error('AuthProvider: Error in refreshUserData:', error);
-    }
-  }, [supabase, user]);
-
-  // Manual sign-out function that immediately clears the state
   const signOut = useCallback(async () => {
     setUser(null);
     setUserData(null);
 
     if (supabase) {
-      // Use client-side sign out directly instead of server action
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('AuthProvider: Error signing out:', error);
@@ -85,41 +72,16 @@ export const AuthProvider = ({
   }, [supabase]);
 
   useEffect(() => {
-    // Initialize Supabase client only on the client side
     const client = createClient();
     setSupabase(client as unknown as SupabaseClient<Database>);
 
-    // Subscribe to auth state changes
     const {
       data: { subscription }
-    } = client.auth.onAuthStateChange(async (event: string, session) => {
-      // Use setTimeout to prevent recursive loop bug in Supabase
-      setTimeout(async () => {
+    } = client.auth.onAuthStateChange((event: string, session) => {
+      setTimeout(() => {
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user);
           setLoading(false);
-
-          try {
-            const { data: userData, error } = await client
-              .from('users')
-              .select('*, roles(*)')
-              .eq('id', session.user.id)
-              .limit(1)
-              .single();
-
-            if (error) {
-              console.error('AuthProvider: Error fetching user data:', error);
-              setUserData(null);
-            } else {
-              setUserData(userData as UserWithRoles);
-            }
-          } catch (error) {
-            console.error(
-              'AuthProvider: Error in auth state change handler:',
-              error
-            );
-            setUserData(null);
-          }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setUserData(null);
@@ -128,24 +90,6 @@ export const AuthProvider = ({
           if (session?.user) {
             setUser(session.user);
             setLoading(false);
-
-            try {
-              const { data: userData, error } = await client
-                .from('users')
-                .select('*, roles(*)')
-                .eq('id', session.user.id)
-                .limit(1)
-                .single();
-
-              if (!error && userData) {
-                setUserData(userData as UserWithRoles);
-              }
-            } catch (error) {
-              console.error(
-                'AuthProvider: Error in INITIAL_SESSION handler:',
-                error
-              );
-            }
           } else {
             setUser(null);
             setUserData(null);
@@ -154,65 +98,20 @@ export const AuthProvider = ({
         } else if (event === 'RECOVERY' && session?.user) {
           setUser(session.user);
           setLoading(false);
-
-          try {
-            const { data: userData, error } = await client
-              .from('users')
-              .select('*, roles(*)')
-              .eq('id', session.user.id)
-              .limit(1)
-              .single();
-
-            if (error) {
-              console.error(
-                'AuthProvider: Error fetching user data on password recovery:',
-                error
-              );
-            } else {
-              setUserData(userData as UserWithRoles);
-            }
-          } catch (error) {
-            console.error(
-              'AuthProvider: Error in password recovery handler:',
-              error
-            );
-          }
         } else if (event === 'USER_UPDATED' && session?.user) {
           setUser(session.user);
           setLoading(false);
-
-          try {
-            const { data: userData, error } = await client
-              .from('users')
-              .select('*, roles(*)')
-              .eq('id', session.user.id)
-              .limit(1)
-              .single();
-
-            if (error) {
-              console.error(
-                'AuthProvider: Error fetching user data on user update:',
-                error
-              );
-            } else {
-              setUserData(userData as UserWithRoles);
-            }
-          } catch (error) {
-            console.error('AuthProvider: Error in user update handler:', error);
-          }
         } else {
           setLoading(false);
         }
       }, 0);
     });
 
-    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
-  }, []); // Empty dependency array - only set up subscription once
+  }, []);
 
-  // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({ user, userData, loading, signOut, refreshUserData }),
     [user, userData, loading, signOut, refreshUserData]

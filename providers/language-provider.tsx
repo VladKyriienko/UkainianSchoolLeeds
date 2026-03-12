@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import type { Language } from '@/types';
 
-export type Language = 'en' | 'uk';
+export type { Language };
 
 type LanguageContextType = {
   language: Language;

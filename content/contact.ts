@@ -33,6 +33,7 @@ type ContactContent = {
   hoursText: string;
   emergencyTitle: string;
   emergencyText: string;
+  openInMapsLabel: string;
 };
 
 export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
@@ -69,7 +70,8 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     hoursTitle: 'Hours',
     hoursText: 'Saturday, 2:00 pm to 5:30 pm',
     emergencyTitle: 'Emergency Contact',
-    emergencyText: 'In case of an emergency, please contact the school office.'
+    emergencyText: 'In case of an emergency, please contact the school office.',
+    openInMapsLabel: 'Open in Google Maps'
   },
   uk: {
     pageTitle: 'Зв’яжіться з нами',
@@ -106,6 +108,7 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     hoursText: 'Субота, з 14:00 до 17:30',
     emergencyTitle: 'Екстрений зв’язок',
     emergencyText:
-      'У разі надзвичайної ситуації, будь ласка, зв’яжіться з офісом школи.'
+      'У разі надзвичайної ситуації, будь ласка, зв’яжіться з офісом школи.',
+    openInMapsLabel: 'Відкрити в Google Maps'
   }
 };

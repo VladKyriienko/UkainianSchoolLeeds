@@ -538,45 +538,9 @@ export const messages = pgTable(
       .defaultNow()
       .notNull()
   },
-  (t) => {
-    // Admin check: users with roles.role = 'admin'
-    const isAdmin = sql`exists (
-      select 1
-      from roles
-      where roles.user_id = auth.uid()
-        and roles.role = 'admin'
-    )`;
-
-    return [
-      // Anyone can create messages (anon + authenticated)
-      pgPolicy('messages_public_insert_anon', {
-        for: 'insert',
-        to: anonRole,
-        withCheck: sql`true`
-      }),
-      pgPolicy('messages_public_insert_authenticated', {
-        for: 'insert',
-        to: authenticatedRole,
-        withCheck: sql`true`
-      }),
-
-      // Admins can read/update/delete all messages
-      pgPolicy('messages_admin_select', {
-        for: 'select',
-        to: authenticatedRole,
-        using: isAdmin
-      }),
-      pgPolicy('messages_admin_update', {
-        for: 'update',
-        to: authenticatedRole,
-        using: isAdmin,
-        withCheck: isAdmin
-      }),
-      pgPolicy('messages_admin_delete', {
-        for: 'delete',
-        to: authenticatedRole,
-        using: isAdmin
-      })
-    ];
+  () => {
+    // No RLS policies: table is accessible only via service_role (server-side with createAdminClient).
+    // Anon and authenticated have no access.
+    return [];
   }
 );

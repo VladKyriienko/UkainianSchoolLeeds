@@ -17,7 +17,7 @@ import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase/hooks';
+import { SignIn } from '@/utils/auth-helpers/server';
 
 export function LoginForm({
   className,
@@ -37,40 +37,8 @@ export function LoginForm({
     setError(null);
 
     try {
-      const supabase = createClient();
-
-      const { data: authData, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (signInError) {
-        throw new Error(signInError.message);
-      }
-
-      // Check if user is active
-      if (authData.user) {
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('is_active')
-          .eq('id', authData.user.id)
-          .single();
-
-        if (userError) {
-          console.error('Error checking user status:', userError);
-        } else if (userData && typeof userData === 'object' && 'is_active' in userData) {
-          const row = userData as { is_active: boolean };
-          if (row.is_active === false) {
-            await supabase.auth.signOut();
-            throw new Error(
-              'Your account has been deactivated. Please contact an administrator.'
-            );
-          }
-        }
-      }
-
-      router.push('/');
+      const path = await SignIn(email, password);
+      router.push(path);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred');
       setIsLoading(false);

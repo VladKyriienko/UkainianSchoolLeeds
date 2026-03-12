@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 export type CreateMessageInput = {
   name: string;
@@ -31,7 +31,7 @@ export async function createMessageAction(input: CreateMessageInput) {
     throw new Error('Please enter a valid email address.');
   }
 
-  const supabase = createClient();
+  const supabase = createAdminClient();
 
   // `messages` might not exist yet in `utils/supabase/types.ts`.
   // Avoid `any` while still allowing inserts.

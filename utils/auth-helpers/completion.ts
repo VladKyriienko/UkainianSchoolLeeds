@@ -45,23 +45,80 @@ export const DEFAULT_COMPLETION_FIELDS: UsersCompletionFieldConfig[] = [
   },
 ];
 
+export type ProfileCompletionResult = {
+  percentage: number;
+  completedFields: string[];
+  missingFields: string[];
+  totalFields: number;
+};
+
+/**
+ * Compute completion from already-fetched table data (no DB call).
+ */
+function computeCompletionFromTableData(
+  tableData: Record<string, Record<string, unknown>>,
+  fields: CompletionFieldConfig[]
+): ProfileCompletionResult {
+  const completedFields: string[] = [];
+  const missingFields: string[] = [];
+
+  fields.forEach((fieldConfig) => {
+    const table = fieldConfig.table || 'users';
+    const data = tableData[table];
+    const fieldValue = data?.[fieldConfig.field];
+
+    const isCompleted = fieldConfig.validator
+      ? fieldConfig.validator(fieldValue)
+      : fieldValue !== null &&
+        fieldValue !== undefined &&
+        fieldValue !== '' &&
+        (typeof fieldValue !== 'string' || fieldValue.trim().length > 0);
+
+    if (isCompleted) {
+      completedFields.push(fieldConfig.id);
+    } else {
+      missingFields.push(fieldConfig.id);
+    }
+  });
+
+  const percentage = Math.round(
+    (completedFields.length / fields.length) * 100
+  );
+
+  return {
+    percentage,
+    completedFields,
+    missingFields,
+    totalFields: fields.length
+  };
+}
+
+/**
+ * Calculate profile completion from an existing user row (no DB call).
+ * Use when profile is already loaded (e.g. from getCurrentUser).
+ */
+export function calculateProfileCompletionFromUserRow(
+  userRow: Record<string, unknown>,
+  customFields?: CompletionFieldConfig[]
+): ProfileCompletionResult {
+  const fields = customFields || DEFAULT_COMPLETION_FIELDS;
+  const tableData: Record<string, Record<string, unknown>> = {
+    users: userRow as Record<string, unknown>
+  };
+  return computeCompletionFromTableData(tableData, fields);
+}
+
 /**
  * Calculate profile completion percentage based on configured fields
  */
 export async function calculateProfileCompletion(
   userId: string,
   customFields?: CompletionFieldConfig[]
-): Promise<{
-  percentage: number;
-  completedFields: string[];
-  missingFields: string[];
-  totalFields: number;
-}> {
+): Promise<ProfileCompletionResult> {
   const supabase = createClient();
   const fields = customFields || DEFAULT_COMPLETION_FIELDS;
 
   try {
-    // Group fields by table for efficient querying
     const fieldsByTable = fields.reduce(
       (acc, field) => {
         const table = field.table || 'users';
@@ -72,14 +129,12 @@ export async function calculateProfileCompletion(
       {} as Record<string, CompletionFieldConfig[]>
     );
 
-    // Fetch data from all required tables
     const tableData: Record<string, Record<string, unknown>> = {};
 
     for (const [tableName, tableFields] of Object.entries(fieldsByTable)) {
       const selectFields = tableFields.map((f) => f.field).join(', ');
 
       try {
-        // Use a more flexible approach for dynamic table queries
         const query = supabase
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .from(tableName as any)
@@ -89,7 +144,6 @@ export async function calculateProfileCompletion(
         const { data, error } = await query;
 
         if (error && tableName === 'users') {
-          // Users table is required
           console.error(
             'Error fetching user data for completion calculation:',
             error
@@ -110,40 +164,7 @@ export async function calculateProfileCompletion(
       }
     }
 
-    const completedFields: string[] = [];
-    const missingFields: string[] = [];
-
-    // Check each configured field
-    fields.forEach((fieldConfig) => {
-      const table = fieldConfig.table || 'users';
-      const data = tableData[table];
-      const fieldValue = data?.[fieldConfig.field];
-
-      // Use custom validator if provided, otherwise use default validation
-      const isCompleted = fieldConfig.validator
-        ? fieldConfig.validator(fieldValue)
-        : fieldValue !== null &&
-          fieldValue !== undefined &&
-          fieldValue !== '' &&
-          (typeof fieldValue !== 'string' || fieldValue.trim().length > 0);
-
-      if (isCompleted) {
-        completedFields.push(fieldConfig.id);
-      } else {
-        missingFields.push(fieldConfig.id);
-      }
-    });
-
-    const percentage = Math.round(
-      (completedFields.length / fields.length) * 100
-    );
-
-    return {
-      percentage,
-      completedFields,
-      missingFields,
-      totalFields: fields.length
-    };
+    return computeCompletionFromTableData(tableData, fields);
   } catch (error) {
     console.error('Error calculating profile completion:', error);
     return {

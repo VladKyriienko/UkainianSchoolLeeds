@@ -56,12 +56,10 @@ max_client_conn = 100
 ## NOTE: Leaving this empty can break older Supabase CLI versions. Prefer omitting or using defaults.
 #schema_paths = ["./schemas/*.sql"]
 
-#[db.seed]
-## If enabled, seeds the database after migrations during a db reset.
-#enabled = true
-## Specifies an ordered list of seed files to load during db reset.
-## Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-#sql_paths = ["./seed.sql"]
+[db.seed]
+# Run after migrations on `supabase db reset` — order matters: auth first, then demo data.
+enabled = true
+sql_paths = ["./seed.sql", "./seed_data.sql"]
 
 # [db.network_restrictions]
 # Enable management of network restrictions.

@@ -219,7 +219,7 @@ export default function ContactContent() {
         </Card>
       </div>
 
-      {/* Map */}
+      {/* Map — link only to avoid third-party cookie warning from embedded iframe */}
       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -236,19 +236,18 @@ export default function ContactContent() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0">
-          <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-b-lg overflow-hidden">
-            <iframe
-              title={content.addressTitle}
-              src={`https://www.google.com/maps?q=${encodeURIComponent(
-                content.addressText.replace(/\n/g, ', ')
-              )}&output=embed`}
-              className="absolute inset-0 w-full h-full border-0"
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
+        <CardContent>
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              content.addressText.replace(/\n/g, ', ')
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-input bg-muted/50 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            <MapPin className="h-4 w-4" />
+            {content.openInMapsLabel}
+          </a>
         </CardContent>
       </Card>
     </div>

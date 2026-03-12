@@ -91,7 +91,7 @@ export function ListView({ events }: ListViewProps) {
 
     const startLabel = showAsNow ? 'Now' : format(displayStartDate, 'MMMM d');
     return `${startLabel} - ${format(last, 'MMMM d')}`;
-  }, [paginatedEvents, startDate, showSelectedDateInTitle]);
+  }, [paginatedEvents, startDate, showSelectedDateInTitle, content.messages.noEvents]);
 
   // Group paginated events by date
   const groupedEvents = useMemo(() => {
@@ -177,20 +177,14 @@ export function ListView({ events }: ListViewProps) {
               <ChevronDown className="h-5 w-5" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[280px] p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"
               selected={startDate}
               onSelect={handleDateSelect}
               defaultMonth={startDate || startOfToday()}
               initialFocus
-              fixedWeeks
-              className="w-full"
-              classNames={{
-                root: '!w-[280px] !min-w-[280px]',
-                weeks: '!min-h-[15rem]',
-                month: '!min-h-[17rem]'
-              }}
+              className="rounded-md"
             />
           </PopoverContent>
         </Popover>

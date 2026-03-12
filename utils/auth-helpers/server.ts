@@ -46,6 +46,27 @@ export async function redirectToPath(path: string) {
   return redirect(path);
 }
 
+/**
+ * Returns whether the current session user is active (for use after OAuth/setSession).
+ * No DB access from browser: call this server action from the client.
+ */
+export async function getCurrentUserActiveStatus(): Promise<{
+  active: boolean;
+} | null> {
+  const supabase = createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase
+    .from('users')
+    .select('is_active')
+    .eq('id', user.id)
+    .single();
+  if (!data || typeof data.is_active !== 'boolean') return null;
+  return { active: data.is_active };
+}
+
 export async function SignOut(formData?: FormData) {
   const pathName = String(formData?.get('pathName') || '/').trim();
 

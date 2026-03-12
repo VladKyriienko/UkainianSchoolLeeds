@@ -20,7 +20,7 @@ const requireOrganisationForSignup = false;
 
 // Post-signup completion requirements
 const requirePostSignupCompletion = false;
-const postSignupCompletionPath = '/profile/complete';
+const postSignupCompletionPath = '/admin/profile/complete';
 
 // Check that at least one of allowPassword and allowEmail is true
 if (!allowPassword && !allowEmail)

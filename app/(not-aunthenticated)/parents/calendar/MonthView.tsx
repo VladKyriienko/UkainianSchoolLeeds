@@ -24,6 +24,8 @@ import { SubscribeToCalendar } from './SubscribeToCalendar';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
 
+const WEEK_STARTS_ON_MONDAY = { weekStartsOn: 1 } as const;
+
 // Helper function to format time from HH:MM:SS to readable format
 function formatTime(timeString: string | null | undefined): string {
   if (!timeString) return '';
@@ -50,10 +52,10 @@ export function MonthView({ events }: MonthViewProps) {
   const [currentMonth, setCurrentMonth] = useState(startOfToday());
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
-  // Generate calendar days for month view
+  // Generate calendar days for month view (week starts on Monday)
   const monthDays = useMemo(() => {
-    const start = startOfWeek(startOfMonth(currentMonth));
-    const end = endOfWeek(endOfMonth(currentMonth));
+    const start = startOfWeek(startOfMonth(currentMonth), WEEK_STARTS_ON_MONDAY);
+    const end = endOfWeek(endOfMonth(currentMonth), WEEK_STARTS_ON_MONDAY);
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 

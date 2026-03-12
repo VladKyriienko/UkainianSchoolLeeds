@@ -18,7 +18,7 @@ import {
   getAuthTypes
 } from '@/utils/auth-helpers/settings';
 import { PasswordInput } from '@/components/common/PasswordInput';
-import { DatePicker } from '@/app/(authenticated)/profile/components/DatePicker';
+import { DatePicker } from '@/app/admin/profile/components/DatePicker';
 import { GoogleOAuthButton } from '@/components/common/GoogleOAuthButton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

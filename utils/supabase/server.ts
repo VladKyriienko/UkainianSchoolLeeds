@@ -37,6 +37,12 @@ export const createClient = (): SupabaseClient<Database> => {
 
   const cookieStorePromise = cookies();
 
+  // First-party cookie options so Chrome doesn't treat session as third-party
+  const firstPartyCookieOptions: Partial<CookieOptions> = {
+    path: '/',
+    sameSite: 'lax'
+  };
+
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -49,7 +55,12 @@ export const createClient = (): SupabaseClient<Database> => {
         async set(name: string, value: string, options: CookieOptions) {
           try {
             const cookieStore = await cookieStorePromise;
-            cookieStore.set({ name, value, ...options });
+            cookieStore.set({
+              name,
+              value,
+              ...firstPartyCookieOptions,
+              ...options
+            });
           } catch (error) {
             // Silently ignore cookie set errors in Server Components
             // Cookies can only be modified in Server Actions or Route Handlers
@@ -66,7 +77,12 @@ export const createClient = (): SupabaseClient<Database> => {
         async remove(name: string, options: CookieOptions) {
           try {
             const cookieStore = await cookieStorePromise;
-            cookieStore.set({ name, value: '', ...options });
+            cookieStore.set({
+              name,
+              value: '',
+              ...firstPartyCookieOptions,
+              ...options
+            });
           } catch (error) {
             // Silently ignore cookie remove errors in Server Components
             // Cookies can only be modified in Server Actions or Route Handlers

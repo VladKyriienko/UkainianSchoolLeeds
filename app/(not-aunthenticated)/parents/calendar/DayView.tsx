@@ -114,6 +114,7 @@ export function DayView({ events }: DayViewProps) {
               onSelect={handleDateSelect}
               defaultMonth={currentDate}
               initialFocus
+              className="rounded-md"
             />
           </PopoverContent>
         </Popover>
