@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getEventById } from '@/app/admin/events/actions';
 import { EventDetailsActions } from '@/app/admin/components/EventDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 import { format } from 'date-fns';
 
 export default async function EventDetailsPage({
@@ -51,14 +49,7 @@ export default async function EventDetailsPage({
     <PageWrapper
       title={event.title}
       description={formatDate(event.date)}
-      goBackButton={
-        <Button asChild>
-          <Link href="/admin/events">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Link>
-        </Button>
-      }
+      goBackButton={<BackButton />}
       actions={<EventDetailsActions eventId={event.id} eventTitle={event.title} />}
     >
       <Card>

@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDocumentById } from '@/app/admin/documents/actions';
 import { DocumentDetailsActions } from '@/app/admin/components/DocumentDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/app/admin/documents/constants';
 import { format } from 'date-fns';
 
@@ -42,14 +40,7 @@ export default async function DocumentViewPage({
     <PageWrapper
       title={doc.title}
       description={typeLabel}
-      goBackButton={
-        <Button asChild>
-          <Link href="/admin/documents">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Link>
-        </Button>
-      }
+      goBackButton={<BackButton />}
       actions={
         <DocumentDetailsActions
           documentId={doc.id}

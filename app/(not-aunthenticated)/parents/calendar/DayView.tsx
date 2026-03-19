@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import {
   format,
   startOfToday,
@@ -132,9 +133,10 @@ export function DayView({ events }: DayViewProps) {
               const eventDate = new Date(event.date);
 
               return (
-                <div
+                <Link
                   key={event.id}
-                  className="border-b last:border-b-0 p-6 hover:bg-muted/30 transition-colors"
+                  href={`/parents/calendar/${event.id}`}
+                  className="block border-b last:border-b-0 p-6 hover:bg-muted/30 transition-colors"
                 >
                   {/* Time Label on Left */}
                   <div className="flex gap-6">
@@ -176,7 +178,7 @@ export function DayView({ events }: DayViewProps) {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

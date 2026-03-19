@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { format, startOfToday, isSameDay, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -224,7 +225,11 @@ export function ListView({ events }: ListViewProps) {
 
                   <div className="space-y-6">
                     {events.map((event) => (
-                      <div key={event.id} className="flex gap-4">
+                      <Link
+                        key={event.id}
+                        href={`/parents/calendar/${event.id}`}
+                        className="flex gap-4 hover:bg-muted/30 rounded-lg -m-2 p-2 transition-colors"
+                      >
                         <div className="flex flex-col items-center justify-start min-w-[60px] text-center">
                           <div className="text-xs uppercase text-muted-foreground font-medium tracking-wide">
                             {format(eventDate, 'EEE')}
@@ -262,7 +267,7 @@ export function ListView({ events }: ListViewProps) {
                             </div>
                           )}
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>

@@ -1,8 +1,7 @@
 import { getAllOrganisations } from '@/app/admin/users/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import CreateUserForm from '@/app/admin/components/CreateUserForm';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/common/BackButton';
 import { Tables } from '@/utils/supabase/types';
 
 export default async function CreateUserPage() {
@@ -25,9 +24,7 @@ export default async function CreateUserPage() {
           <h1 className="text-3xl font-bold mb-2">Create New User</h1>
           <p className="text-gray-400">Add a new user to the system</p>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/admin/users">← Back to Users</Link>
-        </Button>
+        <BackButton />
       </div>
 
       <div className="dark:bg-zinc-800 p-6 rounded-lg">

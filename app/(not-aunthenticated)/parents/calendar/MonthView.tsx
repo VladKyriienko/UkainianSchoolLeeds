@@ -15,6 +15,7 @@ import {
   subMonths,
   parseISO
 } from 'date-fns';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
@@ -230,10 +231,11 @@ export function MonthView({ events }: MonthViewProps) {
                 {/* Events */}
                 <div className="space-y-1">
                   {dayEvents.slice(0, 3).map((event) => (
-                    <div
+                    <Link
                       key={event.id}
+                      href={`/parents/calendar/${event.id}`}
                       className={cn(
-                        'text-xs p-1 rounded truncate cursor-pointer hover:opacity-80',
+                        'block text-xs p-1 rounded truncate hover:opacity-80',
                         event.start_time
                           ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
                           : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
@@ -246,7 +248,7 @@ export function MonthView({ events }: MonthViewProps) {
                         </span>
                       )}
                       {event.title}
-                    </div>
+                    </Link>
                   ))}
                   {dayEvents.length > 3 && (
                     <div className="text-xs text-muted-foreground pl-1">

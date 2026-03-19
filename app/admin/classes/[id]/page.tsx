@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getClassById } from '@/app/admin/classes/actions';
 import { ClassDetailsActions } from '@/app/admin/components/ClassDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 import { format } from 'date-fns';
 
 export default async function ClassViewPage({
@@ -39,14 +37,7 @@ export default async function ClassViewPage({
     <PageWrapper
       title={item.title}
       description={`Order: ${item.order}`}
-      goBackButton={
-        <Button asChild>
-          <Link href="/admin/classes">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Link>
-        </Button>
-      }
+      goBackButton={<BackButton />}
       actions={<ClassDetailsActions classId={item.id} classTitle={item.title} />}
     >
       <Card>

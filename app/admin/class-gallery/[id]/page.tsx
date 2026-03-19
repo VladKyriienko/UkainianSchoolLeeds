@@ -4,9 +4,7 @@ import { getGalleryItemById } from '@/app/admin/class-gallery/actions';
 import { getClassById } from '@/app/admin/classes/actions';
 import { ClassGalleryDetailsActions } from '@/app/admin/components/ClassGalleryDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { format } from 'date-fns';
 
@@ -40,14 +38,7 @@ export default async function ClassGalleryViewPage({
     <PageWrapper
       title="Gallery photo"
       description={classTitle}
-      goBackButton={
-        <Button asChild>
-          <Link href="/admin/class-gallery">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Link>
-        </Button>
-      }
+      goBackButton={<BackButton />}
       actions={<ClassGalleryDetailsActions itemId={item.id} />}
     >
       <Card>
