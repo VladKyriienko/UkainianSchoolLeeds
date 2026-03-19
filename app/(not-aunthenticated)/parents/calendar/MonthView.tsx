@@ -15,6 +15,7 @@ import {
   subMonths,
   parseISO
 } from 'date-fns';
+import { enUS, uk } from 'date-fns/locale';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -50,6 +51,7 @@ type MonthViewProps = {
 export function MonthView({ events }: MonthViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
+  const dateLocale = language === 'uk' ? uk : enUS;
   const [currentMonth, setCurrentMonth] = useState(startOfToday());
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
@@ -129,7 +131,7 @@ export function MonthView({ events }: MonthViewProps) {
         <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
           <PopoverTrigger asChild>
             <button className="text-2xl font-normal hover:opacity-70 transition-opacity flex items-center gap-2">
-              {format(currentMonth, 'MMMM yyyy')}
+              {format(currentMonth, 'MMMM yyyy', { locale: dateLocale })}
               <ChevronDown className="h-5 w-5" />
             </button>
           </PopoverTrigger>
@@ -158,29 +160,28 @@ export function MonthView({ events }: MonthViewProps) {
 
               {/* Month Grid */}
               <div className="grid grid-cols-3 gap-2">
-                {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(
-                  (month, index) => {
-                    const monthDate = new Date(currentMonth.getFullYear(), index, 1);
-                    const isSelected = isSameMonth(monthDate, currentMonth);
-                    return (
-                      <Button
-                        key={month}
-                        variant={isSelected ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => {
-                          setCurrentMonth(monthDate);
-                          setMonthPickerOpen(false);
-                        }}
-                        className={cn(
-                          'w-full',
-                          isSelected && 'bg-primary text-primary-foreground'
-                        )}
-                      >
-                        {month}
-                      </Button>
-                    );
-                  }
-                )}
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((index) => {
+                  const monthDate = new Date(currentMonth.getFullYear(), index, 1);
+                  const isSelected = isSameMonth(monthDate, currentMonth);
+                  const monthLabel = format(monthDate, 'MMM', { locale: dateLocale });
+                  return (
+                    <Button
+                      key={index}
+                      variant={isSelected ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        setCurrentMonth(monthDate);
+                        setMonthPickerOpen(false);
+                      }}
+                      className={cn(
+                        'w-full',
+                        isSelected && 'bg-primary text-primary-foreground'
+                      )}
+                    >
+                      {monthLabel}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           </PopoverContent>
@@ -191,14 +192,21 @@ export function MonthView({ events }: MonthViewProps) {
       <div className="border rounded-lg overflow-hidden">
         {/* Weekday Headers */}
         <div className="grid grid-cols-7 bg-muted">
-          {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, index) => (
-            <div
-              key={index}
-              className="text-center text-sm font-medium py-3 border-r last:border-r-0"
-            >
-              {day}
-            </div>
-          ))}
+          {(() => {
+            const weekStart = startOfWeek(new Date(), WEEK_STARTS_ON_MONDAY);
+            return [0, 1, 2, 3, 4, 5, 6].map((i) => {
+              const d = new Date(weekStart);
+              d.setDate(weekStart.getDate() + i);
+              return (
+                <div
+                  key={i}
+                  className="text-center text-sm font-medium py-3 border-r last:border-r-0"
+                >
+                  {format(d, 'EEEEE', { locale: dateLocale })}
+                </div>
+              );
+            });
+          })()}
         </div>
 
         {/* Calendar Days */}
@@ -230,26 +238,32 @@ export function MonthView({ events }: MonthViewProps) {
 
                 {/* Events */}
                 <div className="space-y-1">
-                  {dayEvents.slice(0, 3).map((event) => (
-                    <Link
-                      key={event.id}
-                      href={`/parents/calendar/${event.id}`}
-                      className={cn(
-                        'block text-xs p-1 rounded truncate hover:opacity-80',
-                        event.start_time
-                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
-                          : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                      )}
-                      title={event.title}
-                    >
-                      {event.start_time && (
-                        <span className="font-medium">
-                          {formatTime(event.start_time)}{' '}
-                        </span>
-                      )}
-                      {event.title}
-                    </Link>
-                  ))}
+                  {dayEvents.slice(0, 3).map((event) => {
+                    const title =
+                      language === 'uk' && event.title_uk
+                        ? event.title_uk
+                        : event.title;
+                    return (
+                      <Link
+                        key={event.id}
+                        href={`/parents/calendar/${event.id}`}
+                        className={cn(
+                          'block text-xs p-1 rounded truncate hover:opacity-80',
+                          event.start_time
+                            ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
+                            : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                        )}
+                        title={title}
+                      >
+                        {event.start_time && (
+                          <span className="font-medium">
+                            {formatTime(event.start_time)}{' '}
+                          </span>
+                        )}
+                        {title}
+                      </Link>
+                    );
+                  })}
                   {dayEvents.length > 3 && (
                     <div className="text-xs text-muted-foreground pl-1">
                       +{dayEvents.length - 3} more

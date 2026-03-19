@@ -8,8 +8,8 @@ type FooterContent = {
   contactAddress: string[];
   contactEmail: string;
   contactPhone: string;
-  quickLinksTitle: string;
-  quickLinks: {
+  socialTitle: string;
+  socialLinks: {
     label: string;
     href: string;
   }[];
@@ -33,13 +33,12 @@ export const FOOTER_CONTENT: Record<FooterLanguage, FooterContent> = {
     ],
     contactEmail: 'admin@ukrainianschool.com',
     contactPhone: '0113 2755883',
-    quickLinksTitle: 'Quick Links',
-    quickLinks: [
-      { label: 'Term Dates', href: '/parents/term-dates' },
-      { label: 'Class Pages', href: '/children/class-pages' },
-      { label: 'Newsletters', href: '/parents/newsletters' },
-      { label: 'Curriculum', href: '/key-info/curriculum' },
-      { label: 'Contact Us', href: '/contact' }
+    socialTitle: 'Social Media',
+    socialLinks: [
+      { label: 'Facebook', href: '#' },
+      { label: 'Instagram', href: '#' },
+      { label: 'YouTube', href: '#' },
+      { label: 'X', href: '#' }
     ],
     copyright: 'All website content copyright © Ukrainian School 2026',
     cookiesPolicy: 'Cookies Policy',
@@ -59,13 +58,12 @@ export const FOOTER_CONTENT: Record<FooterLanguage, FooterContent> = {
     ],
     contactEmail: 'admin@ukrainianschool.com',
     contactPhone: '0113 2755883',
-    quickLinksTitle: 'Швидкі посилання',
-    quickLinks: [
-      { label: 'Навчальні терміни', href: '/parents/term-dates' },
-      { label: 'Класні сторінки', href: '/children/class-pages' },
-      { label: 'Інформаційні бюлетені', href: '/parents/newsletters' },
-      { label: 'Навчальна програма', href: '/key-info/curriculum' },
-      { label: 'Контакти', href: '/contact' }
+    socialTitle: 'Соціальні мережі',
+    socialLinks: [
+      { label: 'Facebook', href: '#' },
+      { label: 'Instagram', href: '#' },
+      { label: 'YouTube', href: '#' },
+      { label: 'X', href: '#' }
     ],
     copyright:
       'Весь контент веб-сайту захищено авторським правом © Українська школа 2026',
