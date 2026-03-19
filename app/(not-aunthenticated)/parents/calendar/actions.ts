@@ -12,6 +12,9 @@ export type CalendarEvent = {
   end_time: string | null;
   location: string | null;
   created_at: string;
+  title_uk?: string | null;
+  description_uk?: string | null;
+  location_uk?: string | null;
 };
 
 export type CalendarEventDetail = CalendarEvent & {

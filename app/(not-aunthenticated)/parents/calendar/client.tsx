@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,13 @@ import { DayView } from './DayView';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
 
+const VIEW_PARAM = 'view';
 type ViewMode = 'list' | 'month' | 'day';
+
+function parseViewMode(value: string | null): ViewMode {
+  if (value === 'list' || value === 'month' || value === 'day') return value;
+  return 'list';
+}
 
 export type CalendarClientProps = {
   initialEvents: CalendarEvent[];
@@ -21,7 +28,29 @@ export type CalendarClientProps = {
 export function CalendarClient({ initialEvents }: CalendarClientProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const viewFromUrl = parseViewMode(searchParams.get(VIEW_PARAM));
+  const [viewMode, setViewModeState] = useState<ViewMode>(viewFromUrl);
+
+  const setViewMode = useCallback(
+    (mode: ViewMode) => {
+      setViewModeState(mode);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(VIEW_PARAM, mode);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Keep state in sync with URL (e.g. browser back/forward)
+  useEffect(() => {
+    const next = parseViewMode(searchParams.get(VIEW_PARAM));
+    setViewModeState(next);
+  }, [searchParams]);
+
   const [search, setSearch] = useState('');
 
   // Filter events based on search only
@@ -32,8 +61,11 @@ export function CalendarClient({ initialEvents }: CalendarClientProps) {
     return initialEvents.filter(
       (event) =>
         event.title.toLowerCase().includes(searchLower) ||
+        event.title_uk?.toLowerCase().includes(searchLower) ||
         event.description?.toLowerCase().includes(searchLower) ||
-        event.location?.toLowerCase().includes(searchLower)
+        event.description_uk?.toLowerCase().includes(searchLower) ||
+        event.location?.toLowerCase().includes(searchLower) ||
+        event.location_uk?.toLowerCase().includes(searchLower)
     );
   }, [initialEvents, search]);
 

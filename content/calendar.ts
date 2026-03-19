@@ -11,6 +11,7 @@ type CalendarCopy = {
   };
   navigation: {
     today: string;
+    now: string;
     thisMonth: string;
     previousPage: string;
     nextPage: string;
@@ -54,6 +55,7 @@ export const CALENDAR_CONTENT: Record<CalendarLanguage, CalendarCopy> = {
     },
     navigation: {
       today: 'Today',
+      now: 'Now',
       thisMonth: 'This Month',
       previousPage: 'Previous page',
       nextPage: 'Next page',
@@ -95,6 +97,7 @@ export const CALENDAR_CONTENT: Record<CalendarLanguage, CalendarCopy> = {
     },
     navigation: {
       today: 'Сьогодні',
+      now: 'Зараз',
       thisMonth: 'Цей місяць',
       previousPage: 'Попередня сторінка',
       nextPage: 'Наступна сторінка',

@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Newspaper, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { enUS, uk } from 'date-fns/locale';
 
 type Props = {
   news: PublicNews[];
@@ -30,7 +31,7 @@ export default function NewsContent({ news }: Props) {
 
   return (
     <div className="space-y-6">
-      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {news.map((item) => {
           const title = language === 'uk' && item.title_uk ? item.title_uk : item.title;
           const description =
@@ -53,7 +54,11 @@ export default function NewsContent({ news }: Props) {
                 ) : null}
                 <CardContent className="pt-4 pb-4">
                   <p className="text-xs text-muted-foreground mb-2">
-                    {item.date ? format(new Date(item.date), 'd MMM yyyy') : ''}
+                    {item.date
+                    ? format(new Date(item.date), 'd MMM yyyy', {
+                        locale: language === 'uk' ? uk : enUS
+                      })
+                    : ''}
                   </p>
                   <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-2">
                     {title}

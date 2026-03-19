@@ -1,11 +1,19 @@
 'use client';
 
 import Link from 'next/link';
+import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
 import { FOOTER_CONTENT } from '@/content/footer';
 
 export type PublicFooterProps = {
   className?: string;
+};
+
+const SOCIAL_ICON_BY_LABEL: Record<string, React.ComponentType<{ className?: string }>> = {
+  Facebook,
+  Instagram,
+  YouTube: Youtube,
+  X: Twitter
 };
 
 export function PublicFooter({ className }: PublicFooterProps) {
@@ -43,15 +51,28 @@ export function PublicFooter({ className }: PublicFooterProps) {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Social Media */}
           <div>
-            <h3 className="font-bold text-lg mb-4 text-ukraine-header-fg">{content.quickLinksTitle}</h3>
-            <nav className="flex flex-col space-y-2 text-sm">
-              {content.quickLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="hover:text-ukraine-yellow hover:underline transition-colors">
-                  {link.label}
-                </Link>
-              ))}
+            <h3 className="font-bold text-lg mb-4 text-ukraine-header-fg">
+              {content.socialTitle}
+            </h3>
+            <nav className="flex items-center justify-center gap-4">
+              {content.socialLinks.map((link) => {
+                const Icon = SOCIAL_ICON_BY_LABEL[link.label];
+
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={link.label}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-ukraine-yellow/40 text-ukraine-header-fg/90 hover:text-ukraine-yellow hover:border-ukraine-yellow transition-colors"
+                  >
+                    {Icon ? <Icon className="h-5 w-5" /> : <span className="text-xs">{link.label}</span>}
+                  </a>
+                );
+              })}
             </nav>
           </div>
         </div>

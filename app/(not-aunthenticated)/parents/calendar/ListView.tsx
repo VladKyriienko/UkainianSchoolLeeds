@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { format, startOfToday, isSameDay, parseISO } from 'date-fns';
+import { enUS, uk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -37,6 +38,7 @@ type ListViewProps = {
 export function ListView({ events }: ListViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
+  const dateLocale = language === 'uk' ? uk : enUS;
   const [startDate, setStartDate] = useState<Date | undefined>(startOfToday());
   const [currentPage, setCurrentPage] = useState(1);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -72,7 +74,7 @@ export function ListView({ events }: ListViewProps) {
     const today = startOfToday();
 
     if (isSameDay(first, last)) {
-      return format(first, 'MMMM d');
+      return format(first, 'MMMM d', { locale: dateLocale });
     }
 
     let displayStartDate: Date;
@@ -87,12 +89,21 @@ export function ListView({ events }: ListViewProps) {
     }
 
     if (isSameDay(displayStartDate, last)) {
-      return format(displayStartDate, 'MMMM d');
+      return format(displayStartDate, 'MMMM d', { locale: dateLocale });
     }
 
-    const startLabel = showAsNow ? 'Now' : format(displayStartDate, 'MMMM d');
-    return `${startLabel} - ${format(last, 'MMMM d')}`;
-  }, [paginatedEvents, startDate, showSelectedDateInTitle, content.messages.noEvents]);
+    const startLabel = showAsNow
+      ? content.navigation.now
+      : format(displayStartDate, 'MMMM d', { locale: dateLocale });
+    return `${startLabel} - ${format(last, 'MMMM d', { locale: dateLocale })}`;
+  }, [
+    paginatedEvents,
+    startDate,
+    showSelectedDateInTitle,
+    content.messages.noEvents,
+    content.navigation.now,
+    dateLocale
+  ]);
 
   // Group paginated events by date
   const groupedEvents = useMemo(() => {
@@ -211,7 +222,9 @@ export function ListView({ events }: ListViewProps) {
                 return null;
               }
 
-              const monthYear = format(eventDate, 'MMMM yyyy');
+              const monthYear = format(eventDate, 'MMMM yyyy', {
+                locale: dateLocale
+              });
               const showMonthHeader = monthYear !== lastMonth;
               lastMonth = monthYear;
 
@@ -224,15 +237,29 @@ export function ListView({ events }: ListViewProps) {
                   )}
 
                   <div className="space-y-6">
-                    {events.map((event) => (
-                      <Link
-                        key={event.id}
-                        href={`/parents/calendar/${event.id}`}
-                        className="flex gap-4 hover:bg-muted/30 rounded-lg -m-2 p-2 transition-colors"
-                      >
-                        <div className="flex flex-col items-center justify-start min-w-[60px] text-center">
+                    {events.map((event) => {
+                      const title =
+                        language === 'uk' && event.title_uk
+                          ? event.title_uk
+                          : event.title;
+                      const location =
+                        language === 'uk' && event.location_uk
+                          ? event.location_uk
+                          : event.location;
+                      const description =
+                        language === 'uk' && event.description_uk
+                          ? event.description_uk
+                          : event.description;
+
+                      return (
+                        <Link
+                          key={event.id}
+                          href={`/parents/calendar/${event.id}`}
+                          className="flex gap-4 hover:bg-muted/30 rounded-lg -m-2 p-2 transition-colors"
+                        >
+                          <div className="flex flex-col items-center justify-start min-w-[60px] text-center">
                           <div className="text-xs uppercase text-muted-foreground font-medium tracking-wide">
-                            {format(eventDate, 'EEE')}
+                            {format(eventDate, 'EEE', { locale: dateLocale })}
                           </div>
                           <div className="text-4xl font-light leading-none mt-1">
                             {format(eventDate, 'd')}
@@ -241,34 +268,35 @@ export function ListView({ events }: ListViewProps) {
 
                         <div className="flex-1">
                           <div className="text-sm text-foreground/60 mb-1">
-                            {format(eventDate, 'MMMM d')}
-                            {event.start_time && (
-                              <>
-                                {' @ '}
-                                {formatTime(event.start_time)}
-                                {event.end_time && ` - ${formatTime(event.end_time)}`}
-                              </>
+                            {format(eventDate, 'MMMM d', { locale: dateLocale })}
+                              {event.start_time && (
+                                <>
+                                  {' @ '}
+                                  {formatTime(event.start_time)}
+                                  {event.end_time && ` - ${formatTime(event.end_time)}`}
+                                </>
+                              )}
+                            </div>
+
+                            <h3 className="text-lg font-semibold mb-1">
+                              {title}
+                            </h3>
+
+                            {location && (
+                              <div className="text-sm text-muted-foreground">
+                                <span className="font-medium">Meanwood School</span> {location}
+                              </div>
+                            )}
+
+                            {description && (
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {description}
+                              </div>
                             )}
                           </div>
-
-                          <h3 className="text-lg font-semibold mb-1">
-                            {event.title}
-                          </h3>
-
-                          {event.location && (
-                            <div className="text-sm text-muted-foreground">
-                              <span className="font-medium">Meanwood School</span> {event.location}
-                            </div>
-                          )}
-
-                          {event.description && (
-                            <div className="text-sm text-muted-foreground mt-1">
-                              {event.description}
-                            </div>
-                          )}
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               );

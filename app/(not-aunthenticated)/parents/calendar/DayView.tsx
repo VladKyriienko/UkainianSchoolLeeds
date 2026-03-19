@@ -8,6 +8,7 @@ import {
   addDays,
   subDays
 } from 'date-fns';
+import { enUS, uk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -40,6 +41,7 @@ type DayViewProps = {
 export function DayView({ events }: DayViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
+  const dateLocale = language === 'uk' ? uk : enUS;
   const [currentDate, setCurrentDate] = useState(startOfToday());
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
@@ -104,7 +106,7 @@ export function DayView({ events }: DayViewProps) {
         <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
           <PopoverTrigger asChild>
             <button className="text-2xl font-normal hover:opacity-70 transition-opacity flex items-center gap-2">
-              {format(currentDate, 'MMMM d, yyyy')}
+              {format(currentDate, 'MMMM d, yyyy', { locale: dateLocale })}
               <ChevronDown className="h-5 w-5" />
             </button>
           </PopoverTrigger>
@@ -131,6 +133,16 @@ export function DayView({ events }: DayViewProps) {
           <div className="space-y-0">
             {dayEvents.map((event) => {
               const eventDate = new Date(event.date);
+              const title =
+                language === 'uk' && event.title_uk ? event.title_uk : event.title;
+              const location =
+                language === 'uk' && event.location_uk
+                  ? event.location_uk
+                  : event.location;
+              const description =
+                language === 'uk' && event.description_uk
+                  ? event.description_uk
+                  : event.description;
 
               return (
                 <Link
@@ -148,7 +160,7 @@ export function DayView({ events }: DayViewProps) {
                     <div className="flex-1">
                       {/* Date and Time */}
                       <div className="text-sm text-foreground/60 mb-2">
-                        {format(eventDate, 'MMMM d')}
+                        {format(eventDate, 'MMMM d', { locale: dateLocale })}
                         {event.start_time && (
                           <>
                             {' @ '}
@@ -160,20 +172,20 @@ export function DayView({ events }: DayViewProps) {
 
                       {/* Title */}
                       <h3 className="text-xl font-semibold mb-2">
-                        {event.title}
+                        {title}
                       </h3>
 
                       {/* Location */}
-                      {event.location && (
+                      {location && (
                         <div className="text-sm text-muted-foreground">
-                          <span className="font-medium">Meanwood School</span> {event.location}
+                          <span className="font-medium">Meanwood School</span> {location}
                         </div>
                       )}
 
                       {/* Description */}
-                      {event.description && (
+                      {description && (
                         <div className="text-sm text-muted-foreground mt-2">
-                          {event.description}
+                          {description}
                         </div>
                       )}
                     </div>
