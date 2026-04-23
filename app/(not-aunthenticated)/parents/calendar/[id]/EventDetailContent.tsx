@@ -5,15 +5,13 @@ import type { CalendarEventDetail } from '../actions';
 
 type Props = {
   event: CalendarEventDetail;
-  dateLabel: string;
   timeLabel: string;
 };
 
-export function EventDetailContent({ event, dateLabel, timeLabel }: Props) {
+export function EventDetailContent({ event, timeLabel }: Props) {
   const { language } = useLanguage();
   const isUk = language === 'uk';
 
-  const title = isUk ? (event.title_uk ?? event.title) : event.title;
   const description = isUk
     ? (event.description_uk ?? event.description)
     : event.description;
@@ -24,25 +22,6 @@ export function EventDetailContent({ event, dateLabel, timeLabel }: Props) {
   return (
     <article className="prose prose-neutral dark:prose-invert max-w-none">
       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6 not-prose">
-        {dateLabel && (
-          <span className="flex items-center gap-2">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            {dateLabel}
-          </span>
-        )}
         {timeLabel && (
           <span className="flex items-center gap-2">
             <svg
@@ -88,8 +67,6 @@ export function EventDetailContent({ event, dateLabel, timeLabel }: Props) {
           </span>
         )}
       </div>
-
-      <h1 className="text-2xl font-bold mb-4">{title}</h1>
 
       {description ? (
         <div className="text-muted-foreground whitespace-pre-line">

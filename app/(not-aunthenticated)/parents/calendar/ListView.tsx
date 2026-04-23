@@ -7,9 +7,10 @@ import { enUS, uk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
-import type { CalendarEvent } from './actions';
+import { ChevronLeft, ChevronRight, ChevronDown, FileText } from 'lucide-react';
+import type { CalendarEvent, CalendarSchedule } from './actions';
 import { SubscribeToCalendar } from './SubscribeToCalendar';
+import { SchedulePreviewDialog } from './SchedulePreviewDialog';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
 
@@ -33,9 +34,24 @@ function formatTime(timeString: string | null | undefined): string {
 
 type ListViewProps = {
   events: CalendarEvent[];
+  schedules: CalendarSchedule[];
 };
 
-export function ListView({ events }: ListViewProps) {
+type CalendarListItem =
+  | (CalendarEvent & { kind: 'event' })
+  | {
+    kind: 'schedule';
+    id: string;
+    date: string;
+    title: string;
+    description: string | null;
+    start_time: null;
+    end_time: null;
+    location: null;
+    publicUrl: string;
+  };
+
+export function ListView({ events, schedules }: ListViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const dateLocale = language === 'uk' ? uk : enUS;
@@ -43,30 +59,60 @@ export function ListView({ events }: ListViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [showSelectedDateInTitle, setShowSelectedDateInTitle] = useState(true);
+  const [selectedSchedule, setSelectedSchedule] = useState<{
+    title: string;
+    publicUrl: string;
+  } | null>(null);
+
+  const allItems = useMemo<CalendarListItem[]>(() => {
+    const scheduleItems: CalendarListItem[] = schedules.map((s) => ({
+      kind: 'schedule',
+      id: `schedule-${s.id}`,
+      date: s.date,
+      title: content.schedule.title,
+      description: null,
+      start_time: null,
+      end_time: null,
+      location: null,
+      publicUrl: s.publicUrl
+    }));
+
+    const eventItems: CalendarListItem[] = events.map((e) => ({
+      ...e,
+      kind: 'event'
+    }));
+
+    return [...eventItems, ...scheduleItems].sort((a, b) => {
+      const ad = parseISO(a.date).getTime();
+      const bd = parseISO(b.date).getTime();
+      if (ad !== bd) return ad - bd;
+      return (a.start_time ?? '').localeCompare(b.start_time ?? '');
+    });
+  }, [events, schedules, content.schedule.title]);
 
   // Filter events by start date
-  const filteredEvents = useMemo(() => {
-    if (!startDate) return events;
+  const filteredItems = useMemo(() => {
+    if (!startDate) return allItems;
 
-    return events.filter((event) => {
-      const eventDate = parseISO(event.date);
+    return allItems.filter((item) => {
+      const eventDate = parseISO(item.date);
       return eventDate >= startDate || isSameDay(eventDate, startDate);
     });
-  }, [events, startDate]);
+  }, [allItems, startDate]);
 
   // Paginate events
-  const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
-  const paginatedEvents = useMemo(() => {
+  const totalPages = Math.ceil(filteredItems.length / EVENTS_PER_PAGE);
+  const paginatedItems = useMemo(() => {
     const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
-    return filteredEvents.slice(startIndex, startIndex + EVENTS_PER_PAGE);
-  }, [filteredEvents, currentPage]);
+    return filteredItems.slice(startIndex, startIndex + EVENTS_PER_PAGE);
+  }, [filteredItems, currentPage]);
 
   // Calculate date range label
   const dateRangeLabel = useMemo(() => {
-    if (paginatedEvents.length === 0) return content.messages.noEvents;
+    if (paginatedItems.length === 0) return content.messages.noEvents;
 
-    const firstEvent = paginatedEvents[0];
-    const lastEvent = paginatedEvents[paginatedEvents.length - 1];
+    const firstEvent = paginatedItems[0];
+    const lastEvent = paginatedItems[paginatedItems.length - 1];
     if (!firstEvent || !lastEvent) return content.messages.noEvents;
 
     const first = parseISO(firstEvent.date);
@@ -97,7 +143,7 @@ export function ListView({ events }: ListViewProps) {
       : format(displayStartDate, 'MMMM d', { locale: dateLocale });
     return `${startLabel} - ${format(last, 'MMMM d', { locale: dateLocale })}`;
   }, [
-    paginatedEvents,
+    paginatedItems,
     startDate,
     showSelectedDateInTitle,
     content.messages.noEvents,
@@ -106,9 +152,9 @@ export function ListView({ events }: ListViewProps) {
   ]);
 
   // Group paginated events by date
-  const groupedEvents = useMemo(() => {
-    const groups: Record<string, CalendarEvent[]> = {};
-    paginatedEvents.forEach((event) => {
+  const groupedItems = useMemo(() => {
+    const groups: Record<string, CalendarListItem[]> = {};
+    paginatedItems.forEach((event) => {
       const dateKey = event.date;
       if (!groups[dateKey]) {
         groups[dateKey] = [];
@@ -116,9 +162,9 @@ export function ListView({ events }: ListViewProps) {
       groups[dateKey].push(event);
     });
     return groups;
-  }, [paginatedEvents]);
+  }, [paginatedItems]);
 
-  const sortedDates = Object.keys(groupedEvents).sort();
+  const sortedDates = Object.keys(groupedItems).sort();
 
   // Reset to page 1 when start date changes
   useEffect(() => {
@@ -212,7 +258,7 @@ export function ListView({ events }: ListViewProps) {
           (() => {
             let lastMonth = '';
             return sortedDates.map((dateKey) => {
-              const events = groupedEvents[dateKey];
+              const events = groupedItems[dateKey];
               if (!events || events.length === 0) return null;
 
               const eventDate = new Date(dateKey);
@@ -238,18 +284,57 @@ export function ListView({ events }: ListViewProps) {
 
                   <div className="space-y-6">
                     {events.map((event) => {
+                      const isSchedule = event.kind === 'schedule';
                       const title =
-                        language === 'uk' && event.title_uk
+                        !isSchedule && language === 'uk' && event.title_uk
                           ? event.title_uk
                           : event.title;
                       const location =
-                        language === 'uk' && event.location_uk
+                        !isSchedule && language === 'uk' && event.location_uk
                           ? event.location_uk
                           : event.location;
                       const description =
-                        language === 'uk' && event.description_uk
+                        !isSchedule && language === 'uk' && event.description_uk
                           ? event.description_uk
                           : event.description;
+
+                      if (isSchedule) {
+                        return (
+                          <button
+                            key={event.id}
+                            type="button"
+                            onClick={() =>
+                              setSelectedSchedule({
+                                title,
+                                publicUrl: event.publicUrl
+                              })
+                            }
+                            className="w-full text-left flex gap-4 hover:bg-muted/30 rounded-lg -m-2 p-2 transition-colors"
+                          >
+                            <div className="flex flex-col items-center justify-start min-w-[60px] text-center">
+                              <div className="text-xs uppercase text-muted-foreground font-medium tracking-wide">
+                                {format(eventDate, 'EEE', { locale: dateLocale })}
+                              </div>
+                              <div className="text-4xl font-light leading-none mt-1">
+                                {format(eventDate, 'd')}
+                              </div>
+                            </div>
+
+                            <div className="flex-1">
+                              <div className="text-sm text-foreground/60 mb-1">
+                                {format(eventDate, 'MMMM d', { locale: dateLocale })}
+                              </div>
+                              <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                {title}
+                              </h3>
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {content.schedule.openPdf}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      }
 
                       return (
                         <Link
@@ -269,7 +354,7 @@ export function ListView({ events }: ListViewProps) {
                         <div className="flex-1">
                           <div className="text-sm text-foreground/60 mb-1">
                             {format(eventDate, 'MMMM d', { locale: dateLocale })}
-                              {event.start_time && (
+                              {!isSchedule && event.start_time && (
                                 <>
                                   {' @ '}
                                   {formatTime(event.start_time)}
@@ -307,8 +392,15 @@ export function ListView({ events }: ListViewProps) {
 
       {/* Subscribe Button - Only events shown on current page */}
       <div className="flex justify-end mt-6">
-        <SubscribeToCalendar events={paginatedEvents} />
+        <SubscribeToCalendar
+          events={paginatedItems.filter((item): item is CalendarEvent & { kind: 'event' } => item.kind === 'event')}
+        />
       </div>
+
+      <SchedulePreviewDialog
+        schedule={selectedSchedule}
+        onOpenChange={(open) => !open && setSelectedSchedule(null)}
+      />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import type { CalendarEvent } from './actions';
+import type { CalendarEvent, CalendarSchedule } from './actions';
 import { MonthView } from './MonthView';
 import { ListView } from './ListView';
 import { DayView } from './DayView';
@@ -23,9 +23,10 @@ function parseViewMode(value: string | null): ViewMode {
 
 export type CalendarClientProps = {
   initialEvents: CalendarEvent[];
+  initialSchedules: CalendarSchedule[];
 };
 
-export function CalendarClient({ initialEvents }: CalendarClientProps) {
+export function CalendarClient({ initialEvents, initialSchedules }: CalendarClientProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const searchParams = useSearchParams();
@@ -112,13 +113,22 @@ export function CalendarClient({ initialEvents }: CalendarClientProps) {
       </div>
 
       {/* List View */}
-      {viewMode === 'list' && <ListView events={searchFilteredEvents} />}
+      {viewMode === 'list' && (
+        <ListView
+          events={searchFilteredEvents}
+          schedules={initialSchedules}
+        />
+      )}
 
       {/* Month View */}
-      {viewMode === 'month' && <MonthView events={searchFilteredEvents} />}
+      {viewMode === 'month' && (
+        <MonthView events={searchFilteredEvents} schedules={initialSchedules} />
+      )}
 
       {/* Day View */}
-      {viewMode === 'day' && <DayView events={searchFilteredEvents} />}
+      {viewMode === 'day' && (
+        <DayView events={searchFilteredEvents} schedules={initialSchedules} />
+      )}
     </div>
   );
 }

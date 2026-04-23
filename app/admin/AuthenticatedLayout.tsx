@@ -59,8 +59,10 @@ function AuthenticatedLayoutContent({
           />
         )}
 
-        <div className="flex container flex-1 flex-col gap-4 p-4 md:p-6">
-          {children}
+        <div className="flex w-full flex-1 flex-col gap-4 p-4 md:p-6">
+          <div className="mx-auto w-full max-w-6xl">
+            {children}
+          </div>
         </div>
       </SidebarInset>
     </>

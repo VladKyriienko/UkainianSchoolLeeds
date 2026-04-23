@@ -2,6 +2,7 @@ import { getAllOrganisations } from '@/app/admin/users/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import CreateUserForm from '@/app/admin/components/CreateUserForm';
 import { BackButton } from '@/components/common/BackButton';
+import { PageWrapper } from '@/components/common/PageWrapper';
 import { Tables } from '@/utils/supabase/types';
 
 export default async function CreateUserPage() {
@@ -18,18 +19,14 @@ export default async function CreateUserPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Create New User</h1>
-          <p className="text-gray-400">Add a new user to the system</p>
-        </div>
-        <BackButton />
-      </div>
-
-      <div className="dark:bg-zinc-800 p-6 rounded-lg">
+    <PageWrapper
+      title="Create New User"
+      description="Add a new user to the system."
+      goBackButton={<BackButton />}
+    >
+      <div className="bg-card border border-border p-6 rounded-lg">
         <CreateUserForm organisations={organisations} />
       </div>
-    </div>
+    </PageWrapper>
   );
 }

@@ -23,6 +23,7 @@ type ContactContent = {
   infoTitle: string;
   addressTitle: string;
   addressText: string;
+  mapQuery: string;
   directionsTitle: string;
   directionsText: string;
   phoneTitle: string;
@@ -33,7 +34,6 @@ type ContactContent = {
   hoursText: string;
   emergencyTitle: string;
   emergencyText: string;
-  openInMapsLabel: string;
 };
 
 export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
@@ -60,6 +60,8 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     infoTitle: 'Contact Information',
     addressTitle: 'Find us',
     addressText: 'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
+    mapQuery:
+      'The Association of Ukrainians in Great Britain, 5 Back Newton Grove, Leeds LS7 4HW, United Kingdom',
     directionsTitle: 'How to get here',
     directionsText:
       'Located in Leeds, easily accessible by public transport and car. Several bus routes stop nearby. Free parking available on site.',
@@ -70,8 +72,7 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     hoursTitle: 'Hours',
     hoursText: 'Saturday, 2:00 pm to 5:30 pm',
     emergencyTitle: 'Emergency Contact',
-    emergencyText: 'In case of an emergency, please contact the school office.',
-    openInMapsLabel: 'Open in Google Maps'
+    emergencyText: 'In case of an emergency, please contact the school office.'
   },
   uk: {
     pageTitle: 'Зв’яжіться з нами',
@@ -97,6 +98,8 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     infoTitle: 'Контактна інформація',
     addressTitle: 'Знайдіть нас',
     addressText: 'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
+    mapQuery:
+      'The Association of Ukrainians in Great Britain, 5 Back Newton Grove, Leeds LS7 4HW, United Kingdom',
     directionsTitle: 'Як до нас дістатися',
     directionsText:
       'Розташовано в Лідсі, зручно дістатися громадським транспортом або автомобілем. Поруч зупиняються кілька автобусних маршрутів. Безкоштовна парковка на території.',
@@ -108,7 +111,6 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     hoursText: 'Субота, з 14:00 до 17:30',
     emergencyTitle: 'Екстрений зв’язок',
     emergencyText:
-      'У разі надзвичайної ситуації, будь ласка, зв’яжіться з офісом школи.',
-    openInMapsLabel: 'Відкрити в Google Maps'
+      'У разі надзвичайної ситуації, будь ласка, зв’яжіться з офісом школи.'
   }
 };

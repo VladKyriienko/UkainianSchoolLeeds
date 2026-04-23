@@ -333,6 +333,53 @@ export const events = pgTable(
   }
 );
 
+export const schedule = pgTable(
+  'schedule',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    date: timestamp('date', { withTimezone: true }).defaultNow().notNull(),
+    file: text('file').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull()
+  },
+  () => {
+    const isAdmin = sql`exists (
+      select 1
+      from roles
+      where roles.user_id = auth.uid()
+        and roles.role = 'admin'
+    )`;
+
+    return [
+      pgPolicy('schedule_admin_select', {
+        for: 'select',
+        to: authenticatedRole,
+        using: isAdmin
+      }),
+      pgPolicy('schedule_admin_insert', {
+        for: 'insert',
+        to: authenticatedRole,
+        withCheck: isAdmin
+      }),
+      pgPolicy('schedule_admin_update', {
+        for: 'update',
+        to: authenticatedRole,
+        using: isAdmin,
+        withCheck: isAdmin
+      }),
+      pgPolicy('schedule_admin_delete', {
+        for: 'delete',
+        to: authenticatedRole,
+        using: isAdmin
+      })
+    ];
+  }
+);
+
 export const documents = pgTable(
   'documents',
   {

@@ -72,6 +72,13 @@ export const navigationRoutes: RouteConfig[] = [
     icon: 'Images',
     requiredRole: 'admin',
     requiresAuth: true
+  },
+  {
+    path: '/admin/schedule',
+    label: 'Schedule',
+    icon: 'CalendarClock',
+    requiredRole: 'admin',
+    requiresAuth: true
   }
 ];
 

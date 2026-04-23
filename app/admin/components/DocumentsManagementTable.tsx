@@ -28,7 +28,10 @@ type DocumentsManagementTableProps = {
   documents: AdminDocument[];
 };
 
-const CONTENT_PREVIEW_LENGTH = 80;
+function isHtmlContent(content: string | null): boolean {
+  if (!content) return false;
+  return /<\/?[a-z][\s\S]*>/i.test(content);
+}
 
 export default function DocumentsManagementTable({
   documents
@@ -104,11 +107,16 @@ export default function DocumentsManagementTable({
                   {DOCUMENT_TYPE_LABELS[doc.type as keyof typeof DOCUMENT_TYPE_LABELS] ?? doc.type}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm max-w-[320px]">
-                  <span title={doc.content}>
-                    {doc.content.length > CONTENT_PREVIEW_LENGTH
-                      ? `${doc.content.slice(0, CONTENT_PREVIEW_LENGTH)}…`
-                      : doc.content}
-                  </span>
+                  {isHtmlContent(doc.content) ? (
+                    <div
+                      className="rich-text-preview"
+                      dangerouslySetInnerHTML={{ __html: doc.content || '' }}
+                    />
+                  ) : (
+                    <span className="line-clamp-3" title={doc.content}>
+                      {doc.content || '—'}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
                   {formatDate(doc.created_at)}

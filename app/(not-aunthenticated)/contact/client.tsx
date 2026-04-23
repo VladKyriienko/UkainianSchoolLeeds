@@ -64,7 +64,7 @@ export default function ContactContent() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Contact Form */}
-      <Card>
+      <Card className="min-w-0">
         <CardHeader>
           <CardTitle>{content.formTitle}</CardTitle>
         </CardHeader>
@@ -155,17 +155,17 @@ export default function ContactContent() {
       </Card>
 
       {/* Contact Information */}
-      <div className="space-y-6">
-        <Card>
+      <div className="space-y-6 min-w-0">
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>{content.infoTitle}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-4">
               <MapPin className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-semibold mb-1">{content.addressTitle}</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">
+                <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
                   {content.addressText}
                 </p>
               </div>
@@ -173,11 +173,11 @@ export default function ContactContent() {
 
             <div className="flex items-start gap-4">
               <Phone className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-semibold mb-1">{content.phoneTitle}</h3>
                 <a
                   href={`tel:${content.phoneValue}`}
-                  className="text-sm text-muted-foreground hover:underline"
+                  className="text-sm text-muted-foreground hover:underline break-words"
                 >
                   {content.phoneValue}
                 </a>
@@ -186,11 +186,11 @@ export default function ContactContent() {
 
             <div className="flex items-start gap-4">
               <Mail className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-semibold mb-1">{content.emailTitle}</h3>
                 <a
                   href={`mailto:${content.emailValue}`}
-                  className="text-sm text-muted-foreground hover:underline"
+                  className="text-sm text-muted-foreground hover:underline break-all"
                 >
                   {content.emailValue}
                 </a>
@@ -199,9 +199,9 @@ export default function ContactContent() {
 
             <div className="flex items-start gap-4">
               <Clock className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-semibold mb-1">{content.hoursTitle}</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">
+                <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
                   {content.hoursText}
                 </p>
               </div>
@@ -209,7 +209,7 @@ export default function ContactContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>{content.emergencyTitle}</CardTitle>
           </CardHeader>
@@ -219,51 +219,38 @@ export default function ContactContent() {
         </Card>
       </div>
 
-      {/* Map — embedded + link to open in new tab */}
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      {/* Map — full-width section without card container */}
+      <section className="lg:col-span-2 min-w-0 space-y-4">
+        <div className="space-y-3">
+          <h2 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
             <MapPin className="h-5 w-5" />
             {content.addressTitle}
-          </CardTitle>
-          <div className="flex items-start gap-4 pt-2">
+          </h2>
+          <div className="flex items-start gap-4">
             <Navigation className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-            <div>
+            <div className="min-w-0">
               <h3 className="font-semibold mb-1 text-sm">{content.directionsTitle}</h3>
-              <p className="text-sm text-muted-foreground whitespace-pre-line">
+              <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
                 {content.directionsText}
               </p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-lg border border-border bg-muted/30" style={{ aspectRatio: '16/9', minHeight: '280px' }}>
-            <iframe
-              title={content.addressTitle}
-              src={`https://www.google.com/maps?q=${encodeURIComponent(
-                content.addressText.replace(/\n/g, ', ')
-              )}&output=embed`}
-              width="100%"
-              height="100%"
-              className="absolute inset-0 border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-          </div>
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              content.addressText.replace(/\n/g, ', ')
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-input bg-muted/50 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-          >
-            <MapPin className="h-4 w-4" />
-            {content.openInMapsLabel}
-          </a>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="relative w-full overflow-hidden rounded-lg border border-border bg-muted/30" style={{ aspectRatio: '16/9', minHeight: '280px' }}>
+          <iframe
+            title={content.addressTitle}
+            src={`https://www.google.com/maps?q=${encodeURIComponent(
+              content.mapQuery
+            )}&output=embed`}
+            width="100%"
+            height="100%"
+            className="absolute inset-0 border-0"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
+        </div>
+      </section>
     </div>
   );
 }

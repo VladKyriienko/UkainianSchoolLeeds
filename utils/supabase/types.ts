@@ -245,6 +245,27 @@ export type Database = {
         }
         Relationships: []
       }
+      schedule: {
+        Row: {
+          created_at: string
+          date: string
+          file: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          file: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          file?: string
+          id?: string
+        }
+        Relationships: []
+      }
       organisation_memberships: {
         Row: {
           id: string
