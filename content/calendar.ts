@@ -25,6 +25,11 @@ type CalendarCopy = {
     noEventsFound: string;
     noEventsForDay: string;
   };
+  schedule: {
+    title: string;
+    openPdf: string;
+    noSchedule: string;
+  };
   subscribe: {
     button: string;
     googleCalendar: string;
@@ -69,6 +74,11 @@ export const CALENDAR_CONTENT: Record<CalendarLanguage, CalendarCopy> = {
       noEventsFound: 'No events found',
       noEventsForDay: 'No events for this day'
     },
+    schedule: {
+      title: 'School timetable',
+      openPdf: 'Open PDF',
+      noSchedule: 'No timetable uploaded yet.'
+    },
     subscribe: {
       button: 'Subscribe to calendar',
       googleCalendar: 'Google Calendar',
@@ -110,6 +120,11 @@ export const CALENDAR_CONTENT: Record<CalendarLanguage, CalendarCopy> = {
       noEvents: 'Немає подій',
       noEventsFound: 'Подій не знайдено',
       noEventsForDay: 'Немає подій на цей день'
+    },
+    schedule: {
+      title: 'Розклад занять',
+      openPdf: 'Відкрити PDF',
+      noSchedule: 'Розклад ще не завантажено.'
     },
     subscribe: {
       button: 'Підписатися на календар',

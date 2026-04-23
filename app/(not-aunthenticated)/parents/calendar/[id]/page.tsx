@@ -4,6 +4,7 @@ import { BackButton } from '@/components/common/BackButton';
 import { getEventById } from '../actions';
 import { format } from 'date-fns';
 import { EventDetailContent } from './EventDetailContent';
+import { Calendar } from 'lucide-react';
 
 function formatTime(timeString: string | null | undefined): string {
   if (!timeString) return '';
@@ -39,11 +40,16 @@ export default async function EventDetailPage({ params }: Props) {
     <PageWrapper
       title={{ en: event.title, uk: event.title_uk ?? event.title }}
       description={
-        dateLabel ? (timeLabel ? `${dateLabel}, ${timeLabel}` : dateLabel) : undefined
+        dateLabel ? (
+          <span className="inline-flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            {timeLabel ? `${dateLabel}, ${timeLabel}` : dateLabel}
+          </span>
+        ) : undefined
       }
       goBackButton={<BackButton />}
     >
-      <EventDetailContent event={event} dateLabel={dateLabel} timeLabel={timeLabel} />
+      <EventDetailContent event={event} timeLabel={timeLabel} />
     </PageWrapper>
   );
 }

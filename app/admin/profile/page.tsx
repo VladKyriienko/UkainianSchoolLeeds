@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { ProfileForm } from './profile-form';
+import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function ProfilePage() {
   const supabase = createClient();
@@ -30,21 +31,15 @@ export default async function ProfilePage() {
   const isEmailAuth = provider === 'email';
 
   return (
-    <div className="container max-w-6xl mx-auto p-4">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Profile</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and preferences.
-          </p>
-        </div>
-
-        <ProfileForm
-          user={user}
-          userData={userData}
-          isEmailAuth={isEmailAuth}
-        />
-      </div>
-    </div>
+    <PageWrapper
+      title="Profile"
+      description="Manage your account settings and preferences."
+    >
+      <ProfileForm
+        user={user}
+        userData={userData}
+        isEmailAuth={isEmailAuth}
+      />
+    </PageWrapper>
   );
 }

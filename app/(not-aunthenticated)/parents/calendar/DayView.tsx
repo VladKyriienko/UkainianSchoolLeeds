@@ -12,9 +12,10 @@ import { enUS, uk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
-import type { CalendarEvent } from './actions';
+import { ChevronLeft, ChevronRight, ChevronDown, FileText } from 'lucide-react';
+import type { CalendarEvent, CalendarSchedule } from './actions';
 import { SubscribeToCalendar } from './SubscribeToCalendar';
+import { SchedulePreviewDialog } from './SchedulePreviewDialog';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
 
@@ -36,14 +37,19 @@ function formatTime(timeString: string | null | undefined): string {
 
 type DayViewProps = {
   events: CalendarEvent[];
+  schedules: CalendarSchedule[];
 };
 
-export function DayView({ events }: DayViewProps) {
+export function DayView({ events, schedules }: DayViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const dateLocale = language === 'uk' ? uk : enUS;
   const [currentDate, setCurrentDate] = useState(startOfToday());
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<{
+    title: string;
+    publicUrl: string;
+  } | null>(null);
 
   // Get events for the current day
   const dayEvents = useMemo(() => {
@@ -55,6 +61,25 @@ export function DayView({ events }: DayViewProps) {
       return eventDateKey === dateKey;
     });
   }, [events, currentDate]);
+
+  const daySchedules = useMemo(() => {
+    const dateKey = format(currentDate, 'yyyy-MM-dd');
+    return schedules.filter((schedule) => {
+      const scheduleDateKey = format(new Date(schedule.date), 'yyyy-MM-dd');
+      return scheduleDateKey === dateKey;
+    });
+  }, [schedules, currentDate]);
+
+  const dayItems = useMemo(
+    () => [
+      ...dayEvents.map((event) => ({ kind: 'event' as const, event })),
+      ...daySchedules.map((schedule) => ({
+        kind: 'schedule' as const,
+        schedule
+      }))
+    ],
+    [dayEvents, daySchedules]
+  );
 
   // Navigation handlers
   const handlePrevDay = () => {
@@ -125,13 +150,47 @@ export function DayView({ events }: DayViewProps) {
 
       {/* Day Timeline */}
       <div className="border rounded-lg">
-        {dayEvents.length === 0 ? (
+        {dayItems.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             {content.messages.noEventsForDay}
           </div>
         ) : (
           <div className="space-y-0">
-            {dayEvents.map((event) => {
+            {dayItems.map((item) => {
+              if (item.kind === 'schedule') {
+                return (
+                  <button
+                    key={`schedule-${item.schedule.id}`}
+                    type="button"
+                    onClick={() =>
+                      setSelectedSchedule({
+                        title: content.schedule.title,
+                        publicUrl: item.schedule.publicUrl
+                      })
+                    }
+                    className="w-full text-left block border-b last:border-b-0 p-6 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex gap-6">
+                      <div className="min-w-[100px] text-muted-foreground">
+                        <FileText className="h-4 w-4 mt-1" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm text-foreground/60 mb-2">
+                          {format(currentDate, 'MMMM d', { locale: dateLocale })}
+                        </div>
+                        <h3 className="text-xl font-semibold mb-2">
+                          {content.schedule.title}
+                        </h3>
+                        <div className="text-sm text-muted-foreground">
+                          {content.schedule.openPdf}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              }
+
+              const event = item.event;
               const eventDate = new Date(event.date);
               const title =
                 language === 'uk' && event.title_uk ? event.title_uk : event.title;
@@ -219,8 +278,13 @@ export function DayView({ events }: DayViewProps) {
 
       {/* Subscribe Button - Only events from selected day */}
       <div className="flex justify-end mt-6">
-        <SubscribeToCalendar events={dayEvents} />
+        <SubscribeToCalendar events={dayEvents.filter((event) => event.kind !== 'schedule')} />
       </div>
+
+      <SchedulePreviewDialog
+        schedule={selectedSchedule}
+        onOpenChange={(open) => !open && setSelectedSchedule(null)}
+      />
     </div>
   );
 }

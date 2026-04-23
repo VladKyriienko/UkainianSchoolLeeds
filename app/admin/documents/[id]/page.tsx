@@ -7,6 +7,11 @@ import { BackButton } from '@/components/common/BackButton';
 import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/app/admin/documents/constants';
 import { format } from 'date-fns';
 
+function isHtmlContent(content: string | null): boolean {
+  if (!content) return false;
+  return /<\/?[a-z][\s\S]*>/i.test(content);
+}
+
 export default async function DocumentViewPage({
   params
 }: {
@@ -24,15 +29,6 @@ export default async function DocumentViewPage({
   if (!doc) {
     notFound();
   }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return '—';
-    try {
-      return format(new Date(dateString), 'MMMM d, yyyy');
-    } catch {
-      return '—';
-    }
-  };
 
   const typeLabel = DOCUMENT_TYPE_LABELS[doc.type as DocumentType] ?? doc.type;
 
@@ -65,7 +61,14 @@ export default async function DocumentViewPage({
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Content</div>
-            <div className="whitespace-pre-wrap">{doc.content || '—'}</div>
+            {isHtmlContent(doc.content) ? (
+              <div
+                className="rich-text-content"
+                dangerouslySetInnerHTML={{ __html: doc.content || '' }}
+              />
+            ) : (
+              <div className="whitespace-pre-wrap">{doc.content || '—'}</div>
+            )}
           </div>
 
           {(doc.title_uk || doc.content_uk) && (
@@ -73,7 +76,14 @@ export default async function DocumentViewPage({
               <div className="text-sm text-muted-foreground mb-1">
                 Content (Ukrainian){doc.title_uk ? ` — ${doc.title_uk}` : ''}
               </div>
-              <div className="whitespace-pre-wrap">{doc.content_uk || '—'}</div>
+              {isHtmlContent(doc.content_uk) ? (
+                <div
+                  className="rich-text-content"
+                  dangerouslySetInnerHTML={{ __html: doc.content_uk || '' }}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap">{doc.content_uk || '—'}</div>
+              )}
             </div>
           )}
 

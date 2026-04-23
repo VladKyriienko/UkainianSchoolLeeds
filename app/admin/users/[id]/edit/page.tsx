@@ -6,6 +6,7 @@ import {
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import UserForm from '@/app/admin/components/UserForm';
 import { BackButton } from '@/components/common/BackButton';
+import { PageWrapper } from '@/components/common/PageWrapper';
 import { Tables } from '@/utils/supabase/types';
 
 export default async function EditUserPage({
@@ -36,28 +37,26 @@ export default async function EditUserPage({
 
   if (!currentUser) {
     return (
-      <div className="max-w-2xl mx-auto py-8 px-4">
+      <PageWrapper
+        title="User Not Found"
+        description="The user you're looking for doesn't exist."
+        goBackButton={<BackButton />}
+      >
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">User Not Found</h1>
-          <p className="text-muted-foreground mb-6">
-            The user you're looking for doesn't exist.
+          <p className="text-muted-foreground">
+            Please return to the users list and try again.
           </p>
-          <BackButton />
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Edit User</h1>
-          <p className="text-muted-foreground">Update user information</p>
-        </div>
-        <BackButton />
-      </div>
-
+    <PageWrapper
+      title="Edit User"
+      description="Update user information."
+      goBackButton={<BackButton />}
+    >
       {error ? (
         <div className="bg-destructive/10 border border-destructive text-destructive-foreground px-4 py-3 rounded mb-6">
           Error loading user: {error}
@@ -71,6 +70,6 @@ export default async function EditUserPage({
           />
         </div>
       )}
-    </div>
+    </PageWrapper>
   );
 }

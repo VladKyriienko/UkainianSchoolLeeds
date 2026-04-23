@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -17,9 +16,9 @@ import type { AdminDocument } from '@/app/admin/documents/actions';
 import { createDocument, updateDocument } from '@/app/admin/documents/actions';
 import {
   DOCUMENT_TYPES,
-  DOCUMENT_TYPE_LABELS,
-  type DocumentType
+  DOCUMENT_TYPE_LABELS
 } from '@/app/admin/documents/constants';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type DocumentFormProps = {
   mode: 'create' | 'edit';
@@ -31,6 +30,8 @@ export function DocumentForm({ mode, document: doc }: DocumentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [typeValue, setTypeValue] = useState<string>(doc?.type ?? 'DOCUMEND');
+  const [content, setContent] = useState<string>(doc?.content ?? '');
+  const [contentUk, setContentUk] = useState<string>(doc?.content_uk ?? '');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,30 +119,26 @@ export function DocumentForm({ mode, document: doc }: DocumentFormProps) {
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="content">Content *</Label>
-          <Textarea
-            id="content"
-            name="content"
-            required
-            defaultValue={doc?.content ?? ''}
-            placeholder="Document content (supports markdown)"
-            rows={10}
-            className="font-mono text-sm"
-          />
-        </div>
+        <RichTextEditor
+          id="content"
+          name="content"
+          label="Content *"
+          value={content}
+          onChange={setContent}
+          placeholder="Document content"
+          required
+          disabled={isSubmitting}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="content_uk">Content (Ukrainian)</Label>
-          <Textarea
-            id="content_uk"
-            name="content_uk"
-            defaultValue={doc?.content_uk ?? ''}
-            placeholder="Зміст документа українською"
-            rows={10}
-            className="font-mono text-sm"
-          />
-        </div>
+        <RichTextEditor
+          id="content_uk"
+          name="content_uk"
+          label="Content (Ukrainian)"
+          value={contentUk}
+          onChange={setContentUk}
+          placeholder="Зміст документа українською"
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="flex gap-4">

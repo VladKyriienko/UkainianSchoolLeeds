@@ -15,6 +15,8 @@ export type CalendarEvent = {
   title_uk?: string | null;
   description_uk?: string | null;
   location_uk?: string | null;
+  kind?: 'event' | 'schedule';
+  publicUrl?: string;
 };
 
 export type CalendarEventDetail = CalendarEvent & {
@@ -27,6 +29,13 @@ export type EventsFilter = {
   search?: string;
   startDate?: string;
   endDate?: string;
+};
+
+export type CalendarSchedule = {
+  id: string;
+  date: string;
+  file: string;
+  publicUrl: string;
 };
 
 export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEvent[]> {
@@ -84,5 +93,30 @@ export async function getEventById(id: string): Promise<CalendarEventDetail | nu
   } catch (err) {
     console.error('Error fetching event:', err);
     return null;
+  }
+}
+
+export async function getSchedules(): Promise<CalendarSchedule[]> {
+  noStore();
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('schedule')
+      .select('*')
+      .order('date', { ascending: true });
+
+    if (error || !data) return [];
+
+    return data.map((item) => ({
+      id: item.id as string,
+      date: item.date as string,
+      file: item.file as string,
+      publicUrl: supabase.storage
+        .from('schedule-files')
+        .getPublicUrl(item.file as string).data.publicUrl
+    }));
+  } catch (err) {
+    console.error('Error fetching schedule:', err);
+    return [];
   }
 }

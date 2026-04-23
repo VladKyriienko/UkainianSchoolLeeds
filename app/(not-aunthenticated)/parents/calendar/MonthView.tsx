@@ -19,10 +19,11 @@ import { enUS, uk } from 'date-fns/locale';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, FileText } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import type { CalendarEvent } from './actions';
+import type { CalendarEvent, CalendarSchedule } from './actions';
 import { SubscribeToCalendar } from './SubscribeToCalendar';
+import { SchedulePreviewDialog } from './SchedulePreviewDialog';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
 
@@ -46,14 +47,19 @@ function formatTime(timeString: string | null | undefined): string {
 
 type MonthViewProps = {
   events: CalendarEvent[];
+  schedules: CalendarSchedule[];
 };
 
-export function MonthView({ events }: MonthViewProps) {
+export function MonthView({ events, schedules }: MonthViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const dateLocale = language === 'uk' ? uk : enUS;
   const [currentMonth, setCurrentMonth] = useState(startOfToday());
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<{
+    title: string;
+    publicUrl: string;
+  } | null>(null);
 
   // Generate calendar days for month view (week starts on Monday)
   const monthDays = useMemo(() => {
@@ -87,6 +93,20 @@ export function MonthView({ events }: MonthViewProps) {
 
     return groups;
   }, [events]);
+
+  const schedulesByDate = useMemo(() => {
+    const groups: Record<string, CalendarSchedule[]> = {};
+
+    schedules.forEach((schedule) => {
+      const dateKey = format(new Date(schedule.date), 'yyyy-MM-dd');
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(schedule);
+    });
+
+    return groups;
+  }, [schedules]);
 
   // Month navigation handlers
   const handlePrevMonth = () => {
@@ -214,8 +234,16 @@ export function MonthView({ events }: MonthViewProps) {
           {monthDays.map((day, index) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayEvents = eventsByDate[dateKey] || [];
+            const daySchedules = schedulesByDate[dateKey] || [];
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isToday = isSameDay(day, startOfToday());
+            const dayItems = [
+              ...dayEvents.map((event) => ({ kind: 'event' as const, event })),
+              ...daySchedules.map((schedule) => ({
+                kind: 'schedule' as const,
+                schedule
+              }))
+            ];
 
             return (
               <div
@@ -238,35 +266,57 @@ export function MonthView({ events }: MonthViewProps) {
 
                 {/* Events */}
                 <div className="space-y-1">
-                  {dayEvents.slice(0, 3).map((event) => {
+                  {dayItems.slice(0, 3).map((item) => {
+                    if (item.kind === 'schedule') {
+                      return (
+                        <button
+                          key={`schedule-${item.schedule.id}`}
+                          type="button"
+                          onClick={() =>
+                            setSelectedSchedule({
+                              title: content.schedule.title,
+                              publicUrl: item.schedule.publicUrl
+                            })
+                          }
+                          className="w-full text-left block text-xs p-1 rounded truncate hover:opacity-80 bg-amber-100 text-amber-900 dark:bg-amber-900 dark:text-amber-100"
+                          title={content.schedule.title}
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            <FileText className="h-3 w-3" />
+                            {content.schedule.title}
+                          </span>
+                        </button>
+                      );
+                    }
+
                     const title =
-                      language === 'uk' && event.title_uk
-                        ? event.title_uk
-                        : event.title;
+                      language === 'uk' && item.event.title_uk
+                        ? item.event.title_uk
+                        : item.event.title;
                     return (
                       <Link
-                        key={event.id}
-                        href={`/parents/calendar/${event.id}`}
+                        key={item.event.id}
+                        href={`/parents/calendar/${item.event.id}`}
                         className={cn(
                           'block text-xs p-1 rounded truncate hover:opacity-80',
-                          event.start_time
+                          item.event.start_time
                             ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
                             : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
                         )}
                         title={title}
                       >
-                        {event.start_time && (
+                        {item.event.start_time && (
                           <span className="font-medium">
-                            {formatTime(event.start_time)}{' '}
+                            {formatTime(item.event.start_time)}{' '}
                           </span>
                         )}
                         {title}
                       </Link>
                     );
                   })}
-                  {dayEvents.length > 3 && (
+                  {dayItems.length > 3 && (
                     <div className="text-xs text-muted-foreground pl-1">
-                      +{dayEvents.length - 3} more
+                      +{dayItems.length - 3} more
                     </div>
                   )}
                 </div>
@@ -278,8 +328,15 @@ export function MonthView({ events }: MonthViewProps) {
 
       {/* Subscribe Button - Only events from selected month */}
       <div className="flex justify-end mt-6">
-        <SubscribeToCalendar events={currentMonthEvents} />
+        <SubscribeToCalendar
+          events={currentMonthEvents.filter((event) => event.kind !== 'schedule')}
+        />
       </div>
+
+      <SchedulePreviewDialog
+        schedule={selectedSchedule}
+        onOpenChange={(open) => !open && setSelectedSchedule(null)}
+      />
     </div>
   );
 }
