@@ -31,6 +31,15 @@ type KeyInfoNavDocument = {
   slug: string;
 };
 
+const KEY_INFO_MENU_CONTENT = {
+  en: {
+    empty: 'No documents yet'
+  },
+  uk: {
+    empty: 'Документи ще не додані'
+  }
+} as const;
+
 export function PublicNavBar({
   showDarkModeToggle = true,
   showNavigation = true,
@@ -39,6 +48,7 @@ export function PublicNavBar({
 }: PublicNavBarProps) {
   const pathname = usePathname();
   const { language } = useLanguage();
+  const keyInfoMenuContent = KEY_INFO_MENU_CONTENT[language];
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpandedKey, setMobileExpandedKey] = useState<string | null>(null);
@@ -92,21 +102,22 @@ export function PublicNavBar({
     return labelsForLang[href] ?? defaultLabel;
   };
 
-  const navigationItems = useMemo<NavItem[]>(() => {
-    if (keyInfoDocuments.length === 0) return NavItems;
+  const navigationItems = useMemo<NavItem[]>(
+    () =>
+      NavItems.map((item) => {
+        if (item.key !== 'keyInfo') return item;
 
-    return NavItems.map((item) => {
-      if (item.key !== 'keyInfo') return item;
-
-      return {
-        ...item,
-        children: keyInfoDocuments.map((document) => ({
-          label: language === 'uk' && document.title_uk ? document.title_uk : document.title,
-          href: `/key-info/${document.slug}`
-        }))
-      };
-    });
-  }, [keyInfoDocuments, language]);
+        return {
+          ...item,
+          children: keyInfoDocuments.map((document) => ({
+            label:
+              language === 'uk' && document.title_uk ? document.title_uk : document.title,
+            href: `/key-info/${document.slug}`
+          }))
+        };
+      }),
+    [keyInfoDocuments, language]
+  );
 
   const activeKey = useMemo(() => {
     const matchesItem = (item: NavItem) => {
@@ -149,7 +160,8 @@ export function PublicNavBar({
           <nav className="hidden lg:flex items-center gap-8">
             {navigationItems.map((item) => {
               const isActive = activeKey === item.key;
-              const hasChildren = !!item.children?.length;
+              const hasChildren = item.key === 'keyInfo' || !!item.children?.length;
+              const isKeyInfo = item.key === 'keyInfo';
 
               if (!hasChildren) {
                 return (
@@ -197,27 +209,33 @@ export function PublicNavBar({
                       )}
                       role="menu"
                     >
-                      {item.children!.map((child) => {
-                        const childActive =
-                          pathname === child.href ||
-                          pathname.startsWith(`${child.href}/`);
-                        return (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            className={cn(
-                              'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
-                              childActive
-                                ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
-                                : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
-                            )}
-                            role="menuitem"
-                            onClick={() => setOpenKey(null)}
-                          >
-                            {getTranslatedLabel(child.label, child.href)}
-                          </Link>
-                        );
-                      })}
+                      {(item.children?.length ?? 0) > 0 ? (
+                        item.children!.map((child) => {
+                          const childActive =
+                            pathname === child.href ||
+                            pathname.startsWith(`${child.href}/`);
+                          return (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              className={cn(
+                                'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
+                                childActive
+                                  ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
+                                  : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
+                              )}
+                              role="menuitem"
+                              onClick={() => setOpenKey(null)}
+                            >
+                              {getTranslatedLabel(child.label, child.href)}
+                            </Link>
+                          );
+                        })
+                      ) : isKeyInfo ? (
+                        <p className="px-4 py-3 text-sm text-ukraine-header-muted">
+                          {keyInfoMenuContent.empty}
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </div>
@@ -308,7 +326,8 @@ export function PublicNavBar({
                   <nav className="flex flex-col gap-2 flex-1">
                     {navigationItems.map((item) => {
                       const isActive = activeKey === item.key;
-                      const hasChildren = !!item.children?.length;
+                      const hasChildren = item.key === 'keyInfo' || !!item.children?.length;
+                      const isKeyInfo = item.key === 'keyInfo';
 
                       if (!hasChildren) {
                         return (
@@ -356,26 +375,32 @@ export function PublicNavBar({
 
                           {isExpanded && (
                             <div className="ml-4 mt-1 flex flex-col gap-1">
-                              {item.children!.map((child) => {
-                                const childActive =
-                                  pathname === child.href ||
-                                  pathname.startsWith(`${child.href}/`);
-                                return (
-                                  <Link
-                                    key={child.href}
-                                    href={child.href}
-                                    className={cn(
-                                      'block rounded-lg px-4 py-2 text-sm transition-colors',
-                                      childActive
-                                        ? 'bg-ukraine-yellow/20 text-ukraine-yellow font-medium'
-                                        : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
-                                    )}
-                                    onClick={closeMobileMenu}
-                                  >
-                                    {getTranslatedLabel(child.label, child.href)}
-                                  </Link>
-                                );
-                              })}
+                              {(item.children?.length ?? 0) > 0 ? (
+                                item.children!.map((child) => {
+                                  const childActive =
+                                    pathname === child.href ||
+                                    pathname.startsWith(`${child.href}/`);
+                                  return (
+                                    <Link
+                                      key={child.href}
+                                      href={child.href}
+                                      className={cn(
+                                        'block rounded-lg px-4 py-2 text-sm transition-colors',
+                                        childActive
+                                          ? 'bg-ukraine-yellow/20 text-ukraine-yellow font-medium'
+                                          : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
+                                      )}
+                                      onClick={closeMobileMenu}
+                                    >
+                                      {getTranslatedLabel(child.label, child.href)}
+                                    </Link>
+                                  );
+                                })
+                              ) : isKeyInfo ? (
+                                <p className="px-4 py-2 text-sm text-ukraine-header-muted">
+                                  {keyInfoMenuContent.empty}
+                                </p>
+                              ) : null}
                             </div>
                           )}
                         </div>
