@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { isHtmlContent } from '@/utils/rich-text';
+import { createDocumentSlug } from '@/utils/document-slug';
 
 type Props = {
   classes: PublicClass[];
@@ -38,6 +39,7 @@ export default function ClassPagesContent({ classes }: Props) {
             language === 'uk' && cls.description_uk
               ? cls.description_uk
               : cls.description ?? '';
+          const slug = createDocumentSlug({ id: cls.id, title: cls.title });
 
           return (
             <li key={cls.id}>
@@ -57,7 +59,7 @@ export default function ClassPagesContent({ classes }: Props) {
                     )
                   ) : null}
                   <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
-                    <Link href={`/children/class-pages/${cls.id}`} className="gap-2">
+                    <Link href={`/parents/class-pages/${slug}`} className="gap-2">
                       {viewLabel}
                       <ChevronRight className="h-4 w-4" />
                     </Link>

@@ -132,7 +132,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           <div className="public-image-frame relative overflow-hidden rounded-2xl border shadow-xl shadow-slate-900/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/home-hero-school.png"
+              src="/school-building.png"
               alt={content.about.imageAlt}
               className="aspect-[16/10] w-full object-cover"
             />
@@ -152,7 +152,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           <Button
             variant="ghost"
             asChild
-            className="public-link mt-6 px-0 hover:bg-transparent"
+            className="public-text-link mt-6 px-0 hover:bg-transparent"
           >
             <Link href="/about/welcome" className="gap-2">
               {content.about.cta}
@@ -173,7 +173,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
               {content.news.title}
             </h2>
           </div>
-          <Button variant="ghost" asChild className="public-link w-fit px-0">
+          <Button variant="ghost" asChild className="public-text-link w-fit px-0">
             <Link href="/parents/news" className="gap-2">
               {content.news.viewAll}
               <ArrowRight className="h-4 w-4" />

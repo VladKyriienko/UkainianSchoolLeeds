@@ -73,7 +73,8 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       description:
         'Lessons take place every Saturday from 14:00 to 17:30. The school has three age groups for children aged 5 to 14 and teaches Ukrainian and English languages, history, culture, geography, music, drama, and art.',
       cta: 'Read more',
-      imageAlt: 'Information board of the Ukrainian Saturday School of Leeds'
+      imageAlt:
+        'Building of the Association of Ukrainians in Great Britain Leeds Branch'
     },
     news: {
       eyebrow: 'News and events',
@@ -127,7 +128,8 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       description:
         'Навчання проходить кожної суботи з 14:00 до 17:30. Школа має три вікові групи для дітей від 5 до 14 років, де викладаються українська та англійська мови, історія, культурологія, географія, музика, акторська майстерність і образотворче мистецтво.',
       cta: 'Читати більше',
-      imageAlt: 'Інформаційний стенд Української суботньої школи Лідсу'
+      imageAlt:
+        'Будівля Association of Ukrainians in Great Britain Leeds Branch'
     },
     news: {
       eyebrow: 'Новини та події',

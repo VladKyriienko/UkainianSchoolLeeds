@@ -434,6 +434,19 @@ p a {
     color: rgb(var(--public-brand));
   }
 
+  .public-text-link {
+    color: rgb(var(--public-brand));
+    transition-property: color, text-decoration-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+    text-underline-offset: 4px;
+  }
+
+  .public-text-link:hover {
+    color: rgb(var(--ukraine-yellow)) !important;
+    text-decoration-line: underline;
+  }
+
   .public-accent-line {
     background: rgb(var(--public-yellow));
   }

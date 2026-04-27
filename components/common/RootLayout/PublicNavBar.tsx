@@ -24,6 +24,13 @@ export type PublicNavBarProps = {
   onMobileMenuOpenChange?: (open: boolean) => void;
 };
 
+type KeyInfoNavDocument = {
+  id: string;
+  title: string;
+  title_uk: string | null;
+  slug: string;
+};
+
 export function PublicNavBar({
   showDarkModeToggle = true,
   showNavigation = true,
@@ -35,6 +42,7 @@ export function PublicNavBar({
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpandedKey, setMobileExpandedKey] = useState<string | null>(null);
+  const [keyInfoDocuments, setKeyInfoDocuments] = useState<KeyInfoNavDocument[]>([]);
 
   const closeMobileMenu = () => {
     setMobileOpen(false);
@@ -52,10 +60,53 @@ export function PublicNavBar({
     }
   }, [mobileOpen]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadKeyInfoDocuments() {
+      try {
+        const response = await fetch('/api/key-info-documents');
+        if (!response.ok) return;
+
+        const data = (await response.json()) as {
+          documents?: KeyInfoNavDocument[];
+        };
+
+        if (isMounted) {
+          setKeyInfoDocuments(data.documents ?? []);
+        }
+      } catch (error) {
+        console.error('Failed to load key info navigation documents:', error);
+      }
+    }
+
+    loadKeyInfoDocuments();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const getTranslatedLabel = (defaultLabel: string, href: string) => {
     const labelsForLang = NAV_LABELS[language] ?? {};
     return labelsForLang[href] ?? defaultLabel;
   };
+
+  const navigationItems = useMemo<NavItem[]>(() => {
+    if (keyInfoDocuments.length === 0) return NavItems;
+
+    return NavItems.map((item) => {
+      if (item.key !== 'keyInfo') return item;
+
+      return {
+        ...item,
+        children: keyInfoDocuments.map((document) => ({
+          label: language === 'uk' && document.title_uk ? document.title_uk : document.title,
+          href: `/key-info/${document.slug}`
+        }))
+      };
+    });
+  }, [keyInfoDocuments, language]);
 
   const activeKey = useMemo(() => {
     const matchesItem = (item: NavItem) => {
@@ -67,8 +118,8 @@ export function PublicNavBar({
       return false;
     };
 
-    return NavItems.find((i) => matchesItem(i))?.key ?? null;
-  }, [pathname]);
+    return navigationItems.find((i) => matchesItem(i))?.key ?? null;
+  }, [navigationItems, pathname]);
 
   const linkClass = (isActive: boolean) =>
     cn(
@@ -96,7 +147,7 @@ export function PublicNavBar({
         {/* Desktop Navigation */}
         {showNavigation && (
           <nav className="hidden lg:flex items-center gap-8">
-            {NavItems.map((item) => {
+            {navigationItems.map((item) => {
               const isActive = activeKey === item.key;
               const hasChildren = !!item.children?.length;
 
@@ -255,7 +306,7 @@ export function PublicNavBar({
 
                 <div className="flex flex-col gap-6 pt-2">
                   <nav className="flex flex-col gap-2 flex-1">
-                    {NavItems.map((item) => {
+                    {navigationItems.map((item) => {
                       const isActive = activeKey === item.key;
                       const hasChildren = !!item.children?.length;
 

@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/utils/supabase/admin';
 import type { Tables } from '@/utils/supabase/types';
+import { createDocumentSlug } from '@/utils/document-slug';
 
 export type PublicClass = Tables<'classes'>;
 
@@ -30,4 +31,13 @@ export async function getClassById(id: string): Promise<PublicClass | null> {
 
   if (error || !data) return null;
   return data as PublicClass;
+}
+
+export async function getClassBySlug(slug: string): Promise<PublicClass | null> {
+  const classes = await getClasses();
+
+  return (
+    classes.find((cls) => createDocumentSlug({ id: cls.id, title: cls.title }) === slug) ??
+    null
+  );
 }
