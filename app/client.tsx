@@ -33,7 +33,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
 
   return (
     <div className="public-page w-full overflow-hidden pb-12">
-      <section className="public-hero relative isolate -mx-4 overflow-hidden md:-mx-6 lg:-mx-8">
+      <section className="public-hero relative isolate overflow-hidden md:-mx-6 lg:-mx-8">
         <div className="public-hero-image-desktop absolute inset-y-0 right-0 hidden w-[64%] bg-cover bg-center lg:block" />
         <div className="absolute inset-y-0 right-0 hidden w-[64%] bg-gradient-to-b from-white/10 via-transparent to-white/40 lg:block" />
         <div className="relative z-10 grid min-h-[540px] items-center gap-8 px-4 py-12 md:px-8 lg:grid-cols-[0.52fr_0.48fr] lg:px-14 lg:py-16">
@@ -251,7 +251,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
         </div>
       </section>
 
-      <section className="public-cta-section -mx-4 mt-6 overflow-hidden px-4 py-10 md:-mx-6 md:px-8 lg:-mx-8 lg:px-14">
+      <section className="public-cta-section mt-6 overflow-hidden px-4 py-10 md:-mx-6 md:px-8 lg:-mx-8 lg:px-14">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-xl">
             <Users className="mb-5 h-12 w-12 text-white/25" />
