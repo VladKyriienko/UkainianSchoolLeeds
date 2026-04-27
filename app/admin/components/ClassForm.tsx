@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { AdminClass } from '@/app/admin/classes/actions';
 import { createClass, updateClass } from '@/app/admin/classes/actions';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type ClassFormProps = {
   mode: 'create' | 'edit';
@@ -18,6 +18,8 @@ export function ClassForm({ mode, classItem }: ClassFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [description, setDescription] = useState(classItem?.description ?? '');
+  const [descriptionUk, setDescriptionUk] = useState(classItem?.description_uk ?? '');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,27 +85,25 @@ export function ClassForm({ mode, classItem }: ClassFormProps) {
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            defaultValue={classItem?.description ?? ''}
-            placeholder="Class description"
-            rows={4}
-          />
-        </div>
+        <RichTextEditor
+          id="description"
+          name="description"
+          label="Description"
+          value={description}
+          onChange={setDescription}
+          placeholder="Class description"
+          disabled={isSubmitting}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="description_uk">Description (Ukrainian)</Label>
-          <Textarea
-            id="description_uk"
-            name="description_uk"
-            defaultValue={classItem?.description_uk ?? ''}
-            placeholder="Опис класу українською"
-            rows={4}
-          />
-        </div>
+        <RichTextEditor
+          id="description_uk"
+          name="description_uk"
+          label="Description (Ukrainian)"
+          value={descriptionUk}
+          onChange={setDescriptionUk}
+          placeholder="Опис класу українською"
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="space-y-2 max-w-xs">

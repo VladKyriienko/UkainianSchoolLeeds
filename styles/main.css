@@ -126,6 +126,25 @@ p a {
     --ukraine-header-fg: 255 255 255;
     --ukraine-header-muted: 235 245 255;
 
+    /* Public website design tokens */
+    --public-surface: 255 255 255;
+    --public-ink: 20 35 63;
+    --public-ink-strong: 13 26 61;
+    --public-muted: 88 101 125;
+    --public-brand: 25 103 210;
+    --public-brand-hover: 21 89 182;
+    --public-yellow: 255 215 71;
+    --public-yellow-hover: 243 201 35;
+    --public-warm-border: 239 231 212;
+    --public-cool-border: 219 227 239;
+    --public-card-border: 230 221 201;
+    --public-soft-blue: 246 249 255;
+    --public-news-surface: 238 244 255;
+    --public-warm-icon-bg: 255 241 184;
+    --public-warm-icon: 210 155 0;
+    --public-cookie-bg: 18 63 122;
+    --public-cookie-border: 127 177 239;
+
     /* Border Radius */
     --radius: 0.75rem;
 
@@ -375,6 +394,182 @@ p a {
 }
 
 @layer components {
+  .public-page {
+    color: rgb(var(--public-ink));
+  }
+
+  .public-hero {
+    background: rgb(var(--public-surface));
+  }
+
+  .public-hero-image-desktop {
+    background-image:
+      linear-gradient(
+        90deg,
+        rgb(var(--public-surface)) 0%,
+        rgb(var(--public-surface) / 0.9) 16%,
+        rgb(var(--public-surface) / 0.18) 45%,
+        rgb(var(--public-surface) / 0) 100%
+      ),
+      url('/home-hero-school.png');
+  }
+
+  .public-hero-image-mobile {
+    background-image:
+      linear-gradient(
+        90deg,
+        rgb(var(--public-surface) / 0.88),
+        rgb(var(--public-surface) / 0.12)
+      ),
+      url('/home-hero-school.png');
+  }
+
+  .public-title {
+    color: rgb(var(--public-ink-strong));
+  }
+
+  .public-title-accent,
+  .public-link,
+  .public-eyebrow {
+    color: rgb(var(--public-brand));
+  }
+
+  .public-accent-line {
+    background: rgb(var(--public-yellow));
+  }
+
+  .public-text {
+    color: rgb(var(--public-muted));
+  }
+
+  .public-button-primary {
+    background: rgb(var(--public-brand));
+    color: rgb(var(--primary-foreground));
+  }
+
+  .public-button-primary:hover {
+    background: rgb(var(--public-brand-hover));
+  }
+
+  .public-button-outline {
+    border-color: rgb(var(--public-cool-border));
+    background: rgb(var(--public-surface));
+    color: rgb(var(--public-ink));
+  }
+
+  .public-button-outline:hover {
+    background: rgb(var(--public-soft-blue));
+    color: rgb(var(--public-ink));
+  }
+
+  .public-button-yellow {
+    background: rgb(var(--public-yellow));
+    color: rgb(var(--public-ink));
+  }
+
+  .public-button-yellow:hover {
+    background: rgb(var(--public-yellow-hover));
+  }
+
+  .public-icon-soft {
+    background: rgb(var(--public-soft-blue));
+    color: rgb(var(--public-brand));
+  }
+
+  .public-icon-warm {
+    background: rgb(var(--public-warm-icon-bg));
+    color: rgb(var(--public-warm-icon));
+  }
+
+  .public-floating-card {
+    border-color: rgb(var(--public-surface) / 0.8);
+    background: rgb(var(--public-surface) / 0.95);
+  }
+
+  .public-feature-card {
+    border-color: rgb(var(--public-warm-border));
+    background: rgb(var(--public-surface) / 0.7);
+  }
+
+  .public-feature-card:hover {
+    border-color: rgb(var(--public-cool-border));
+    background: rgb(var(--public-surface));
+  }
+
+  .public-feature-card:hover .public-feature-icon {
+    background: rgb(var(--public-brand));
+    color: rgb(var(--primary-foreground));
+  }
+
+  .public-dot-accent {
+    color: rgb(var(--public-brand) / 0.35);
+  }
+
+  .public-image-frame {
+    border-color: rgb(var(--public-surface));
+    background: rgb(var(--public-surface));
+  }
+
+  .public-empty-state {
+    border-color: rgb(var(--public-cool-border));
+    background: rgb(var(--public-surface) / 0.7);
+    color: rgb(var(--public-muted));
+  }
+
+  .public-news-card {
+    border-color: rgb(var(--public-card-border));
+    background: rgb(var(--public-surface));
+  }
+
+  .public-news-image {
+    background: rgb(var(--public-news-surface));
+  }
+
+  .public-news-placeholder {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--public-news-surface)),
+      rgb(var(--public-yellow) / 0.35)
+    );
+    color: rgb(var(--public-brand));
+  }
+
+  .public-date-badge {
+    background: rgb(var(--public-surface));
+  }
+
+  .public-cta-section {
+    background: rgb(var(--public-brand));
+    color: rgb(var(--primary-foreground));
+  }
+
+  .public-section-divider {
+    border-color: rgb(var(--public-warm-border));
+  }
+
+  .cookie-consent-banner {
+    border-color: rgb(var(--public-cookie-border) / 0.4);
+    background: rgb(var(--public-cookie-bg) / 0.95);
+    color: rgb(var(--primary-foreground));
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .cookie-consent-banner {
+      background: rgb(var(--public-cookie-bg) / 0.9);
+    }
+  }
+
+  .cookie-consent-reject {
+    border-color: rgb(var(--primary-foreground) / 0.7);
+    background: transparent;
+    color: rgb(var(--primary-foreground));
+  }
+
+  .cookie-consent-reject:hover {
+    background: rgb(var(--primary-foreground) / 0.1);
+    color: rgb(var(--primary-foreground));
+  }
+
   .rich-text-content {
     @apply text-foreground leading-7;
   }

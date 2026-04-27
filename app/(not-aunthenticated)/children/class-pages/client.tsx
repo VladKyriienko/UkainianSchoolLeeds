@@ -7,6 +7,7 @@ import type { PublicClass } from './actions';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronRight } from 'lucide-react';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
   classes: PublicClass[];
@@ -16,8 +17,6 @@ export default function ClassPagesContent({ classes }: Props) {
   const { language } = useLanguage();
   const content = CLASS_PAGES_CONTENT;
 
-  const titleKey = language === 'uk' ? 'pageTitleUk' : 'pageTitle';
-  const descKey = language === 'uk' ? 'pageDescriptionUk' : 'pageDescription';
   const viewLabel = language === 'uk' ? content.viewClassLabelUk : content.viewClassLabel;
   const noClasses = language === 'uk' ? content.noClassesUk : content.noClasses;
 
@@ -46,9 +45,16 @@ export default function ClassPagesContent({ classes }: Props) {
                 <CardContent className="pt-6 pb-6">
                   <h3 className="font-semibold text-lg text-foreground mb-2">{title}</h3>
                   {description ? (
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {description}
-                    </p>
+                    isHtmlContent(description) ? (
+                      <div
+                        className="rich-text-preview mb-4"
+                        dangerouslySetInnerHTML={{ __html: description }}
+                      />
+                    ) : (
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                        {description}
+                      </p>
+                    )
                   ) : null}
                   <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                     <Link href={`/children/class-pages/${cls.id}`} className="gap-2">

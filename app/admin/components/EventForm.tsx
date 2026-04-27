@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { AdminEvent } from '@/app/admin/events/actions';
 import { createEvent, updateEvent } from '@/app/admin/events/actions';
 import { format } from 'date-fns';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type EventFormProps = {
   mode: 'create' | 'edit';
@@ -19,6 +19,8 @@ export function EventForm({ mode, event }: EventFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [description, setDescription] = useState(event?.description || '');
+  const [descriptionUk, setDescriptionUk] = useState(event?.description_uk || '');
 
   // Format date for input (YYYY-MM-DD)
   const formatDateForInput = (dateString: string | null) => {
@@ -100,27 +102,25 @@ export function EventForm({ mode, event }: EventFormProps) {
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            defaultValue={event?.description || ''}
-            placeholder="Event description"
-            rows={4}
-          />
-        </div>
+        <RichTextEditor
+          id="description"
+          name="description"
+          label="Description"
+          value={description}
+          onChange={setDescription}
+          placeholder="Event description"
+          disabled={isSubmitting}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="description_uk">Description (Ukrainian)</Label>
-          <Textarea
-            id="description_uk"
-            name="description_uk"
-            defaultValue={event?.description_uk || ''}
-            placeholder="Опис події українською"
-            rows={4}
-          />
-        </div>
+        <RichTextEditor
+          id="description_uk"
+          name="description_uk"
+          label="Description (Ukrainian)"
+          value={descriptionUk}
+          onChange={setDescriptionUk}
+          placeholder="Опис події українською"
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

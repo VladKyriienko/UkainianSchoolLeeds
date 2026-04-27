@@ -13,6 +13,7 @@ import { SubscribeToCalendar } from './SubscribeToCalendar';
 import { SchedulePreviewDialog } from './SchedulePreviewDialog';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
+import { isHtmlContent } from '@/utils/rich-text';
 
 const EVENTS_PER_PAGE = 10;
 
@@ -374,9 +375,16 @@ export function ListView({ events, schedules }: ListViewProps) {
                             )}
 
                             {description && (
-                              <div className="text-sm text-muted-foreground mt-1">
-                                {description}
-                              </div>
+                              isHtmlContent(description) ? (
+                                <div
+                                  className="rich-text-preview mt-1"
+                                  dangerouslySetInnerHTML={{ __html: description }}
+                                />
+                              ) : (
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {description}
+                                </div>
+                              )
                             )}
                           </div>
                         </Link>

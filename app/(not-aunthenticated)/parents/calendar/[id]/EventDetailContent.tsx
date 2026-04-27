@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/providers/language-provider';
 import type { CalendarEventDetail } from '../actions';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
   event: CalendarEventDetail;
@@ -69,9 +70,16 @@ export function EventDetailContent({ event, timeLabel }: Props) {
       </div>
 
       {description ? (
-        <div className="text-muted-foreground whitespace-pre-line">
-          {description}
-        </div>
+        isHtmlContent(description) ? (
+          <div
+            className="rich-text-content"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
+        ) : (
+          <div className="text-muted-foreground whitespace-pre-line">
+            {description}
+          </div>
+        )
       ) : (
         <p className="text-muted-foreground">No description.</p>
       )}

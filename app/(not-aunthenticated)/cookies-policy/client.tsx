@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
 import { useLanguage } from '@/providers/language-provider';
 import type { PublicCookiesPolicyDocument } from './actions';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type CookiesPolicyContentProps = {
   document: PublicCookiesPolicyDocument | null;
@@ -34,7 +35,7 @@ export default function CookiesPolicyContent({ document }: CookiesPolicyContentP
   }
 
   const content = language === 'uk' && document.content_uk ? document.content_uk : document.content;
-  const isHtmlContent = /<\/?[a-z][\s\S]*>/i.test(content);
+  const hasHtml = isHtmlContent(content);
   const updatedAt = format(new Date(document.created_at), 'd MMMM yyyy', {
     locale
   });
@@ -46,7 +47,7 @@ export default function CookiesPolicyContent({ document }: CookiesPolicyContentP
       </p>
 
       <section>
-        {isHtmlContent ? (
+        {hasHtml ? (
           <div
             className="rich-text-content"
             dangerouslySetInnerHTML={{ __html: content }}

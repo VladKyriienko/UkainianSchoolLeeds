@@ -4,7 +4,7 @@ import { PublicHomeClient } from './client';
 import { PublicLayout } from '@/components/common/RootLayout/PublicLayout';
 import { getNews } from '@/app/(not-aunthenticated)/parents/news/actions';
 
-const HOME_NEWS_LIMIT = 2;
+const HOME_NEWS_LIMIT = 3;
 
 export default async function HomePage() {
   const { user } = await getCurrentUser();

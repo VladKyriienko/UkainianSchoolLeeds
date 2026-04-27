@@ -18,6 +18,7 @@ import { SubscribeToCalendar } from './SubscribeToCalendar';
 import { SchedulePreviewDialog } from './SchedulePreviewDialog';
 import { useLanguage } from '@/providers/language-provider';
 import { CALENDAR_CONTENT } from '@/content/calendar';
+import { isHtmlContent } from '@/utils/rich-text';
 
 // Helper function to format time from HH:MM:SS to readable format
 function formatTime(timeString: string | null | undefined): string {
@@ -243,9 +244,16 @@ export function DayView({ events, schedules }: DayViewProps) {
 
                       {/* Description */}
                       {description && (
-                        <div className="text-sm text-muted-foreground mt-2">
-                          {description}
-                        </div>
+                        isHtmlContent(description) ? (
+                          <div
+                            className="rich-text-preview mt-2"
+                            dangerouslySetInnerHTML={{ __html: description }}
+                          />
+                        ) : (
+                          <div className="text-sm text-muted-foreground mt-2">
+                            {description}
+                          </div>
+                        )
                       )}
                     </div>
                   </div>

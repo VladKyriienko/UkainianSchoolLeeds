@@ -5,6 +5,7 @@ import { EventDetailsActions } from '@/app/admin/components/EventDetailsActions'
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { format } from 'date-fns';
+import { isHtmlContent } from '@/utils/rich-text';
 
 export default async function EventDetailsPage({
   params
@@ -64,7 +65,14 @@ export default async function EventDetailsPage({
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>
-            <div className="whitespace-pre-wrap">{event.description || '—'}</div>
+            {isHtmlContent(event.description) ? (
+              <div
+                className="rich-text-content"
+                dangerouslySetInnerHTML={{ __html: event.description || '' }}
+              />
+            ) : (
+              <div className="whitespace-pre-wrap">{event.description || '—'}</div>
+            )}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

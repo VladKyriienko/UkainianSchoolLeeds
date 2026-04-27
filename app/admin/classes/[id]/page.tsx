@@ -5,6 +5,7 @@ import { ClassDetailsActions } from '@/app/admin/components/ClassDetailsActions'
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { format } from 'date-fns';
+import { isHtmlContent } from '@/utils/rich-text';
 
 export default async function ClassViewPage({
   params
@@ -23,15 +24,6 @@ export default async function ClassViewPage({
   if (!item) {
     notFound();
   }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return '—';
-    try {
-      return format(new Date(dateString), 'MMMM d, yyyy');
-    } catch {
-      return '—';
-    }
-  };
 
   return (
     <PageWrapper
@@ -52,7 +44,14 @@ export default async function ClassViewPage({
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>
-            <div className="whitespace-pre-wrap">{item.description || '—'}</div>
+            {isHtmlContent(item.description) ? (
+              <div
+                className="rich-text-content"
+                dangerouslySetInnerHTML={{ __html: item.description || '' }}
+              />
+            ) : (
+              <div className="whitespace-pre-wrap">{item.description || '—'}</div>
+            )}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -77,7 +76,14 @@ export default async function ClassViewPage({
                   <div className="text-sm text-muted-foreground mb-1">
                     Description (Ukrainian)
                   </div>
-                  <div className="whitespace-pre-wrap">{item.description_uk}</div>
+                  {isHtmlContent(item.description_uk) ? (
+                    <div
+                      className="rich-text-content"
+                      dangerouslySetInnerHTML={{ __html: item.description_uk }}
+                    />
+                  ) : (
+                    <div className="whitespace-pre-wrap">{item.description_uk}</div>
+                  )}
                 </div>
               )}
             </div>

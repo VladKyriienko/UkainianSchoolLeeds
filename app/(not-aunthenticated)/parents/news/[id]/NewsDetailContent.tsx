@@ -4,6 +4,7 @@ import { useLanguage } from '@/providers/language-provider';
 import { format } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
 import type { PublicNews } from '../actions';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
   item: PublicNews;
@@ -36,9 +37,16 @@ export function NewsDetailContent({ item }: Props) {
         </div>
       ) : null}
       {description ? (
-        <div className="text-muted-foreground whitespace-pre-line">
-          {description}
-        </div>
+        isHtmlContent(description) ? (
+          <div
+            className="rich-text-content"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
+        ) : (
+          <div className="text-muted-foreground whitespace-pre-line">
+            {description}
+          </div>
+        )
       ) : (
         <p className="text-muted-foreground">Content will be added soon.</p>
       )}

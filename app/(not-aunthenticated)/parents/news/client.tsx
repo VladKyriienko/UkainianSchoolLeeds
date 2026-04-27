@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Newspaper, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
   news: PublicNews[];
@@ -64,9 +65,16 @@ export default function NewsContent({ news }: Props) {
                     {title}
                   </h3>
                   {description ? (
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {description}
-                    </p>
+                    isHtmlContent(description) ? (
+                      <div
+                        className="rich-text-preview mb-4"
+                        dangerouslySetInnerHTML={{ __html: description }}
+                      />
+                    ) : (
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                        {description}
+                      </p>
+                    )
                   ) : null}
                   <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                     <Link href={`/parents/news/${item.id}`} className="gap-2">

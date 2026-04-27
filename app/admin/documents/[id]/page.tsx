@@ -6,11 +6,7 @@ import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/app/admin/documents/constants';
 import { format } from 'date-fns';
-
-function isHtmlContent(content: string | null): boolean {
-  if (!content) return false;
-  return /<\/?[a-z][\s\S]*>/i.test(content);
-}
+import { isHtmlContent } from '@/utils/rich-text';
 
 export default async function DocumentViewPage({
   params
