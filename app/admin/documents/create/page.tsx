@@ -1,7 +1,6 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { DocumentForm } from '@/app/admin/components/DocumentForm';
 import { listDocuments } from '@/app/admin/documents/actions';
-import type { DocumentType } from '@/app/admin/documents/constants';
 
 const SINGLETON_DOCUMENT_TYPES = ['COOKIES_POLICY', 'PRIVACY_POLICY'] as const;
 
@@ -13,7 +12,9 @@ export default async function CreateDocumentPage() {
     })
   );
   const unavailableTypes = existingSingletonTypes.filter(
-    (type): type is DocumentType => type !== null
+    (
+      type
+    ): type is (typeof SINGLETON_DOCUMENT_TYPES)[number] => type !== null
   );
 
   return (
