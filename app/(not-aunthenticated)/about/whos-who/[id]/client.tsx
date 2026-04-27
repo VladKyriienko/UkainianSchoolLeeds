@@ -3,6 +3,7 @@
 import { useLanguage } from '@/providers/language-provider';
 import { WHOS_WHO_CONTENT } from '@/content/whos-who';
 import type { PublicTeacher } from '../actions';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
   teacher: PublicTeacher;
@@ -60,9 +61,16 @@ export default function MemberDetailClient({ teacher }: Props) {
         <div className="flex-1 min-w-0">
           {description ? (
             <section>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                {description}
-              </p>
+              {isHtmlContent(description) ? (
+                <div
+                  className="rich-text-content"
+                  dangerouslySetInnerHTML={{ __html: description }}
+                />
+              ) : (
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {description}
+                </p>
+              )}
             </section>
           ) : (
             <p className="text-muted-foreground italic">{placeholder}</p>

@@ -1,15 +1,16 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { getClassById } from '../actions';
+import { getClassBySlug } from '../actions';
 import { BackButton } from '@/components/common/BackButton';
+import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 export default async function ClassDetailPage({ params }: Props) {
-  const { id } = await params;
-  const cls = await getClassById(id);
+  const { slug } = await params;
+  const cls = await getClassBySlug(slug);
   if (!cls) notFound();
 
   return (
@@ -26,9 +27,16 @@ export default async function ClassDetailPage({ params }: Props) {
     >
       <div className="prose prose-neutral dark:prose-invert max-w-none">
         {cls.description_uk || cls.description ? (
-          <p className="text-muted-foreground whitespace-pre-line">
-            {cls.description_uk || cls.description}
-          </p>
+          isHtmlContent(cls.description_uk || cls.description) ? (
+            <div
+              className="rich-text-content"
+              dangerouslySetInnerHTML={{ __html: cls.description_uk || cls.description || '' }}
+            />
+          ) : (
+            <p className="text-muted-foreground whitespace-pre-line">
+              {cls.description_uk || cls.description}
+            </p>
+          )
         ) : (
           <p className="text-muted-foreground">
             Content for this class will be added soon.

@@ -16,22 +16,32 @@ import type { AdminDocument } from '@/app/admin/documents/actions';
 import { createDocument, updateDocument } from '@/app/admin/documents/actions';
 import {
   DOCUMENT_TYPES,
-  DOCUMENT_TYPE_LABELS
+  DOCUMENT_TYPE_LABELS,
+  type DocumentType
 } from '@/app/admin/documents/constants';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type DocumentFormProps = {
   mode: 'create' | 'edit';
   document?: AdminDocument | null;
+  unavailableTypes?: DocumentType[];
 };
 
-export function DocumentForm({ mode, document: doc }: DocumentFormProps) {
+export function DocumentForm({
+  mode,
+  document: doc,
+  unavailableTypes = []
+}: DocumentFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [typeValue, setTypeValue] = useState<string>(doc?.type ?? 'DOCUMEND');
   const [content, setContent] = useState<string>(doc?.content ?? '');
   const [contentUk, setContentUk] = useState<string>(doc?.content_uk ?? '');
+  const availableTypes =
+    mode === 'create'
+      ? DOCUMENT_TYPES.filter((type) => !unavailableTypes.includes(type))
+      : DOCUMENT_TYPES;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -109,7 +119,7 @@ export function DocumentForm({ mode, document: doc }: DocumentFormProps) {
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
-            {DOCUMENT_TYPES.map((t) => (
+            {availableTypes.map((t) => (
               <SelectItem key={t} value={t}>
                 {DOCUMENT_TYPE_LABELS[t]}
               </SelectItem>

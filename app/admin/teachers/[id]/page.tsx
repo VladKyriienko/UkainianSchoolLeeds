@@ -6,6 +6,7 @@ import { getTeacherById } from '@/app/admin/teachers/actions';
 import { TeacherDetailsActions } from '@/app/admin/components/TeacherDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
+import { isHtmlContent } from '@/utils/rich-text';
 
 export default async function TeacherDetailsPage({
   params
@@ -82,9 +83,16 @@ export default async function TeacherDetailsPage({
 
             <div>
               <div className="text-sm text-muted-foreground mb-1">Description</div>
-              <div className="whitespace-pre-wrap">
-                {teacher.description || '—'}
-              </div>
+              {isHtmlContent(teacher.description) ? (
+                <div
+                  className="rich-text-content"
+                  dangerouslySetInnerHTML={{ __html: teacher.description || '' }}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap">
+                  {teacher.description || '—'}
+                </div>
+              )}
             </div>
 
             <div className="text-sm text-muted-foreground">

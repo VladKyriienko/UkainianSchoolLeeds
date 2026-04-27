@@ -4,6 +4,7 @@ import * as React from 'react';
 import { PublicNavBar } from './PublicNavBar';
 import { PublicFooter } from './PublicFooter';
 import { cn } from '@/utils/cn';
+import { CookieConsentPopup } from '@/components/common/CookieConsentPopup';
 
 export type PublicLayoutProps = {
   children: React.ReactNode;
@@ -63,6 +64,8 @@ export function PublicLayout({
       {showFooter && (
         <PublicFooter />
       )}
+
+      <CookieConsentPopup />
     </div>
   );
 }

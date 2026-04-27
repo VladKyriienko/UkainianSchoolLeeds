@@ -24,6 +24,22 @@ export type PublicNavBarProps = {
   onMobileMenuOpenChange?: (open: boolean) => void;
 };
 
+type KeyInfoNavDocument = {
+  id: string;
+  title: string;
+  title_uk: string | null;
+  slug: string;
+};
+
+const KEY_INFO_MENU_CONTENT = {
+  en: {
+    empty: 'No documents yet'
+  },
+  uk: {
+    empty: 'Документи ще не додані'
+  }
+} as const;
+
 export function PublicNavBar({
   showDarkModeToggle = true,
   showNavigation = true,
@@ -32,9 +48,11 @@ export function PublicNavBar({
 }: PublicNavBarProps) {
   const pathname = usePathname();
   const { language } = useLanguage();
+  const keyInfoMenuContent = KEY_INFO_MENU_CONTENT[language];
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpandedKey, setMobileExpandedKey] = useState<string | null>(null);
+  const [keyInfoDocuments, setKeyInfoDocuments] = useState<KeyInfoNavDocument[]>([]);
 
   const closeMobileMenu = () => {
     setMobileOpen(false);
@@ -52,10 +70,54 @@ export function PublicNavBar({
     }
   }, [mobileOpen]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadKeyInfoDocuments() {
+      try {
+        const response = await fetch('/api/key-info-documents');
+        if (!response.ok) return;
+
+        const data = (await response.json()) as {
+          documents?: KeyInfoNavDocument[];
+        };
+
+        if (isMounted) {
+          setKeyInfoDocuments(data.documents ?? []);
+        }
+      } catch (error) {
+        console.error('Failed to load key info navigation documents:', error);
+      }
+    }
+
+    loadKeyInfoDocuments();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const getTranslatedLabel = (defaultLabel: string, href: string) => {
     const labelsForLang = NAV_LABELS[language] ?? {};
     return labelsForLang[href] ?? defaultLabel;
   };
+
+  const navigationItems = useMemo<NavItem[]>(
+    () =>
+      NavItems.map((item) => {
+        if (item.key !== 'keyInfo') return item;
+
+        return {
+          ...item,
+          children: keyInfoDocuments.map((document) => ({
+            label:
+              language === 'uk' && document.title_uk ? document.title_uk : document.title,
+            href: `/key-info/${document.slug}`
+          }))
+        };
+      }),
+    [keyInfoDocuments, language]
+  );
 
   const activeKey = useMemo(() => {
     const matchesItem = (item: NavItem) => {
@@ -67,8 +129,8 @@ export function PublicNavBar({
       return false;
     };
 
-    return NavItems.find((i) => matchesItem(i))?.key ?? null;
-  }, [pathname]);
+    return navigationItems.find((i) => matchesItem(i))?.key ?? null;
+  }, [navigationItems, pathname]);
 
   const linkClass = (isActive: boolean) =>
     cn(
@@ -96,9 +158,10 @@ export function PublicNavBar({
         {/* Desktop Navigation */}
         {showNavigation && (
           <nav className="hidden lg:flex items-center gap-8">
-            {NavItems.map((item) => {
+            {navigationItems.map((item) => {
               const isActive = activeKey === item.key;
-              const hasChildren = !!item.children?.length;
+              const hasChildren = item.key === 'keyInfo' || !!item.children?.length;
+              const isKeyInfo = item.key === 'keyInfo';
 
               if (!hasChildren) {
                 return (
@@ -146,27 +209,33 @@ export function PublicNavBar({
                       )}
                       role="menu"
                     >
-                      {item.children!.map((child) => {
-                        const childActive =
-                          pathname === child.href ||
-                          pathname.startsWith(`${child.href}/`);
-                        return (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            className={cn(
-                              'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
-                              childActive
-                                ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
-                                : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
-                            )}
-                            role="menuitem"
-                            onClick={() => setOpenKey(null)}
-                          >
-                            {getTranslatedLabel(child.label, child.href)}
-                          </Link>
-                        );
-                      })}
+                      {(item.children?.length ?? 0) > 0 ? (
+                        item.children!.map((child) => {
+                          const childActive =
+                            pathname === child.href ||
+                            pathname.startsWith(`${child.href}/`);
+                          return (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              className={cn(
+                                'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
+                                childActive
+                                  ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
+                                  : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
+                              )}
+                              role="menuitem"
+                              onClick={() => setOpenKey(null)}
+                            >
+                              {getTranslatedLabel(child.label, child.href)}
+                            </Link>
+                          );
+                        })
+                      ) : isKeyInfo ? (
+                        <p className="px-4 py-3 text-sm text-ukraine-header-muted">
+                          {keyInfoMenuContent.empty}
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </div>
@@ -255,9 +324,10 @@ export function PublicNavBar({
 
                 <div className="flex flex-col gap-6 pt-2">
                   <nav className="flex flex-col gap-2 flex-1">
-                    {NavItems.map((item) => {
+                    {navigationItems.map((item) => {
                       const isActive = activeKey === item.key;
-                      const hasChildren = !!item.children?.length;
+                      const hasChildren = item.key === 'keyInfo' || !!item.children?.length;
+                      const isKeyInfo = item.key === 'keyInfo';
 
                       if (!hasChildren) {
                         return (
@@ -305,26 +375,32 @@ export function PublicNavBar({
 
                           {isExpanded && (
                             <div className="ml-4 mt-1 flex flex-col gap-1">
-                              {item.children!.map((child) => {
-                                const childActive =
-                                  pathname === child.href ||
-                                  pathname.startsWith(`${child.href}/`);
-                                return (
-                                  <Link
-                                    key={child.href}
-                                    href={child.href}
-                                    className={cn(
-                                      'block rounded-lg px-4 py-2 text-sm transition-colors',
-                                      childActive
-                                        ? 'bg-ukraine-yellow/20 text-ukraine-yellow font-medium'
-                                        : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
-                                    )}
-                                    onClick={closeMobileMenu}
-                                  >
-                                    {getTranslatedLabel(child.label, child.href)}
-                                  </Link>
-                                );
-                              })}
+                              {(item.children?.length ?? 0) > 0 ? (
+                                item.children!.map((child) => {
+                                  const childActive =
+                                    pathname === child.href ||
+                                    pathname.startsWith(`${child.href}/`);
+                                  return (
+                                    <Link
+                                      key={child.href}
+                                      href={child.href}
+                                      className={cn(
+                                        'block rounded-lg px-4 py-2 text-sm transition-colors',
+                                        childActive
+                                          ? 'bg-ukraine-yellow/20 text-ukraine-yellow font-medium'
+                                          : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
+                                      )}
+                                      onClick={closeMobileMenu}
+                                    >
+                                      {getTranslatedLabel(child.label, child.href)}
+                                    </Link>
+                                  );
+                                })
+                              ) : isKeyInfo ? (
+                                <p className="px-4 py-2 text-sm text-ukraine-header-muted">
+                                  {keyInfoMenuContent.empty}
+                                </p>
+                              ) : null}
                             </div>
                           )}
                         </div>

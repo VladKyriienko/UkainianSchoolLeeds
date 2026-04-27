@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminNews } from '@/app/admin/news/actions';
 import { createNews, updateNews } from '@/app/admin/news/actions';
 import { format } from 'date-fns';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type NewsFormProps = {
   mode: 'create' | 'edit';
@@ -31,6 +31,8 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [description, setDescription] = useState(newsItem?.description ?? '');
+  const [descriptionUk, setDescriptionUk] = useState(newsItem?.description_uk ?? '');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,27 +99,25 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            defaultValue={newsItem?.description ?? ''}
-            placeholder="News description"
-            rows={4}
-          />
-        </div>
+        <RichTextEditor
+          id="description"
+          name="description"
+          label="Description"
+          value={description}
+          onChange={setDescription}
+          placeholder="News description"
+          disabled={isSubmitting}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="description_uk">Description (Ukrainian)</Label>
-          <Textarea
-            id="description_uk"
-            name="description_uk"
-            defaultValue={newsItem?.description_uk ?? ''}
-            placeholder="Опис новини українською"
-            rows={4}
-          />
-        </div>
+        <RichTextEditor
+          id="description_uk"
+          name="description_uk"
+          label="Description (Ukrainian)"
+          value={descriptionUk}
+          onChange={setDescriptionUk}
+          placeholder="Опис новини українською"
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

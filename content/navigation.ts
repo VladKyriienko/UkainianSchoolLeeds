@@ -28,12 +28,7 @@ export const NAV_LABELS: Record<Language, Record<string, string>> = {
     '/parents/news': 'Latest News',
     '/parents/newsletters': 'Newsletters',
     '/parents/calendar': 'Calendar',
-    '/parents/term-dates': 'Term Dates',
-
-    '/children': 'Children',
-    '/children/class-pages': 'Class Pages',
-    '/children/school-council': 'School Council',
-    '/children/e-safety': 'eSafety',
+    '/parents/class-pages': 'Class Pages',
 
     '/key-info': 'Key Info',
     '/key-info/curriculum': 'Curriculum',
@@ -71,12 +66,7 @@ export const NAV_LABELS: Record<Language, Record<string, string>> = {
     '/parents/news': 'Останні новини',
     '/parents/newsletters': 'Інформаційні бюлетені',
     '/parents/calendar': 'Календар',
-    '/parents/term-dates': 'Навчальні терміни',
-
-    '/children': 'Дітям',
-    '/children/class-pages': 'Класні сторінки',
-    '/children/school-council': 'Шкільна рада',
-    '/children/e-safety': 'Інтернет-безпека',
+    '/parents/class-pages': 'Класні сторінки',
 
     '/key-info': 'Основна інформація',
     '/key-info/curriculum': 'Навчальна програма',

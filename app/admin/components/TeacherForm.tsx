@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
 import {
   Select,
@@ -19,6 +18,7 @@ import {
   createTeacher,
   updateTeacher
 } from '@/app/admin/teachers/actions';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type TeacherFormProps = {
   mode: 'create' | 'edit';
@@ -31,6 +31,8 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [description, setDescription] = useState(teacher?.description || '');
+  const [descriptionUk, setDescriptionUk] = useState(teacher?.description_uk || '');
 
   const [category, setCategory] = useState<string>(
     teacher?.category || 'TEACHER'
@@ -166,27 +168,25 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            defaultValue={teacher?.description || ''}
-            placeholder="Short bio / description"
-            rows={5}
-          />
-        </div>
+        <RichTextEditor
+          id="description"
+          name="description"
+          label="Description"
+          value={description}
+          onChange={setDescription}
+          placeholder="Short bio / description"
+          disabled={isSubmitting}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="description_uk">Description (Ukrainian)</Label>
-          <Textarea
-            id="description_uk"
-            name="description_uk"
-            defaultValue={teacher?.description_uk || ''}
-            placeholder="Коротка біографія українською"
-            rows={5}
-          />
-        </div>
+        <RichTextEditor
+          id="description_uk"
+          name="description_uk"
+          label="Description (Ukrainian)"
+          value={descriptionUk}
+          onChange={setDescriptionUk}
+          placeholder="Коротка біографія українською"
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="flex gap-4">
