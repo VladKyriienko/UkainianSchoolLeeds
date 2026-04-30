@@ -6,13 +6,13 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import { TextStyleKit } from '@tiptap/extension-text-style';
 import {
   Bold,
   Italic,
   Underline as UnderlineIcon,
   List,
   ListOrdered,
-  Quote,
   Undo2,
   Redo2,
   Heading2,
@@ -33,12 +33,14 @@ type RichTextEditorProps = {
   disabled?: boolean;
 };
 
-const toolbarButtonClass = 'h-8 w-8 p-0';
+const toolbarButtonClass =
+  'h-7 w-7 rounded-sm border border-transparent bg-transparent p-0 text-foreground transition-colors hover:bg-muted';
 
 function getToolbarButtonClass(isActive: boolean): string {
   return cn(
     toolbarButtonClass,
-    isActive && 'bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:text-primary-foreground'
+    isActive &&
+    'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60'
   );
 }
 
@@ -62,9 +64,11 @@ export function RichTextEditor({
     editable: !isDisabled,
     extensions: [
       StarterKit.configure({
-        heading: { levels: [2, 3] }
+        heading: { levels: [2, 3] },
+        blockquote: false
       }),
       Underline,
+      TextStyleKit,
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -96,7 +100,7 @@ export function RichTextEditor({
       isHeading3: currentEditor?.isActive('heading', { level: 3 }) ?? false,
       isBulletList: currentEditor?.isActive('bulletList') ?? false,
       isOrderedList: currentEditor?.isActive('orderedList') ?? false,
-      isBlockquote: currentEditor?.isActive('blockquote') ?? false,
+      textColor: currentEditor?.getAttributes('textStyle').color ?? '',
       canUndo: currentEditor?.can().chain().focus().undo().run() ?? false,
       canRedo: currentEditor?.can().chain().focus().redo().run() ?? false
     })
@@ -109,7 +113,7 @@ export function RichTextEditor({
     isHeading3: false,
     isBulletList: false,
     isOrderedList: false,
-    isBlockquote: false,
+    textColor: '',
     canUndo: false,
     canRedo: false
   };
@@ -125,7 +129,7 @@ export function RichTextEditor({
       <Label htmlFor={id}>{label}</Label>
 
       <div className="rounded-md border bg-background">
-        <div className="flex flex-wrap items-center gap-1 border-b p-2">
+        <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/40 px-2 py-1.5">
           <Toggle
             type="button"
             variant="outline"
@@ -172,7 +176,7 @@ export function RichTextEditor({
             <UnderlineIcon className="h-4 w-4" />
           </Toggle>
 
-          <div className="mx-1 h-6 w-px bg-border" />
+          <div className="mx-1.5 h-5 w-px bg-border/80" />
 
           <Toggle
             type="button"
@@ -205,7 +209,7 @@ export function RichTextEditor({
             <Heading3 className="h-4 w-4" />
           </Toggle>
 
-          <div className="mx-1 h-6 w-px bg-border" />
+          <div className="mx-1.5 h-5 w-px bg-border/80" />
 
           <Toggle
             type="button"
@@ -237,23 +241,50 @@ export function RichTextEditor({
           >
             <ListOrdered className="h-4 w-4" />
           </Toggle>
+          <div className="mx-1 h-6 w-px bg-border" />
+
+          <Label
+            htmlFor={`${id}-text-color`}
+            className="sr-only"
+          >
+            Text color
+          </Label>
+          <input
+            id={`${id}-text-color`}
+            type="color"
+            value={toolbarState.textColor || '#000000'}
+            onChange={(e) => {
+              editor
+                ?.chain()
+                .focus()
+                .setMark('textStyle', { color: e.target.value })
+                .run();
+            }}
+            disabled={!editor || isDisabled}
+            className="h-7 w-7 cursor-pointer rounded-sm border border-input bg-background p-1 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label="Text color"
+          />
           <Toggle
             type="button"
             variant="outline"
             size="sm"
-            className={getToolbarButtonClass(toolbarState.isBlockquote)}
-            pressed={toolbarState.isBlockquote}
+            className="h-7 rounded-sm border border-transparent px-2 text-[11px] transition-colors hover:bg-muted"
             onMouseDown={keepEditorSelection}
             onClick={() => {
-              editor?.chain().focus().toggleBlockquote().run();
+              editor
+                ?.chain()
+                .focus()
+                .setMark('textStyle', { color: null })
+                .removeEmptyTextStyle()
+                .run();
             }}
             disabled={!editor || isDisabled}
-            aria-label="Quote"
+            aria-label="Reset text color"
           >
-            <Quote className="h-4 w-4" />
+            Reset
           </Toggle>
 
-          <div className="mx-1 h-6 w-px bg-border" />
+          <div className="mx-1.5 h-5 w-px bg-border/80" />
 
           <Toggle
             type="button"
@@ -294,7 +325,6 @@ export function RichTextEditor({
             '[&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:leading-snug [&_.ProseMirror_h3]:my-3',
             '[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-3',
             '[&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:my-3',
-            '[&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_blockquote]:my-3',
             '[&_.ProseMirror>p.is-editor-empty:first-child::before]:pointer-events-none',
             '[&_.ProseMirror>p.is-editor-empty:first-child::before]:float-left',
             '[&_.ProseMirror>p.is-editor-empty:first-child::before]:h-0',

@@ -5,24 +5,12 @@ import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
 import type { Tables } from '@/utils/supabase/types';
 import { randomUUID } from 'crypto';
+import { sanitizeFilename } from '@/utils/file-name';
+import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminTeacher = Tables<'teachers'>;
-
-function normalizeTextField(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function sanitizeFilename(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 async function uploadTeacherPhotoIfPresent(
   photoFile: File | null
@@ -126,15 +114,15 @@ export async function getTeacherById(id: string): Promise<AdminTeacher | null> {
 export async function createTeacher(formData: FormData) {
   await verifyAdminAccess();
 
-  const name = normalizeTextField(formData.get('name'));
-  const nameUk = normalizeTextField(formData.get('name_uk'));
-  const title = normalizeTextField(formData.get('title'));
-  const titleUk = normalizeTextField(formData.get('title_uk'));
-  const phone = normalizeTextField(formData.get('phone'));
-  const email = normalizeTextField(formData.get('email'));
-  const description = normalizeTextField(formData.get('description'));
-  const descriptionUk = normalizeTextField(formData.get('description_uk'));
-  const categoryRaw = normalizeTextField(formData.get('category'));
+  const name = normalizeText(formData.get('name'));
+  const nameUk = normalizeText(formData.get('name_uk'));
+  const title = normalizeText(formData.get('title'));
+  const titleUk = normalizeText(formData.get('title_uk'));
+  const phone = normalizeText(formData.get('phone'));
+  const email = normalizeText(formData.get('email'));
+  const description = normalizeText(formData.get('description'));
+  const descriptionUk = normalizeText(formData.get('description_uk'));
+  const categoryRaw = normalizeText(formData.get('category'));
 
   if (!name) {
     throw new Error('Name is required');
@@ -177,15 +165,15 @@ export async function createTeacher(formData: FormData) {
 export async function updateTeacher(id: string, formData: FormData) {
   await verifyAdminAccess();
 
-  const name = normalizeTextField(formData.get('name'));
-  const nameUk = normalizeTextField(formData.get('name_uk'));
-  const title = normalizeTextField(formData.get('title'));
-  const titleUk = normalizeTextField(formData.get('title_uk'));
-  const phone = normalizeTextField(formData.get('phone'));
-  const email = normalizeTextField(formData.get('email'));
-  const description = normalizeTextField(formData.get('description'));
-  const descriptionUk = normalizeTextField(formData.get('description_uk'));
-  const categoryRaw = normalizeTextField(formData.get('category'));
+  const name = normalizeText(formData.get('name'));
+  const nameUk = normalizeText(formData.get('name_uk'));
+  const title = normalizeText(formData.get('title'));
+  const titleUk = normalizeText(formData.get('title_uk'));
+  const phone = normalizeText(formData.get('phone'));
+  const email = normalizeText(formData.get('email'));
+  const description = normalizeText(formData.get('description'));
+  const descriptionUk = normalizeText(formData.get('description_uk'));
+  const categoryRaw = normalizeText(formData.get('category'));
 
   if (!name) {
     throw new Error('Name is required');
@@ -221,7 +209,9 @@ export async function updateTeacher(id: string, formData: FormData) {
       .eq('id', id)
       .single();
     if (existing?.photo) {
-      await supabaseAdmin.storage.from('teachers-photos').remove([existing.photo]);
+      await supabaseAdmin.storage
+        .from('teachers-photos')
+        .remove([existing.photo]);
     }
     updatePayload.photo = null;
   } else if (photoPath) {

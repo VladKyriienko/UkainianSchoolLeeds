@@ -109,7 +109,7 @@ function Calendar({
           defaultClassNames.day
         ),
         day_button: cn(
-          'flex size-full items-center justify-center rounded-md',
+          'flex size-full items-center justify-center rounded-md border border-transparent transition-colors hover:border-primary/50 hover:bg-accent/70 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60',
           defaultClassNames.day_button
         ),
         range_start: cn(
@@ -123,7 +123,7 @@ function Calendar({
           defaultClassNames.selected
         ),
         today: cn(
-          'bg-accent text-accent-foreground rounded-md',
+          'rounded-md border border-primary/40 bg-primary/10 font-semibold text-primary aria-selected:border-primary aria-selected:bg-primary aria-selected:text-primary-foreground',
           defaultClassNames.today
         ),
         outside: cn(

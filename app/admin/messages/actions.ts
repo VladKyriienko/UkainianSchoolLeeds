@@ -13,19 +13,21 @@ export async function listMessages(options?: {
   page?: number;
   limit?: number;
   search?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }): Promise<{ messages: AdminMessage[]; total: number }> {
   await verifyAdminAccess();
 
   const page = options?.page || 1;
   const limit = options?.limit || 20;
   const search = options?.search?.trim();
+  const dateFrom = options?.dateFrom?.trim();
+  const dateTo = options?.dateTo?.trim();
 
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin
-    .from('messages')
-    .select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('messages').select('*', { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -33,6 +35,14 @@ export async function listMessages(options?: {
     query = query.or(
       `email.ilike.${term},name.ilike.${term},subject.ilike.${term},message.ilike.${term}`
     );
+  }
+
+  if (dateFrom) {
+    query = query.gte('created_at', `${dateFrom}T00:00:00.000Z`);
+  }
+
+  if (dateTo) {
+    query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
   }
 
   const { data, error, count } = await query

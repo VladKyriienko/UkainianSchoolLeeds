@@ -43,8 +43,6 @@ p a {
 .animated {
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
-  -webkit-animation-duration: 1s;
-  animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
@@ -73,7 +71,7 @@ p a {
     --popover-foreground: 39 39 42;
 
     /* Primary - Ukrainian Blue (Main CTAs) */
-    --primary: 30 120 210;
+    --primary: 30 118 208;
     --primary-foreground: 255 255 255;
 
     /* Secondary - Light warm */
@@ -97,6 +95,16 @@ p a {
     --input: 240 230 210;
     --ring: 30 120 210;
 
+    /* Base semantic accents */
+    --primary-hover: 21 89 182;
+    --highlight: 255 215 0;
+    --highlight-hover: 243 201 35;
+    --surface-soft: 246 249 255;
+    --surface-tint: 238 244 255;
+    --warning-surface: 255 241 184;
+    --warning-foreground: 210 155 0;
+    --info-muted: 235 245 255;
+
     /* Charts */
     --chart-1: 30 120 210;
     --chart-2: 34 197 194;
@@ -119,31 +127,31 @@ p a {
     --font-serif: Merriweather, Georgia, serif;
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
-    /* Ukrainian colors (reusable for header, footer, accents) */
-    --ukraine-blue: 30 120 210;
-    --ukraine-yellow: 255 215 0;
-    --ukraine-header-bg: 30 120 210;
-    --ukraine-header-fg: 255 255 255;
-    --ukraine-header-muted: 235 245 255;
+    /* Ukrainian colors (derived from base tokens) */
+    --ukraine-blue: var(--primary);
+    --ukraine-yellow: var(--highlight);
+    --ukraine-header-bg: var(--primary);
+    --ukraine-header-fg: var(--primary-foreground);
+    --ukraine-header-muted: var(--info-muted);
 
-    /* Public website design tokens */
-    --public-surface: 255 255 255;
-    --public-ink: 20 35 63;
-    --public-ink-strong: 13 26 61;
-    --public-muted: 88 101 125;
-    --public-brand: 25 103 210;
-    --public-brand-hover: 21 89 182;
-    --public-yellow: 255 215 71;
-    --public-yellow-hover: 243 201 35;
-    --public-warm-border: 239 231 212;
-    --public-cool-border: 219 227 239;
-    --public-card-border: 230 221 201;
-    --public-soft-blue: 246 249 255;
-    --public-news-surface: 238 244 255;
-    --public-warm-icon-bg: 255 241 184;
-    --public-warm-icon: 210 155 0;
-    --public-cookie-bg: 18 63 122;
-    --public-cookie-border: 127 177 239;
+    /* Public website design tokens (derived from base where possible) */
+    --public-surface: var(--card);
+    --public-ink: var(--foreground);
+    --public-ink-strong: var(--foreground);
+    --public-muted: var(--muted-foreground);
+    --public-brand: var(--primary);
+    --public-brand-hover: var(--primary-hover);
+    --public-yellow: var(--ukraine-yellow);
+    --public-yellow-hover: var(--highlight-hover);
+    --public-warm-border: var(--border);
+    --public-cool-border: var(--border);
+    --public-card-border: var(--border);
+    --public-soft-blue: var(--surface-soft);
+    --public-news-surface: var(--surface-tint);
+    --public-warm-icon-bg: var(--warning-surface);
+    --public-warm-icon: var(--warning-foreground);
+    --public-cookie-bg: var(--primary);
+    --public-cookie-border: var(--ring);
 
     /* Border Radius */
     --radius: 0.75rem;
@@ -167,6 +175,11 @@ p a {
     /* Spacing */
     --spacing: 0.25rem;
     --tracking-normal: 0em;
+    --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+    --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+    --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+    --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+    --tracking-widest: calc(var(--tracking-normal) + 0.1em);
   }
 
   /* ==========================================
@@ -182,7 +195,7 @@ p a {
     --popover: 28 30 42;
     --popover-foreground: 226 232 240;
 
-    --primary: 40 140 220;
+    --primary: 30 120 210;
     --primary-foreground: 255 255 255;
 
     --secondary: 51 65 85;
@@ -200,6 +213,16 @@ p a {
     --border: 71 85 105;
     --input: 71 85 105;
     --ring: 45 212 191;
+
+    /* Base semantic accents */
+    --primary-hover: 30 120 210;
+    --highlight: 255 215 0;
+    --highlight-hover: 243 201 35;
+    --surface-soft: 51 65 85;
+    --surface-tint: 71 85 105;
+    --warning-surface: 146 106 0;
+    --warning-foreground: 255 255 255;
+    --info-muted: 148 163 184;
 
     --ukraine-header-bg: 40 100 180;
     --ukraine-header-fg: 255 255 255;
@@ -364,26 +387,10 @@ p a {
     --ring: 241 245 249;
   }
 
-  /* Typography System */
-  .theme {
-    --font-sans: 'Quicksand', -apple-system, system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-    --font-serif: Merriweather, Georgia, serif;
-    --radius: 0.5rem;
-    --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
-    --tracking-tight: calc(var(--tracking-normal) - 0.025em);
-    --tracking-wide: calc(var(--tracking-normal) + 0.025em);
-    --tracking-wider: calc(var(--tracking-normal) + 0.05em);
-    --tracking-widest: calc(var(--tracking-normal) + 0.1em);
-  }
-
   body {
     letter-spacing: var(--tracking-normal);
   }
-}
 
-/* Apply border colors globally */
-@layer base {
   * {
     @apply border-border;
   }
@@ -394,6 +401,8 @@ p a {
 }
 
 @layer components {
+
+  /* Public page surfaces and typography */
   .public-page {
     color: rgb(var(--public-ink));
   }
@@ -404,23 +413,19 @@ p a {
 
   .public-hero-image-desktop {
     background-image:
-      linear-gradient(
-        90deg,
+      linear-gradient(90deg,
         rgb(var(--public-surface)) 0%,
         rgb(var(--public-surface) / 0.9) 16%,
         rgb(var(--public-surface) / 0.18) 45%,
-        rgb(var(--public-surface) / 0) 100%
-      ),
+        rgb(var(--public-surface) / 0) 100%),
       url('/home-hero-school.png');
   }
 
   .public-hero-image-mobile {
     background-image:
-      linear-gradient(
-        90deg,
+      linear-gradient(90deg,
         rgb(var(--public-surface) / 0.88),
-        rgb(var(--public-surface) / 0.12)
-      ),
+        rgb(var(--public-surface) / 0.12)),
       url('/home-hero-school.png');
   }
 
@@ -442,8 +447,8 @@ p a {
     text-underline-offset: 4px;
   }
 
-  .public-text-link:hover {
-    color: rgb(var(--ukraine-yellow)) !important;
+  .public-page .public-text-link:hover {
+    color: rgb(var(--ukraine-yellow));
     text-decoration-line: underline;
   }
 
@@ -453,6 +458,15 @@ p a {
 
   .public-text {
     color: rgb(var(--public-muted));
+  }
+
+  /* Public CTAs and interactive elements */
+  .public-button-primary,
+  .public-button-outline,
+  .public-button-yellow {
+    transition-property: background-color, color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
   }
 
   .public-button-primary {
@@ -494,6 +508,7 @@ p a {
     color: rgb(var(--public-warm-icon));
   }
 
+  /* Public cards and media sections */
   .public-floating-card {
     border-color: rgb(var(--public-surface) / 0.8);
     background: rgb(var(--public-surface) / 0.95);
@@ -539,11 +554,9 @@ p a {
   }
 
   .public-news-placeholder {
-    background: linear-gradient(
-      135deg,
-      rgb(var(--public-news-surface)),
-      rgb(var(--public-yellow) / 0.35)
-    );
+    background: linear-gradient(135deg,
+        rgb(var(--public-news-surface)),
+        rgb(var(--public-yellow) / 0.35));
     color: rgb(var(--public-brand));
   }
 
@@ -560,6 +573,7 @@ p a {
     border-color: rgb(var(--public-warm-border));
   }
 
+  /* Cookie consent */
   .cookie-consent-banner {
     border-color: rgb(var(--public-cookie-border) / 0.4);
     background: rgb(var(--public-cookie-bg) / 0.95);
@@ -583,6 +597,28 @@ p a {
     color: rgb(var(--primary-foreground));
   }
 
+  /* Rich text: shared inline semantics */
+  .rich-text-content strong,
+  .rich-text-preview strong {
+    @apply font-semibold;
+  }
+
+  .rich-text-content em,
+  .rich-text-preview em {
+    @apply italic;
+  }
+
+  .rich-text-content u,
+  .rich-text-preview u {
+    @apply underline;
+  }
+
+  .rich-text-content a,
+  .rich-text-preview a {
+    @apply underline underline-offset-2 text-primary;
+  }
+
+  /* Rich text: full content */
   .rich-text-content {
     @apply text-foreground leading-7;
   }
@@ -603,18 +639,6 @@ p a {
     @apply my-2;
   }
 
-  .rich-text-content strong {
-    @apply font-semibold;
-  }
-
-  .rich-text-content em {
-    @apply italic;
-  }
-
-  .rich-text-content u {
-    @apply underline;
-  }
-
   .rich-text-content ul {
     @apply list-disc pl-6 my-3;
   }
@@ -631,10 +655,7 @@ p a {
     @apply border-l-4 border-border pl-4 italic my-3;
   }
 
-  .rich-text-content a {
-    @apply underline underline-offset-2 text-primary;
-  }
-
+  /* Rich text: compact preview */
   .rich-text-preview {
     @apply text-foreground/90 text-sm leading-6 max-h-20 overflow-hidden;
   }
@@ -647,18 +668,6 @@ p a {
 
   .rich-text-preview p {
     @apply my-1;
-  }
-
-  .rich-text-preview strong {
-    @apply font-semibold;
-  }
-
-  .rich-text-preview em {
-    @apply italic;
-  }
-
-  .rich-text-preview u {
-    @apply underline;
   }
 
   .rich-text-preview ul {
@@ -675,9 +684,5 @@ p a {
 
   .rich-text-preview blockquote {
     @apply border-l-2 border-border pl-3 italic my-1;
-  }
-
-  .rich-text-preview a {
-    @apply underline underline-offset-2 text-primary;
   }
 }

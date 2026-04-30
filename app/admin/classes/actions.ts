@@ -4,16 +4,11 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import type { Tables } from '@/utils/supabase/types';
+import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminClass = Tables<'classes'>;
-
-function normalizeText(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
 
 export async function listClasses(options?: {
   page?: number;
@@ -152,7 +147,9 @@ export async function updateClass(
   }
 }
 
-export async function deleteClass(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteClass(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 

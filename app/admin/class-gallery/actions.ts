@@ -5,22 +5,13 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import type { Tables } from '@/utils/supabase/types';
 import { randomUUID } from 'crypto';
+import { sanitizeFilename } from '@/utils/file-name';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminGalleryItem = Tables<'class_photo_galery'>;
 
-function sanitizeFilename(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-async function uploadGalleryPhoto(
-  photoFile: File
-): Promise<string> {
+async function uploadGalleryPhoto(photoFile: File): Promise<string> {
   if (!photoFile.type.startsWith('image/')) {
     throw new Error('Photo must be an image');
   }
@@ -77,7 +68,9 @@ export async function listGalleryItems(options?: {
   };
 }
 
-export async function getGalleryItemById(id: string): Promise<AdminGalleryItem | null> {
+export async function getGalleryItemById(
+  id: string
+): Promise<AdminGalleryItem | null> {
   await verifyAdminAccess();
 
   const { data, error } = await supabaseAdmin
@@ -125,7 +118,10 @@ export async function createGalleryItem(
     revalidatePath('/admin/class-gallery');
     return { success: true };
   } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error'
+    };
   }
 }
 
@@ -151,7 +147,9 @@ export async function updateGalleryItem(
     if (photoFile && photoFile.size > 0) {
       const existing = await getGalleryItemById(id);
       if (existing?.photo) {
-        await supabaseAdmin.storage.from('class-gallery').remove([existing.photo]);
+        await supabaseAdmin.storage
+          .from('class-gallery')
+          .remove([existing.photo]);
       }
       photoPath = await uploadGalleryPhoto(photoFile);
     }
@@ -174,11 +172,16 @@ export async function updateGalleryItem(
     revalidatePath(`/admin/class-gallery/${id}`);
     return { success: true };
   } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error'
+    };
   }
 }
 
-export async function deleteGalleryItem(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteGalleryItem(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 
@@ -196,6 +199,9 @@ export async function deleteGalleryItem(id: string): Promise<{ success: boolean;
     revalidatePath('/admin/class-gallery');
     return { success: true };
   } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error'
+    };
   }
 }

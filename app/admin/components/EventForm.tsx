@@ -7,8 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { AdminEvent } from '@/app/admin/events/actions';
 import { createEvent, updateEvent } from '@/app/admin/events/actions';
-import { format } from 'date-fns';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
+import {
+  formatTimeForInput,
+  parseInputDate,
+  toInputDateValue
+} from '@/utils/date-format';
+import { DatePicker } from '@/app/admin/profile/components/DatePicker';
 
 type EventFormProps = {
   mode: 'create' | 'edit';
@@ -21,22 +26,9 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [description, setDescription] = useState(event?.description || '');
   const [descriptionUk, setDescriptionUk] = useState(event?.description_uk || '');
-
-  // Format date for input (YYYY-MM-DD)
-  const formatDateForInput = (dateString: string | null) => {
-    if (!dateString) return '';
-    try {
-      return format(new Date(dateString), 'yyyy-MM-dd');
-    } catch {
-      return '';
-    }
-  };
-
-  // Format time for input (HH:mm)
-  const formatTimeForInput = (timeString: string | null) => {
-    if (!timeString) return '';
-    return timeString.substring(0, 5); // Extract HH:mm from HH:mm:ss
-  };
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    parseInputDate(event?.date ?? '')
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -126,13 +118,13 @@ export function EventForm({ mode, event }: EventFormProps) {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="date">Date *</Label>
-          <Input
-            id="date"
-            name="date"
-            type="date"
-            required
-            defaultValue={formatDateForInput(event?.date || null)}
+          <DatePicker
+            date={selectedDate}
+            onDateChange={setSelectedDate}
+            placeholder="Select date"
+            buttonClassName="h-10"
           />
+          <input name="date" type="hidden" required value={toInputDateValue(selectedDate)} />
         </div>
 
         <div className="space-y-2">

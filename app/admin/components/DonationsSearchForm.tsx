@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Search, Calendar } from 'lucide-react';
+import { DatePicker } from '@/app/admin/profile/components/DatePicker';
+import { parseInputDate, toInputDateValue } from '@/utils/date-format';
 
 type DonationsSearchFormProps = {
   initialSearch?: string;
@@ -71,22 +73,34 @@ export function DonationsSearchForm({
             <Calendar className="w-4 h-4" />
             From
           </Label>
-          <Input
-            id="donations-dateFrom"
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="w-[160px]"
+          <DatePicker
+            date={parseInputDate(dateFrom)}
+            onDateChange={(date) => {
+              const next = toInputDateValue(date);
+              setDateFrom(next);
+              if (dateTo && next && next > dateTo) {
+                setDateTo(next);
+              }
+            }}
+            placeholder="From date"
+            buttonClassName="h-10 w-[160px]"
+            disabled={(date) => {
+              const to = parseInputDate(dateTo);
+              return to ? date > to : false;
+            }}
           />
         </div>
         <div className="space-y-1">
           <Label htmlFor="donations-dateTo">To</Label>
-          <Input
-            id="donations-dateTo"
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="w-[160px]"
+          <DatePicker
+            date={parseInputDate(dateTo)}
+            onDateChange={(date) => setDateTo(toInputDateValue(date))}
+            placeholder="To date"
+            buttonClassName="h-10 w-[160px]"
+            disabled={(date) => {
+              const from = parseInputDate(dateFrom);
+              return from ? date < from : false;
+            }}
           />
         </div>
       </div>

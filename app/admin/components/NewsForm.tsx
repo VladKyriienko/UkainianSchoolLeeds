@@ -8,23 +8,15 @@ import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminNews } from '@/app/admin/news/actions';
 import { createNews, updateNews } from '@/app/admin/news/actions';
-import { format } from 'date-fns';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { parseInputDate, toInputDateValue } from '@/utils/date-format';
+import { DatePicker } from '@/app/admin/profile/components/DatePicker';
 
 type NewsFormProps = {
   mode: 'create' | 'edit';
   newsItem?: AdminNews | null;
   currentPhotoUrl?: string | null;
 };
-
-function formatDateForInput(dateString: string | null): string {
-  if (!dateString) return '';
-  try {
-    return format(new Date(dateString), 'yyyy-MM-dd');
-  } catch {
-    return '';
-  }
-}
 
 export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
   const router = useRouter();
@@ -33,6 +25,9 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [description, setDescription] = useState(newsItem?.description ?? '');
   const [descriptionUk, setDescriptionUk] = useState(newsItem?.description_uk ?? '');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    parseInputDate(newsItem?.date ?? '')
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,13 +118,13 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="date">Date *</Label>
-          <Input
-            id="date"
-            name="date"
-            type="date"
-            required
-            defaultValue={formatDateForInput(newsItem?.date ?? null)}
+          <DatePicker
+            date={selectedDate}
+            onDateChange={setSelectedDate}
+            placeholder="Select date"
+            buttonClassName="h-10"
           />
+          <input name="date" type="hidden" required value={toInputDateValue(selectedDate)} />
         </div>
 
         <div className="space-y-2">

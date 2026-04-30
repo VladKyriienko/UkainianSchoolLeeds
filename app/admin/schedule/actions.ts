@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
+import { sanitizeFilename } from '@/utils/file-name';
 
 const supabaseAdmin = createAdminClient();
 const SCHEDULE_BUCKET = 'schedule-files';
@@ -15,14 +16,6 @@ export type AdminSchedule = {
   created_at: string;
   publicUrl: string;
 };
-
-function sanitizeFilename(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 function isSaturdayDateString(value: string): boolean {
   const d = new Date(`${value}T12:00:00.000Z`);
@@ -45,9 +38,7 @@ export async function listSchedule(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin
-    .from('schedule')
-    .select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('schedule').select('*', { count: 'exact' });
 
   if (dateFrom) {
     query = query.gte('date', `${dateFrom}T00:00:00.000Z`);
@@ -148,7 +139,9 @@ export async function createSchedule(
   }
 }
 
-export async function deleteSchedule(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteSchedule(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 
@@ -158,7 +151,10 @@ export async function deleteSchedule(id: string): Promise<{ success: boolean; er
       .eq('id', id)
       .single();
 
-    const { error } = await supabaseAdmin.from('schedule').delete().eq('id', id);
+    const { error } = await supabaseAdmin
+      .from('schedule')
+      .delete()
+      .eq('id', id);
     if (error) {
       return { success: false, error: error.message };
     }
