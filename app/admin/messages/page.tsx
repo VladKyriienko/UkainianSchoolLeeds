@@ -12,6 +12,8 @@ type AdminMessagesPageProps = {
     page?: string;
     limit?: string;
     search?: string;
+    dateFrom?: string;
+    dateTo?: string;
   }>;
 };
 
@@ -22,6 +24,8 @@ export default async function AdminMessagesPage({
   const page = parseInt(params.page || '1', 10);
   const limit = parseInt(params.limit || '20', 10);
   const search = params.search || '';
+  const dateFrom = params.dateFrom || '';
+  const dateTo = params.dateTo || '';
 
   let messages: Awaited<ReturnType<typeof listMessages>>['messages'] = [];
   let totalMessages = 0;
@@ -31,7 +35,9 @@ export default async function AdminMessagesPage({
     const result = await listMessages({
       page,
       limit,
-      ...(search && { search })
+      ...(search && { search }),
+      ...(dateFrom && { dateFrom }),
+      ...(dateTo && { dateTo })
     });
     messages = result.messages;
     totalMessages = result.total;
@@ -43,7 +49,11 @@ export default async function AdminMessagesPage({
 
   return (
     <PageWrapper title="Messages" description="View contact form messages">
-      <MessagesSearchForm initialSearch={search} />
+      <MessagesSearchForm
+        initialSearch={search}
+        initialDateFrom={dateFrom}
+        initialDateTo={dateTo}
+      />
       {error ? (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
@@ -65,7 +75,11 @@ export default async function AdminMessagesPage({
             totalPages={totalPages}
             baseUrl="/admin/messages"
             limit={limit}
-            {...(search ? { searchParams: { search } } : {})}
+            searchParams={{
+              ...(search ? { search } : {}),
+              ...(dateFrom ? { dateFrom } : {}),
+              ...(dateTo ? { dateTo } : {})
+            }}
             className="mt-6"
           />
         </>

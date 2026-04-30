@@ -16,6 +16,7 @@ type DatePickerProps = {
   date: Date | undefined;
   onDateChange?: (date: Date | undefined) => void;
   placeholder?: string;
+  displayFormat?: string;
   disabled?: (date: Date) => boolean;
   className?: string;
   buttonClassName?: string;
@@ -32,6 +33,7 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       date,
       onDateChange,
       placeholder = 'Pick a date',
+      displayFormat = 'dd.MM.yyyy',
       disabled,
       className,
       buttonClassName,
@@ -44,6 +46,8 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     },
     ref
   ) => {
+    const initialMonth = date ?? defaultMonth;
+
     return (
       <div className={cn('w-full', className)}>
         <Popover>
@@ -52,27 +56,27 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
               ref={ref}
               variant="outline"
               className={cn(
-                'w-full justify-start text-left font-normal',
+                'w-full justify-start text-left font-normal transition-colors hover:border-primary/50 hover:bg-accent/40',
                 !date && 'text-muted-foreground',
                 buttonClassName
               )}
               {...props}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, 'PPP') : <span>{placeholder}</span>}
+              {date ? format(date, displayFormat) : <span>{placeholder}</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"
               selected={date}
-              onSelect={onDateChange || (() => {})}
+              onSelect={onDateChange || (() => { })}
               required={false}
+              {...(initialMonth && { defaultMonth: initialMonth })}
               {...(disabled && { disabled })}
               {...(captionLayout && { captionLayout })}
               {...(fromYear && { fromYear })}
               {...(toYear && { toYear })}
-              {...(defaultMonth && { defaultMonth })}
               className={calendarClassName || ''}
             />
           </PopoverContent>

@@ -4,21 +4,14 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
 import type { Tables } from '@/utils/supabase/types';
+import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminEvent = Tables<'events'>;
 
-function normalizeTextField(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
 function normalizeTimeField(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
+  return normalizeText(value);
 }
 
 export async function listEvents(options?: {
@@ -36,9 +29,7 @@ export async function listEvents(options?: {
   const dateFrom = options?.dateFrom?.trim();
   const dateTo = options?.dateTo?.trim();
 
-  let query = supabaseAdmin
-    .from('events')
-    .select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('events').select('*', { count: 'exact' });
 
   if (search) {
     query = query.or(
@@ -55,7 +46,9 @@ export async function listEvents(options?: {
     query = query.lte('date', toEnd);
   }
 
-  query = query.order('date', { ascending: false }).order('start_time', { ascending: false });
+  query = query
+    .order('date', { ascending: false })
+    .order('start_time', { ascending: false });
 
   const from = (page - 1) * limit;
   const to = from + limit - 1;
@@ -91,7 +84,9 @@ export async function getEventById(id: string): Promise<AdminEvent | null> {
   return data as AdminEvent;
 }
 
-export async function createEvent(formData: FormData): Promise<{ success: boolean; error?: string }> {
+export async function createEvent(
+  formData: FormData
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 
@@ -105,11 +100,11 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
       return { success: false, error: 'Date is required' };
     }
 
-    const description = normalizeTextField(formData.get('description'));
-    const descriptionUk = normalizeTextField(formData.get('description_uk'));
-    const location = normalizeTextField(formData.get('location'));
-    const locationUk = normalizeTextField(formData.get('location_uk'));
-    const titleUk = normalizeTextField(formData.get('title_uk'));
+    const description = normalizeText(formData.get('description'));
+    const descriptionUk = normalizeText(formData.get('description_uk'));
+    const location = normalizeText(formData.get('location'));
+    const locationUk = normalizeText(formData.get('location_uk'));
+    const titleUk = normalizeText(formData.get('title_uk'));
     const startTime = normalizeTimeField(formData.get('start_time'));
     const endTime = normalizeTimeField(formData.get('end_time'));
 
@@ -132,13 +127,17 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
     });
 
     if (insertError) {
-      return { success: false, error: `Failed to create event: ${insertError.message}` };
+      return {
+        success: false,
+        error: `Failed to create event: ${insertError.message}`
+      };
     }
 
     revalidatePath('/admin/events');
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
     return { success: false, error: errorMessage };
   }
 }
@@ -160,11 +159,11 @@ export async function updateEvent(
       return { success: false, error: 'Date is required' };
     }
 
-    const description = normalizeTextField(formData.get('description'));
-    const descriptionUk = normalizeTextField(formData.get('description_uk'));
-    const location = normalizeTextField(formData.get('location'));
-    const locationUk = normalizeTextField(formData.get('location_uk'));
-    const titleUk = normalizeTextField(formData.get('title_uk'));
+    const description = normalizeText(formData.get('description'));
+    const descriptionUk = normalizeText(formData.get('description_uk'));
+    const location = normalizeText(formData.get('location'));
+    const locationUk = normalizeText(formData.get('location_uk'));
+    const titleUk = normalizeText(formData.get('title_uk'));
     const startTime = normalizeTimeField(formData.get('start_time'));
     const endTime = normalizeTimeField(formData.get('end_time'));
 
@@ -190,32 +189,45 @@ export async function updateEvent(
       .eq('id', id);
 
     if (updateError) {
-      return { success: false, error: `Failed to update event: ${updateError.message}` };
+      return {
+        success: false,
+        error: `Failed to update event: ${updateError.message}`
+      };
     }
 
     revalidatePath('/admin/events');
     revalidatePath(`/admin/events/${id}`);
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
     return { success: false, error: errorMessage };
   }
 }
 
-export async function deleteEvent(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteEvent(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 
-    const { error: deleteError } = await supabaseAdmin.from('events').delete().eq('id', id);
+    const { error: deleteError } = await supabaseAdmin
+      .from('events')
+      .delete()
+      .eq('id', id);
 
     if (deleteError) {
-      return { success: false, error: `Failed to delete event: ${deleteError.message}` };
+      return {
+        success: false,
+        error: `Failed to delete event: ${deleteError.message}`
+      };
     }
 
     revalidatePath('/admin/events');
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
     return { success: false, error: errorMessage };
   }
 }

@@ -4,17 +4,15 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import type { Tables } from '@/utils/supabase/types';
-import { DOCUMENT_TYPES, type DocumentType } from '@/app/admin/documents/constants';
+import {
+  DOCUMENT_TYPES,
+  type DocumentType
+} from '@/app/admin/documents/constants';
+import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminDocument = Tables<'documents'>;
-
-function normalizeText(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
 
 export async function listDocuments(options?: {
   page?: number;
@@ -31,9 +29,7 @@ export async function listDocuments(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin
-    .from('documents')
-    .select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('documents').select('*', { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -57,7 +53,9 @@ export async function listDocuments(options?: {
   };
 }
 
-export async function getDocumentById(id: string): Promise<AdminDocument | null> {
+export async function getDocumentById(
+  id: string
+): Promise<AdminDocument | null> {
   await verifyAdminAccess();
 
   const { data, error } = await supabaseAdmin
@@ -102,13 +100,15 @@ export async function createDocument(
     const titleUk = normalizeText(formData.get('title_uk'));
     const contentUk = normalizeText(formData.get('content_uk'));
 
-    const { error: insertError } = await supabaseAdmin.from('documents').insert({
-      title: title.trim(),
-      title_uk: titleUk,
-      content: content.trim(),
-      content_uk: contentUk,
-      type: typeRaw as DocumentType
-    });
+    const { error: insertError } = await supabaseAdmin
+      .from('documents')
+      .insert({
+        title: title.trim(),
+        title_uk: titleUk,
+        content: content.trim(),
+        content_uk: contentUk,
+        type: typeRaw as DocumentType
+      });
 
     if (insertError) {
       return {
@@ -181,11 +181,16 @@ export async function updateDocument(
   }
 }
 
-export async function deleteDocument(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteDocument(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 
-    const { error } = await supabaseAdmin.from('documents').delete().eq('id', id);
+    const { error } = await supabaseAdmin
+      .from('documents')
+      .delete()
+      .eq('id', id);
 
     if (error) {
       return { success: false, error: error.message };

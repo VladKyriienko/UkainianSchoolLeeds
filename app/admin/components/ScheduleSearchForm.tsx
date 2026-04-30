@@ -2,9 +2,10 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar } from 'lucide-react';
+import { DatePicker } from '@/app/admin/profile/components/DatePicker';
+import { parseInputDate, toInputDateValue } from '@/utils/date-format';
 
 type ScheduleSearchFormProps = {
   initialDateFrom?: string;
@@ -53,22 +54,34 @@ export function ScheduleSearchForm({
             <Calendar className="w-4 h-4" />
             Date from
           </Label>
-          <Input
-            id="schedule-dateFrom"
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="w-[180px]"
+          <DatePicker
+            date={parseInputDate(dateFrom)}
+            onDateChange={(date) => {
+              const next = toInputDateValue(date);
+              setDateFrom(next);
+              if (dateTo && next && next > dateTo) {
+                setDateTo(next);
+              }
+            }}
+            placeholder="Date from"
+            buttonClassName="h-10 w-[180px]"
+            disabled={(date) => {
+              const to = parseInputDate(dateTo);
+              return to ? date > to : false;
+            }}
           />
         </div>
         <div className="space-y-1">
           <Label htmlFor="schedule-dateTo">Date to</Label>
-          <Input
-            id="schedule-dateTo"
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="w-[180px]"
+          <DatePicker
+            date={parseInputDate(dateTo)}
+            onDateChange={(date) => setDateTo(toInputDateValue(date))}
+            placeholder="Date to"
+            buttonClassName="h-10 w-[180px]"
+            disabled={(date) => {
+              const from = parseInputDate(dateFrom);
+              return from ? date < from : false;
+            }}
           />
         </div>
       </div>

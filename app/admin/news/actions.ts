@@ -5,24 +5,12 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import type { Tables } from '@/utils/supabase/types';
 import { randomUUID } from 'crypto';
+import { sanitizeFilename } from '@/utils/file-name';
+import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminNews = Tables<'news'>;
-
-function normalizeText(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function sanitizeFilename(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 async function uploadNewsPhotoIfPresent(
   photoFile: File | null
@@ -142,10 +130,7 @@ export async function createNews(
         ? `${dateRaw.trim()}T12:00:00.000Z`
         : new Date().toISOString();
     const orderRaw = formData.get('order');
-    const order = Math.max(
-      0,
-      parseInt(String(orderRaw ?? '0'), 10) || 0
-    );
+    const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
 
     const photoEntry = formData.get('photo');
     const photoFile = photoEntry instanceof File ? photoEntry : null;
@@ -197,10 +182,7 @@ export async function updateNews(
         ? `${dateRaw.trim()}T12:00:00.000Z`
         : new Date().toISOString();
     const orderRaw = formData.get('order');
-    const order = Math.max(
-      0,
-      parseInt(String(orderRaw ?? '0'), 10) || 0
-    );
+    const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
 
     const removePhoto = formData.get('remove_photo') === '1';
     const photoEntry = formData.get('photo');
@@ -222,7 +204,9 @@ export async function updateNews(
         .eq('id', id)
         .single();
       if (existing?.photo) {
-        await supabaseAdmin.storage.from('news-photos').remove([existing.photo]);
+        await supabaseAdmin.storage
+          .from('news-photos')
+          .remove([existing.photo]);
       }
       updatePayload.photo = null;
     } else if (photoPath) {
@@ -250,7 +234,9 @@ export async function updateNews(
   }
 }
 
-export async function deleteNews(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteNews(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
 
