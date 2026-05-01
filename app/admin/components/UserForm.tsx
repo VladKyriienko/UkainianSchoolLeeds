@@ -29,7 +29,7 @@ type Organisation = {
 
 type UserFormProps = {
   organisations: Organisation[];
-  classes: AdminClass[];
+  classes?: AdminClass[];
   user?: AdminUser; // If provided, we're editing; otherwise creating
   mode: 'create' | 'edit';
 };
