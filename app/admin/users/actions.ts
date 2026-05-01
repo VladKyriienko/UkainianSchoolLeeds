@@ -3,7 +3,7 @@
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
-import { getAuthEmailRedirectUrl } from '@/utils/auth-email-redirect';
+import { getURL } from '@/utils/helpers';
 import { format } from 'date-fns';
 import type { Tables } from '@/utils/supabase/types';
 
@@ -376,9 +376,7 @@ export async function createUser(data: CreateUserData) {
     // Create auth user and let the database trigger handle public user record and role creation
     const { data: authUser, error: authError } =
       await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
-        redirectTo: await getAuthEmailRedirectUrl(
-          '/auth/callback?redirectTo=/auth/update-password'
-        ),
+        redirectTo: getURL('/auth/callback?redirectTo=/auth/update-password'),
         data: {
           full_name: data.full_name || '',
           system_role: data.role || 'user',
@@ -433,9 +431,7 @@ export async function sendWelcomeEmail(userId: string) {
     // Re-send invite email using admin.inviteUserByEmail
     const { error: inviteError } =
       await supabaseAdmin.auth.admin.inviteUserByEmail(authUser.user.email, {
-        redirectTo: await getAuthEmailRedirectUrl(
-          '/auth/callback?redirectTo=/auth/update-password'
-        ),
+        redirectTo: getURL('/auth/callback?redirectTo=/auth/update-password'),
         data: authUser.user.user_metadata
       });
 
@@ -486,9 +482,7 @@ export async function sendPasswordResetOrInvite(userId: string) {
       // User is verified - send password reset email
       const { error: resetError } =
         await supabaseAdmin.auth.resetPasswordForEmail(authUser.user.email, {
-          redirectTo: await getAuthEmailRedirectUrl(
-            '/auth/callback?redirectTo=/auth/update-password'
-          )
+          redirectTo: getURL('/auth/callback?redirectTo=/auth/update-password')
         });
 
       if (resetError) {
@@ -502,9 +496,7 @@ export async function sendPasswordResetOrInvite(userId: string) {
       // User is not verified - send invite email
       const { error: inviteError } =
         await supabaseAdmin.auth.admin.inviteUserByEmail(authUser.user.email, {
-          redirectTo: await getAuthEmailRedirectUrl(
-            '/auth/callback?redirectTo=/auth/update-password'
-          ),
+          redirectTo: getURL('/auth/callback?redirectTo=/auth/update-password'),
           data: authUser.user.user_metadata
         });
 
@@ -747,7 +739,7 @@ export async function sendMagicLink(userId: string) {
     const { error: magicError } = await supabaseAdmin.auth.signInWithOtp({
       email: authUser.user.email,
       options: {
-        emailRedirectTo: await getAuthEmailRedirectUrl('/auth/callback')
+        emailRedirectTo: getURL('/auth/callback')
       }
     });
 
