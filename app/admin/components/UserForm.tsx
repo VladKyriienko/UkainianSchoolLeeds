@@ -79,7 +79,10 @@ export default function UserForm({
           })
         };
 
-        await createUser(createData);
+        const createResult = await createUser(createData);
+        if (!createResult.success) {
+          throw new Error(createResult.error ?? 'Failed to create user');
+        }
         router.push('/admin/users');
       } else {
         const updateData = {

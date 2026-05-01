@@ -407,11 +407,11 @@ export async function createUser(data: CreateUserData) {
 
     revalidatePath('/admin/users');
     revalidatePath('/teacher/class-gallery');
-    return { success: true, user: authUser.user };
+    return { success: true };
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : 'Failed to create user';
-    throw new Error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 }
 
