@@ -31,22 +31,6 @@ type NavUserMenuItem = {
   action?: string;
 };
 
-const userMenuGroups: { items: NavUserMenuItem[]; separator?: boolean }[] = [
-  {
-    items: [
-      {
-        title: 'Profile',
-        href: '/admin/profile',
-        iconName: 'User'
-      }
-    ],
-    separator: true
-  },
-  {
-    items: [{ title: 'Sign Out', action: 'signout', iconName: 'LogOut' }]
-  }
-];
-
 export function NavUser() {
   const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
@@ -89,15 +73,34 @@ export function NavUser() {
 
   const userInitials = userData?.full_name
     ? userData.full_name
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .toUpperCase()
+      .split(' ')
+      .map((n: string) => n[0])
+      .join('')
+      .toUpperCase()
     : user.email?.charAt(0).toUpperCase() || 'U';
 
   // Use email as fallback display name if userData hasn't loaded yet
   const displayName =
     userData?.full_name || user.email?.split('@')[0] || 'User';
+  const isAdmin = userData?.roles?.some((role) => role.role === 'admin');
+  const isTeacher = userData?.roles?.some((role) => role.role === 'teacher');
+  const profileHref = isAdmin ? '/admin/profile' : isTeacher ? '/teacher/profile' : '/';
+
+  const userMenuGroups: { items: NavUserMenuItem[]; separator?: boolean }[] = [
+    {
+      items: [
+        {
+          title: 'Profile',
+          href: profileHref,
+          iconName: 'User'
+        }
+      ],
+      separator: true
+    },
+    {
+      items: [{ title: 'Sign Out', action: 'signout', iconName: 'LogOut' }]
+    }
+  ];
 
   return (
     <SidebarMenu>
@@ -147,9 +150,14 @@ export function NavUser() {
                   <span className="truncate font-semibold">{displayName}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
-                {userData?.roles?.some((role) => role.role === 'admin') && (
+                {isAdmin && (
                   <Badge variant="secondary" className="text-xs">
                     Admin
+                  </Badge>
+                )}
+                {!isAdmin && isTeacher && (
+                  <Badge variant="secondary" className="text-xs">
+                    Teacher
                   </Badge>
                 )}
               </div>

@@ -88,6 +88,7 @@ export function UserSearchForm({
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="teacher">Teacher</SelectItem>
               <SelectItem value="user">User</SelectItem>
             </SelectContent>
           </Select>

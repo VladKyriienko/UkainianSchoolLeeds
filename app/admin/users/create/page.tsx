@@ -1,4 +1,5 @@
 import { getAllOrganisations } from '@/app/admin/users/actions';
+import { listClasses } from '@/app/admin/classes/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import CreateUserForm from '@/app/admin/components/CreateUserForm';
 import { BackButton } from '@/components/common/BackButton';
@@ -10,12 +11,19 @@ export default async function CreateUserPage() {
   const { allowOrganisations } = getOrganisationSettings();
 
   let organisations: Tables<'organisations'>[] = [];
+  let classes: Awaited<ReturnType<typeof listClasses>>['classes'] = [];
   if (allowOrganisations) {
     try {
       organisations = await getAllOrganisations();
     } catch (error) {
       console.error('Error fetching organisations:', error);
     }
+  }
+  try {
+    const classesResult = await listClasses({ page: 1, limit: 500 });
+    classes = classesResult.classes;
+  } catch (error) {
+    console.error('Error fetching classes:', error);
   }
 
   return (
@@ -25,7 +33,7 @@ export default async function CreateUserPage() {
       goBackButton={<BackButton />}
     >
       <div className="bg-card border border-border p-6 rounded-lg">
-        <CreateUserForm organisations={organisations} />
+        <CreateUserForm organisations={organisations} classes={classes} />
       </div>
     </PageWrapper>
   );

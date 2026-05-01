@@ -52,8 +52,9 @@ export async function updateProfileAction(profileData: {
       return { success: false, error: 'Failed to update profile' };
     }
 
-    // Revalidate the page to ensure fresh data
+    // Revalidate profile pages for both admin and teacher areas
     revalidatePath('/admin/profile');
+    revalidatePath('/teacher/profile');
 
     return { success: true };
   } catch (error) {
@@ -124,8 +125,9 @@ export async function uploadAvatarAction(file: File): Promise<{
       };
     }
 
-    // Revalidate the page
+    // Revalidate profile pages for both admin and teacher areas
     revalidatePath('/admin/profile');
+    revalidatePath('/teacher/profile');
 
     return { success: true, avatarUrl: publicUrl };
   } catch (error) {
@@ -193,8 +195,9 @@ export async function deleteAvatarAction(): Promise<{
       return { success: false, error: 'Failed to remove avatar from profile' };
     }
 
-    // Revalidate the page
+    // Revalidate profile pages for both admin and teacher areas
     revalidatePath('/admin/profile');
+    revalidatePath('/teacher/profile');
 
     return { success: true };
   } catch (error) {
@@ -249,11 +252,19 @@ export async function changeEmailAction(newEmail: string): Promise<{
       };
     }
 
+    // Determine where to return after email confirmation.
+    const { data: roleRows } = await supabase
+      .from('roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const isAdmin = roleRows?.some((role) => role.role === 'admin') ?? false;
+    const profileRedirectPath = isAdmin ? '/admin/profile' : '/teacher/profile';
+
     // Update email (this will send confirmation emails to both addresses)
     const { error: updateError } = await supabase.auth.updateUser(
       { email: newEmail },
       {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/admin/profile`
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${profileRedirectPath}`
       }
     );
 

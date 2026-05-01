@@ -1,7 +1,6 @@
 'use server';
 
 import { createAdminClient } from '@/utils/supabase/admin';
-import { createClient as createServerClient } from '@/utils/supabase/server';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
 import { getURL } from '@/utils/helpers';
@@ -38,13 +37,15 @@ export type AdminUser = {
   last_sign_in_at?: string;
   role?: string;
   is_active?: boolean;
+  teacher_class_id?: string | null;
   organisations?: OrganisationMembership[];
 };
 
 export type CreateUserData = {
   email: string;
   full_name?: string;
-  role?: 'admin' | 'user';
+  role?: 'admin' | 'teacher' | 'user';
+  class_id?: string;
   organisation_id?: string;
   organisation_role?: string;
 };
@@ -53,6 +54,7 @@ export type UpdateUserData = {
   email?: string;
   full_name?: string;
   role?: string;
+  class_id?: string;
   password?: string;
 };
 
@@ -78,6 +80,37 @@ export type UpdateOrganisationData = {
 export type AdminOrganisation = {
   organisation_memberships?: OrganisationMembership[];
 } & Tables<'organisations'>;
+
+async function setTeacherClassAssignment(
+  userId: string,
+  classId?: string | null
+): Promise<void> {
+  const { error: deleteError } = await supabaseAdmin
+    .from('teacher_class')
+    .delete()
+    .eq('teacher_id', userId);
+
+  if (deleteError) {
+    throw new Error(
+      `Failed to clear teacher class assignment: ${deleteError.message}`
+    );
+  }
+
+  if (!classId) return;
+
+  const { error: insertError } = await supabaseAdmin
+    .from('teacher_class')
+    .insert({
+      teacher_id: userId,
+      class_id: classId
+    });
+
+  if (insertError) {
+    throw new Error(
+      `Failed to assign class to teacher: ${insertError.message}`
+    );
+  }
+}
 
 /** Lightweight count for dashboard stats. */
 export async function getUsersCount(): Promise<number> {
@@ -216,6 +249,26 @@ export async function getAllUsers(options?: {
     }
   }
 
+  // Get teacher class assignments in batches
+  let teacherClasses: Array<{ teacher_id: string; class_id: string }> = [];
+  for (let i = 0; i < allUserIds.length; i += rolesBatchSize) {
+    const batch = allUserIds.slice(i, i + rolesBatchSize);
+    const { data: batchTeacherClasses, error: teacherClassesError } =
+      await supabaseAdmin
+        .from('teacher_class')
+        .select('teacher_id, class_id')
+        .in('teacher_id', batch);
+
+    if (teacherClassesError) {
+      console.error(
+        `Error fetching teacher classes batch ${Math.floor(i / rolesBatchSize) + 1}:`,
+        teacherClassesError
+      );
+    } else if (batchTeacherClasses) {
+      teacherClasses = teacherClasses.concat(batchTeacherClasses);
+    }
+  }
+
   // Combine all data into AdminUser objects
   const allUsers: AdminUser[] = allAuthUsers
     .filter((authUser) => authUser.email) // Filter out users without email
@@ -258,6 +311,9 @@ export async function getAllUsers(options?: {
       if (publicUser?.is_active !== undefined) {
         adminUser.is_active = publicUser.is_active;
       }
+      adminUser.teacher_class_id =
+        teacherClasses.find((item) => item.teacher_id === authUser.id)
+          ?.class_id ?? null;
 
       return adminUser;
     });
@@ -345,8 +401,12 @@ export async function createUser(data: CreateUserData) {
     // - public.roles record
     // - public.organisation_memberships record (if organisation data provided)
     // So we don't need to manually insert into these tables
+    if (data.role === 'teacher' && data.class_id) {
+      await setTeacherClassAssignment(authUser.user.id, data.class_id);
+    }
 
     revalidatePath('/admin/users');
+    revalidatePath('/teacher/class-gallery');
     return { success: true, user: authUser.user };
   } catch (error: unknown) {
     const errorMessage =
@@ -491,16 +551,25 @@ export async function updateUser(userId: string, data: UpdateUserData) {
       const { error: roleError } = await supabaseAdmin.from('roles').upsert([
         {
           user_id: userId,
-          role: data.role as 'admin' | 'user'
+          role: data.role as 'admin' | 'teacher' | 'user'
         }
       ]);
 
       if (roleError) {
         console.error('Role update error:', roleError);
       }
+
+      if (data.role !== 'teacher') {
+        await setTeacherClassAssignment(userId, null);
+      } else if (data.class_id !== undefined) {
+        await setTeacherClassAssignment(userId, data.class_id || null);
+      }
+    } else if (data.class_id !== undefined) {
+      await setTeacherClassAssignment(userId, data.class_id || null);
     }
 
     revalidatePath('/admin/users');
+    revalidatePath('/teacher/class-gallery');
     return { success: true };
   } catch (error: unknown) {
     const errorMessage =
@@ -522,7 +591,47 @@ export async function deleteUser(userId: string) {
       throw new Error(`Failed to delete user: ${authError.message}`);
     }
 
-    // The database cascades will handle the rest via RLS policies
+    // Clean up related public records (there is no DB-level cascade from auth.users).
+    const { error: membershipsError } = await supabaseAdmin
+      .from('organisation_memberships')
+      .delete()
+      .eq('user_id', userId);
+    if (membershipsError) {
+      throw new Error(
+        `User deleted from auth, but failed to delete organisation memberships: ${membershipsError.message}`
+      );
+    }
+
+    const { error: uploadsError } = await supabaseAdmin
+      .from('user_uploads')
+      .delete()
+      .eq('user_id', userId);
+    if (uploadsError) {
+      throw new Error(
+        `User deleted from auth, but failed to delete uploads: ${uploadsError.message}`
+      );
+    }
+
+    const { error: rolesError } = await supabaseAdmin
+      .from('roles')
+      .delete()
+      .eq('user_id', userId);
+    if (rolesError) {
+      throw new Error(
+        `User deleted from auth, but failed to delete roles: ${rolesError.message}`
+      );
+    }
+
+    const { error: profileError } = await supabaseAdmin
+      .from('users')
+      .delete()
+      .eq('id', userId);
+    if (profileError) {
+      throw new Error(
+        `User deleted from auth, but failed to delete profile: ${profileError.message}`
+      );
+    }
+
     revalidatePath('/admin/users');
     return { success: true };
   } catch (error: unknown) {

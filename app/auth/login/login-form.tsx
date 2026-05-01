@@ -29,7 +29,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const { allowOauth } = getAuthTypes();
+  const { allowOauth, allowSignUp } = getAuthTypes();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,15 +106,17 @@ export function LoginForm({
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
-            </div>
+            {allowSignUp && (
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{' '}
+                <Link
+                  href="/auth/sign-up"
+                  className="underline underline-offset-4"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

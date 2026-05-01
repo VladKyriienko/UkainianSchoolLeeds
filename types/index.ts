@@ -1,7 +1,7 @@
 import type { ValidLucideIconName } from '@/utils/lucide-icons';
 
 // Route & auth
-export type UserRole = 'admin' | 'user' | null;
+export type UserRole = 'admin' | 'teacher' | 'user' | null;
 
 export type RouteConfig = {
   path: string;

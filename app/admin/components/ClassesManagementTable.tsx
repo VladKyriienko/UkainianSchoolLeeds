@@ -14,6 +14,7 @@ import { BookOpen } from 'lucide-react';
 import type { AdminClass } from '@/app/admin/classes/actions';
 import { deleteClass } from '@/app/admin/classes/actions';
 import { formatDateLabel } from '@/utils/date-format';
+import { isHtmlContent } from '@/utils/rich-text';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
@@ -22,8 +23,6 @@ import { useConfirmAction } from '@/hooks/useConfirmAction';
 type ClassesManagementTableProps = {
   classes: AdminClass[];
 };
-
-const DESC_PREVIEW_LENGTH = 60;
 
 export default function ClassesManagementTable({
   classes: classesList
@@ -82,13 +81,16 @@ export default function ClassesManagementTable({
             <TableRow key={item.id}>
               <TableCell className="font-medium">{item.title}</TableCell>
               <TableCell className="text-muted-foreground text-sm max-w-[280px]">
-                <span title={item.description ?? ''}>
-                  {item.description
-                    ? item.description.length > DESC_PREVIEW_LENGTH
-                      ? `${item.description.slice(0, DESC_PREVIEW_LENGTH)}…`
-                      : item.description
-                    : '—'}
-                </span>
+                {isHtmlContent(item.description) ? (
+                  <div
+                    className="rich-text-preview"
+                    dangerouslySetInnerHTML={{ __html: item.description || '' }}
+                  />
+                ) : (
+                  <span className="line-clamp-3" title={item.description ?? ''}>
+                    {item.description || '—'}
+                  </span>
+                )}
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {item.order}

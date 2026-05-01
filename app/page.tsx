@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@/utils/auth-helpers/server';
+import { hasAdminRole, hasTeacherRole } from '@/utils/auth-helpers/roles';
 import { redirect } from 'next/navigation';
 import { PublicHomeClient } from './client';
 import { PublicLayout } from '@/components/common/RootLayout/PublicLayout';
@@ -7,10 +8,13 @@ import { getNews } from '@/app/(not-aunthenticated)/parents/news/actions';
 const HOME_NEWS_LIMIT = 3;
 
 export default async function HomePage() {
-  const { user } = await getCurrentUser();
+  const { user, profileData } = await getCurrentUser();
 
-  if (user) {
+  if (user && hasAdminRole(profileData)) {
     redirect('/admin');
+  }
+  if (user && hasTeacherRole(profileData)) {
+    redirect('/teacher');
   }
 
   const allNews = await getNews();

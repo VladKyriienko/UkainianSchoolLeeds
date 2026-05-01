@@ -2,6 +2,7 @@
 const allowOauth = true;
 const allowEmail = true;
 const allowPassword = true;
+const allowSignUp = false;
 
 // Boolean toggle to determine auth form fields
 const enableMarketingConsent = true;
@@ -27,7 +28,7 @@ if (!allowPassword && !allowEmail)
   throw new Error('At least one of allowPassword and allowEmail must be true');
 
 export const getAuthTypes = () => {
-  return { allowOauth, allowEmail, allowPassword };
+  return { allowOauth, allowEmail, allowPassword, allowSignUp };
 };
 
 export const getMarketingConsentSettings = () => {
@@ -67,7 +68,7 @@ export const getViewTypes = () => {
       'password_signin',
       'forgot_password',
       'update_password',
-      'signup'
+      ...(allowSignUp ? ['signup'] : [])
     ];
   }
 
