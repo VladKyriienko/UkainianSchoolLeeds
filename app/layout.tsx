@@ -30,7 +30,7 @@ export default async function Layout({ children }: PropsWithChildren) {
   const { user, profileData } = await getCurrentUser();
 
   return (
-    <html lang="en" className={theme || 'light'}>
+    <html lang="en" className={theme || 'light'} suppressHydrationWarning>
       <head>
         <script
           async
@@ -39,7 +39,7 @@ export default async function Layout({ children }: PropsWithChildren) {
         />
       </head>
       <Providers user={user} userData={profileData}>
-        <body>{children}</body>
+        <body suppressHydrationWarning>{children}</body>
       </Providers>
     </html>
   );
