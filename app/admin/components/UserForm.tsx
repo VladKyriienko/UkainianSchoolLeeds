@@ -36,7 +36,7 @@ type UserFormProps = {
 
 export default function UserForm({
   organisations,
-  classes,
+  classes = [],
   user,
   mode
 }: UserFormProps) {
