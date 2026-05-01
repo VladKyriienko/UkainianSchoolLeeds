@@ -56,6 +56,7 @@ export function ListView({ events, schedules }: ListViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const dateLocale = language === 'uk' ? uk : enUS;
+  const [mounted, setMounted] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(startOfToday());
   const [currentPage, setCurrentPage] = useState(1);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -64,6 +65,10 @@ export function ListView({ events, schedules }: ListViewProps) {
     title: string;
     publicUrl: string;
   } | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const allItems = useMemo<CalendarListItem[]>(() => {
     const scheduleItems: CalendarListItem[] = schedules.map((s) => ({
@@ -199,6 +204,10 @@ export function ListView({ events, schedules }: ListViewProps) {
     setDatePickerOpen(false);
     setShowSelectedDateInTitle(true);
   };
+
+  if (!mounted) {
+    return <div className="w-full" suppressHydrationWarning />;
+  }
 
   return (
     <div className="w-full">
@@ -344,17 +353,17 @@ export function ListView({ events, schedules }: ListViewProps) {
                           className="flex gap-4 hover:bg-muted/30 rounded-lg -m-2 p-2 transition-colors"
                         >
                           <div className="flex flex-col items-center justify-start min-w-[60px] text-center">
-                          <div className="text-xs uppercase text-muted-foreground font-medium tracking-wide">
-                            {format(eventDate, 'EEE', { locale: dateLocale })}
+                            <div className="text-xs uppercase text-muted-foreground font-medium tracking-wide">
+                              {format(eventDate, 'EEE', { locale: dateLocale })}
+                            </div>
+                            <div className="text-4xl font-light leading-none mt-1">
+                              {format(eventDate, 'd')}
+                            </div>
                           </div>
-                          <div className="text-4xl font-light leading-none mt-1">
-                            {format(eventDate, 'd')}
-                          </div>
-                        </div>
 
-                        <div className="flex-1">
-                          <div className="text-sm text-foreground/60 mb-1">
-                            {format(eventDate, 'MMMM d', { locale: dateLocale })}
+                          <div className="flex-1">
+                            <div className="text-sm text-foreground/60 mb-1">
+                              {format(eventDate, 'MMMM d', { locale: dateLocale })}
                               {!isSchedule && event.start_time && (
                                 <>
                                   {' @ '}
