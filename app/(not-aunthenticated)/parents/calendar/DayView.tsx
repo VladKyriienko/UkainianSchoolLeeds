@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   format,
@@ -45,12 +45,17 @@ export function DayView({ events, schedules }: DayViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const dateLocale = language === 'uk' ? uk : enUS;
+  const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(startOfToday());
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<{
     title: string;
     publicUrl: string;
   } | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get events for the current day
   const dayEvents = useMemo(() => {
@@ -101,6 +106,10 @@ export function DayView({ events, schedules }: DayViewProps) {
       setDatePickerOpen(false);
     }
   };
+
+  if (!mounted) {
+    return <div className="w-full" suppressHydrationWarning />;
+  }
 
   return (
     <div className="w-full">

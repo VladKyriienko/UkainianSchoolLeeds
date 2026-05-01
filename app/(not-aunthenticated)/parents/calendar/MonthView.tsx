@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   format,
   startOfWeek,
@@ -54,12 +54,17 @@ export function MonthView({ events, schedules }: MonthViewProps) {
   const { language } = useLanguage();
   const content = CALENDAR_CONTENT[language];
   const dateLocale = language === 'uk' ? uk : enUS;
+  const [mounted, setMounted] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(startOfToday());
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<{
     title: string;
     publicUrl: string;
   } | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Generate calendar days for month view (week starts on Monday)
   const monthDays = useMemo(() => {
@@ -120,6 +125,10 @@ export function MonthView({ events, schedules }: MonthViewProps) {
   const handleThisMonth = () => {
     setCurrentMonth(startOfToday());
   };
+
+  if (!mounted) {
+    return <div className="w-full" suppressHydrationWarning />;
+  }
 
   return (
     <div className="w-full">
