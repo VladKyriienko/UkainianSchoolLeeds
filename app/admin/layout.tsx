@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/utils/auth-helpers/server';
+import { hasAdminRole } from '@/utils/auth-helpers/roles';
 import { getCompletionBannerData } from '@/components/common/CompletionBanner';
 import { AuthenticatedLayout } from './AuthenticatedLayout';
 import {
@@ -28,7 +29,7 @@ export default async function Layout({ children }: PropsWithChildren) {
     profileData?.roles[0]?.role
   );
 
-  const isAdmin = profileData?.roles?.[0]?.role === 'admin';
+  const isAdmin = hasAdminRole(profileData);
 
   return (
     <AuthenticatedLayout

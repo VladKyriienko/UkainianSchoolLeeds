@@ -8,6 +8,11 @@ export type CompressionOptions = {
   maxHeight?: number;
   quality?: number;
   maxSizeKB?: number;
+  /**
+   * When set (e.g. `image/jpeg`), forces `canvas.toBlob` to use this MIME type.
+   * Use for large PNGs: PNG encoding often ignores quality and stays huge, breaking Server Action body limits.
+   */
+  outputMimeType?: string;
 };
 
 /**
@@ -21,8 +26,17 @@ export async function compressImage(
     maxWidth = 800,
     maxHeight = 800,
     quality = 0.8,
-    maxSizeKB = 500
+    maxSizeKB = 500,
+    outputMimeType
   } = options;
+
+  const blobMime =
+    outputMimeType ??
+    (file.type.startsWith('image/png') ? 'image/png' : 'image/jpeg');
+  const outFileName =
+    blobMime === 'image/jpeg'
+      ? `${file.name.replace(/\.[^/.]+$/i, '') || 'photo'}.jpg`
+      : file.name;
 
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
@@ -78,7 +92,7 @@ export async function compressImage(
               attempts >= maxAttempts ||
               currentQuality <= 0.1
             ) {
-              const compressedFile = new File([blob], file.name, {
+              const compressedFile = new File([blob], outFileName, {
                 type: blob.type,
                 lastModified: Date.now()
               });
@@ -90,7 +104,7 @@ export async function compressImage(
               tryCompress();
             }
           },
-          file.type.startsWith('image/png') ? 'image/png' : 'image/jpeg',
+          blobMime,
           currentQuality
         );
       };

@@ -3,6 +3,7 @@
 import { cache } from 'react';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { createClient, UserWithRoles } from '@/utils/supabase/server';
+import { hasAdminRole } from '@/utils/auth-helpers/roles';
 import { redirect } from 'next/navigation';
 import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
 import type { User } from '@supabase/supabase-js';
@@ -17,30 +18,32 @@ function isValidEmail(email: string) {
  * This ensures only one database query is made per request,
  * even if called multiple times (e.g., in layout and page).
  */
-export const getCurrentUser = cache(async (): Promise<{
-  user: User | null;
-  profileData: UserWithRoles | null;
-}> => {
-  const supabase = createClient();
+export const getCurrentUser = cache(
+  async (): Promise<{
+    user: User | null;
+    profileData: UserWithRoles | null;
+  }> => {
+    const supabase = createClient();
 
-  // Get authenticated user
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+    // Get authenticated user
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return { user: null, profileData: null };
+    if (!user) {
+      return { user: null, profileData: null };
+    }
+
+    // Get user profile data from users table
+    const { data: profileData } = await supabase
+      .from('users')
+      .select('*, roles(*)')
+      .eq('id', user.id)
+      .single();
+
+    return { user, profileData };
   }
-
-  // Get user profile data from users table
-  const { data: profileData } = await supabase
-    .from('users')
-    .select('*, roles(*)')
-    .eq('id', user.id)
-    .single();
-
-  return { user, profileData };
-});
+);
 
 export async function redirectToPath(path: string) {
   return redirect(path);
@@ -232,7 +235,7 @@ export async function updateName(formData: FormData) {
  * Verifies that the current user has admin role.
  * Throws an error if user is not authenticated or not an admin.
  * Returns the user ID if successful.
- * 
+ *
  * This function uses getCurrentUser cache to avoid duplicate database queries.
  */
 export async function verifyAdminAccess(): Promise<string> {
@@ -248,12 +251,7 @@ export async function verifyAdminAccess(): Promise<string> {
     throw new Error('User profile not found');
   }
 
-  // Check if user has admin role
-  const hasAdminRole = profileData.roles?.some(
-    (role: { role: string }) => role.role === 'admin'
-  );
-
-  if (!hasAdminRole) {
+  if (!hasAdminRole(profileData)) {
     redirect('/');
     throw new Error('Unauthorized: Admin access required');
   }
@@ -283,12 +281,7 @@ export async function getAdminUser(): Promise<{
     throw new Error('User profile not found');
   }
 
-  // Check if user has admin role
-  const hasAdminRole = profileData.roles?.some(
-    (role: { role: string }) => role.role === 'admin'
-  );
-
-  if (!hasAdminRole) {
+  if (!hasAdminRole(profileData)) {
     redirect('/');
     throw new Error('Unauthorized: Admin access required');
   }

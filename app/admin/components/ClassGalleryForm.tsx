@@ -16,6 +16,7 @@ import {
 import type { AdminGalleryItem } from '@/app/admin/class-gallery/actions';
 import { createGalleryItem, updateGalleryItem } from '@/app/admin/class-gallery/actions';
 import type { AdminClass } from '@/app/admin/classes/actions';
+import { compressImage, validateImageFile } from '@/utils/image-compression';
 
 type ClassGalleryFormProps = {
   mode: 'create' | 'edit';
@@ -38,14 +39,32 @@ export function ClassGalleryForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setIsSubmitting(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    formData.set('class_id', classId);
-    if (photoFile) formData.set('photo', photoFile);
-
     try {
+      let fileToUpload: File | null = photoFile;
+      if (photoFile) {
+        const validation = validateImageFile(photoFile);
+        if (!validation.isValid) {
+          setError(validation.error ?? 'Invalid image');
+          setIsSubmitting(false);
+          return;
+        }
+        fileToUpload = await compressImage(photoFile, {
+          maxWidth: 1600,
+          maxHeight: 1600,
+          quality: 0.85,
+          maxSizeKB: 500,
+          outputMimeType: 'image/jpeg'
+        });
+      }
+
+      const formData = new FormData(form);
+      formData.set('class_id', classId);
+      if (fileToUpload) formData.set('photo', fileToUpload);
+
       let result;
       if (mode === 'create') {
         result = await createGalleryItem(formData);

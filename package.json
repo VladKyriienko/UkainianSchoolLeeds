@@ -2,7 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
@@ -115,7 +115,6 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "dotenv": "^16.4.5",
     "@eslint/js": "^9.36.0",
     "@playwright/test": "^1.51.0",
     "@prisma/client": "^6.7.0",
@@ -123,6 +122,7 @@
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "autoprefixer": "^10.4.19",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9.30.0",
     "eslint-config-next": "^16.0.10",
