@@ -1,54 +1,20 @@
-function normalizeSiteOrigin(raw: string): string {
-  const trimmed = raw.trim().replace(/\/+$/, '');
-  return trimmed.includes('http') ? trimmed : `https://${trimmed}`;
-}
-
-function isLocalhostOrigin(value: string): boolean {
-  try {
-    const u = new URL(value.includes('http') ? value : `https://${value}`);
-    return u.hostname === 'localhost' || u.hostname === '127.0.0.1';
-  } catch {
-    return /localhost|127\.0\.0\.1/i.test(value);
-  }
-}
-
-/**
- * Canonical browser origin for auth redirects, emails (e.g. Supabase invite `redirectTo`), and metadata.
- *
- * **Production:** set `NEXT_PUBLIC_SITE_URL` to your real domain (e.g. `https://school.example.com`).
- * If it is missing or still points at `localhost`, invite and magic-link emails will contain wrong links.
- *
- * On Vercel we also fall back to `VERCEL_URL` / `NEXT_PUBLIC_VERCEL_URL` so deploys work without a custom env,
- * but for a **custom domain** you should still set `NEXT_PUBLIC_SITE_URL` explicitly.
- */
 export const getURL = (path: string = '') => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? '';
-  const publicVercel = process.env.NEXT_PUBLIC_VERCEL_URL?.trim() ?? '';
-  const runtimeVercel = process.env.VERCEL_URL?.trim() ?? '';
+  // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL &&
+    process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
+        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
+          process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ''
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
+        : // If neither is set, default to localhost for local development.
+          'http://localhost:3000/';
 
-  let url: string;
-  const siteUrlLooksInvalidForProd =
-    process.env.NODE_ENV === 'production' &&
-    siteUrl !== '' &&
-    isLocalhostOrigin(siteUrl);
-
-  if (siteUrlLooksInvalidForProd) {
-    console.warn(
-      '[getURL] NEXT_PUBLIC_SITE_URL is localhost in production; it will be ignored. Set NEXT_PUBLIC_SITE_URL to your public HTTPS origin (e.g. https://example.com).'
-    );
-  }
-
-  if (siteUrl !== '' && !siteUrlLooksInvalidForProd) {
-    url = normalizeSiteOrigin(siteUrl);
-  } else if (publicVercel !== '') {
-    url = normalizeSiteOrigin(publicVercel);
-  } else if (runtimeVercel !== '') {
-    url = normalizeSiteOrigin(runtimeVercel.replace(/^https?:\/\//, ''));
-  } else {
-    url = 'http://localhost:3000';
-  }
-
+  // Trim the URL and remove trailing slash if exists.
   url = url.replace(/\/+$/, '');
+  // Make sure to include `https://` when not localhost.
+  url = url.includes('http') ? url : `https://${url}`;
   // Ensure path starts without a slash to avoid double slashes in the final URL.
   path = path.replace(/^\/+/, '');
 
