@@ -8,6 +8,7 @@ import {
   AdminUser,
   CreateUserData
 } from '@/app/admin/users/actions';
+import type { AdminClass } from '@/app/admin/classes/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,18 +29,25 @@ type Organisation = {
 
 type UserFormProps = {
   organisations: Organisation[];
+  classes: AdminClass[];
   user?: AdminUser; // If provided, we're editing; otherwise creating
   mode: 'create' | 'edit';
 };
 
-export default function UserForm({ organisations, user, mode }: UserFormProps) {
+export default function UserForm({
+  organisations,
+  classes,
+  user,
+  mode
+}: UserFormProps) {
   const router = useRouter();
   const { allowOrganisations } = getOrganisationSettings();
 
   const [formData, setFormData] = useState({
     email: user?.email || '',
     full_name: user?.full_name || '',
-    role: (user?.role as 'admin' | 'user') || 'user',
+    role: (user?.role as 'admin' | 'teacher' | 'user') || 'user',
+    class_id: user?.teacher_class_id || '',
     organisation_id: '',
     organisation_role: 'user'
   });
@@ -56,10 +64,13 @@ export default function UserForm({ organisations, user, mode }: UserFormProps) {
       if (mode === 'create') {
         const createData: CreateUserData = {
           email: formData.email.trim(),
-          role: formData.role as 'admin' | 'user',
+          role: formData.role as 'admin' | 'teacher' | 'user',
           ...(formData.full_name.trim() && {
             full_name: formData.full_name.trim()
           }),
+          ...(formData.role === 'teacher' && formData.class_id
+            ? { class_id: formData.class_id }
+            : {}),
           ...(formData.organisation_id && {
             organisation_id: formData.organisation_id
           }),
@@ -74,6 +85,9 @@ export default function UserForm({ organisations, user, mode }: UserFormProps) {
         const updateData = {
           email: formData.email.trim(),
           role: formData.role,
+          ...(formData.role === 'teacher'
+            ? { class_id: formData.class_id }
+            : { class_id: '' }),
           ...(formData.full_name.trim() && {
             full_name: formData.full_name.trim()
           })
@@ -137,7 +151,10 @@ export default function UserForm({ organisations, user, mode }: UserFormProps) {
         <Select
           value={formData.role}
           onValueChange={(value) =>
-            setFormData({ ...formData, role: value as 'admin' | 'user' })
+            setFormData({
+              ...formData,
+              role: value as 'admin' | 'teacher' | 'user'
+            })
           }
         >
           <SelectTrigger>
@@ -145,10 +162,38 @@ export default function UserForm({ organisations, user, mode }: UserFormProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="user">User</SelectItem>
+            <SelectItem value="teacher">Teacher</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
           </SelectContent>
         </Select>
       </div>
+
+      {formData.role === 'teacher' && (
+        <div className="space-y-2">
+          <Label htmlFor="class_id">Teacher Class</Label>
+          <Select
+            value={formData.class_id || 'none'}
+            onValueChange={(value) =>
+              setFormData({
+                ...formData,
+                class_id: value === 'none' ? '' : value
+              })
+            }
+          >
+            <SelectTrigger id="class_id">
+              <SelectValue placeholder="Select class" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No class</SelectItem>
+              {classes.map((classItem) => (
+                <SelectItem key={classItem.id} value={classItem.id}>
+                  {classItem.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {mode === 'create' && allowOrganisations && organisations.length > 0 && (
         <>

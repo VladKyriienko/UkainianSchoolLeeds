@@ -400,6 +400,42 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_class: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          teacher_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          teacher_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_class_class_id_classes_id_fk"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_class_teacher_id_users_id_fk"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_uploads: {
         Row: {
           created_at: string
@@ -467,7 +503,7 @@ export type Database = {
       keep_db_active: { Args: never; Returns: undefined }
     }
     Enums: {
-      rolesEnum: "admin" | "user"
+      rolesEnum: "admin" | "teacher" | "user"
       teacherCategoryEnum: "HEADTEACHER" | "TEACHER" | "STAF"
       typeDocumentEnum: "COOKIES_POLICY" | "PRIVACY_POLICY" | "DOCUMEND"
     }
@@ -597,7 +633,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      rolesEnum: ["admin", "user"],
+      rolesEnum: ["admin", "teacher", "user"],
       teacherCategoryEnum: ["HEADTEACHER", "TEACHER", "STAF"],
       typeDocumentEnum: ["COOKIES_POLICY", "PRIVACY_POLICY", "DOCUMEND"],
     },

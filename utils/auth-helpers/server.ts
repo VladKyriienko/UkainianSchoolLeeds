@@ -118,6 +118,21 @@ export async function SignIn(email: string, password: string) {
     }
   }
 
+  if (authData.user) {
+    const { data: roleRows } = await supabase
+      .from('roles')
+      .select('role')
+      .eq('user_id', authData.user.id);
+
+    const roles = roleRows?.map((item) => item.role) ?? [];
+    if (roles.includes('admin')) {
+      return '/admin';
+    }
+    if (roles.includes('teacher')) {
+      return '/teacher';
+    }
+  }
+
   return '/';
 }
 
@@ -147,7 +162,7 @@ export async function updatePassword(formData: FormData) {
     );
   } else if (data.user) {
     return getStatusRedirect(
-      '/',
+      '/auth/login',
       'Success!',
       'Your password has been updated.'
     );

@@ -23,19 +23,25 @@ type ClassGalleryFormProps = {
   item?: AdminGalleryItem | null;
   classes: AdminClass[];
   currentPhotoUrl?: string | null | undefined;
+  successRedirectPath?: string;
+  fixedClassId?: string;
+  hideClassSelect?: boolean;
 };
 
 export function ClassGalleryForm({
   mode,
   item,
   classes: classesList,
-  currentPhotoUrl
+  currentPhotoUrl,
+  successRedirectPath = '/admin/class-gallery',
+  fixedClassId,
+  hideClassSelect = false
 }: ClassGalleryFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [classId, setClassId] = useState<string>(item?.class_id ?? '');
+  const [classId, setClassId] = useState<string>(fixedClassId ?? item?.class_id ?? '');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,8 +67,15 @@ export function ClassGalleryForm({
         });
       }
 
+      const selectedClassId = fixedClassId ?? classId;
+      if (!selectedClassId) {
+        setError('Class is required');
+        setIsSubmitting(false);
+        return;
+      }
+
       const formData = new FormData(form);
-      formData.set('class_id', classId);
+      formData.set('class_id', selectedClassId);
       if (fileToUpload) formData.set('photo', fileToUpload);
 
       let result;
@@ -77,7 +90,7 @@ export function ClassGalleryForm({
         setIsSubmitting(false);
         return;
       }
-      router.push('/admin/class-gallery');
+      router.push(successRedirectPath);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save');
       setIsSubmitting(false);
@@ -92,25 +105,27 @@ export function ClassGalleryForm({
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label>Class *</Label>
-        <Select
-          value={classId}
-          onValueChange={setClassId}
-          required
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select class" />
-          </SelectTrigger>
-          <SelectContent>
-            {classesList.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {!hideClassSelect && (
+        <div className="space-y-2">
+          <Label>Class *</Label>
+          <Select
+            value={classId}
+            onValueChange={setClassId}
+            required
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select class" />
+            </SelectTrigger>
+            <SelectContent>
+              {classesList.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <ImageUploadField
         id="photo"

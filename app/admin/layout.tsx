@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/utils/auth-helpers/server';
-import { hasAdminRole } from '@/utils/auth-helpers/roles';
+import { hasAdminRole, hasTeacherRole } from '@/utils/auth-helpers/roles';
 import { getCompletionBannerData } from '@/components/common/CompletionBanner';
 import { AuthenticatedLayout } from './AuthenticatedLayout';
 import {
@@ -14,6 +14,13 @@ export default async function Layout({ children }: PropsWithChildren) {
 
   if (!user) {
     redirect('/auth/login');
+  }
+
+  if (!hasAdminRole(profileData)) {
+    if (hasTeacherRole(profileData)) {
+      redirect('/teacher');
+    }
+    redirect('/');
   }
 
   const completionBannerData = await getCompletionBannerData(
@@ -29,7 +36,7 @@ export default async function Layout({ children }: PropsWithChildren) {
     profileData?.roles[0]?.role
   );
 
-  const isAdmin = hasAdminRole(profileData);
+  const isAdmin = true;
 
   return (
     <AuthenticatedLayout

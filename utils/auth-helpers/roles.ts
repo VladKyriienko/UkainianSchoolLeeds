@@ -8,3 +8,12 @@ export function hasAdminRole(profileData: UserWithRoles | null): boolean {
     ) ?? false
   );
 }
+
+/** True if the profile has a `teacher` role. */
+export function hasTeacherRole(profileData: UserWithRoles | null): boolean {
+  return (
+    profileData?.roles?.some(
+      (role: { role: string }) => role.role === 'teacher'
+    ) ?? false
+  );
+}

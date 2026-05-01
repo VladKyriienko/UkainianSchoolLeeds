@@ -42,7 +42,7 @@ export const users = pgTable(
 // ENUMS
 // =================================================================================
 
-export const rolesEnum = pgEnum('rolesEnum', ['admin', 'user']);
+export const rolesEnum = pgEnum('rolesEnum', ['admin', 'teacher', 'user']);
 
 export const teacherCategoryEnum = pgEnum('teacherCategoryEnum', [
   'HEADTEACHER',
@@ -472,6 +472,62 @@ export const classes = pgTable(
         withCheck: isAdmin
       }),
       pgPolicy('classes_admin_delete', {
+        for: 'delete',
+        to: authenticatedRole,
+        using: isAdmin
+      })
+    ];
+  }
+);
+
+export const teacherClass = pgTable(
+  'teacher_class',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    teacherId: uuid('teacher_id')
+      .notNull()
+      .references(() => users.id),
+    classId: uuid('class_id')
+      .notNull()
+      .references(() => classes.id),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull()
+  },
+  () => {
+    const isAdmin = sql`exists (
+      select 1
+      from roles
+      where roles.user_id = auth.uid()
+        and roles.role = 'admin'
+    )`;
+
+    return [
+      pgPolicy('teacher_class_admin_select', {
+        for: 'select',
+        to: authenticatedRole,
+        using: isAdmin
+      }),
+      pgPolicy('teacher_class_teacher_select', {
+        for: 'select',
+        to: authenticatedRole,
+        using: sql`teacher_id = auth.uid()`
+      }),
+      pgPolicy('teacher_class_admin_insert', {
+        for: 'insert',
+        to: authenticatedRole,
+        withCheck: isAdmin
+      }),
+      pgPolicy('teacher_class_admin_update', {
+        for: 'update',
+        to: authenticatedRole,
+        using: isAdmin,
+        withCheck: isAdmin
+      }),
+      pgPolicy('teacher_class_admin_delete', {
         for: 'delete',
         to: authenticatedRole,
         using: isAdmin

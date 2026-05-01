@@ -3,6 +3,7 @@ import {
   getAllOrganisations,
   AdminUser
 } from '@/app/admin/users/actions';
+import { listClasses } from '@/app/admin/classes/actions';
 import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
 import UserForm from '@/app/admin/components/UserForm';
 import { BackButton } from '@/components/common/BackButton';
@@ -18,6 +19,7 @@ export default async function EditUserPage({
 
   let users: AdminUser[] = [];
   let organisations: Tables<'organisations'>[] = [];
+  let classes: Awaited<ReturnType<typeof listClasses>>['classes'] = [];
   let error: string | null = null;
 
   try {
@@ -27,6 +29,8 @@ export default async function EditUserPage({
     if (allowOrganisations) {
       organisations = await getAllOrganisations();
     }
+    const classesResult = await listClasses({ page: 1, limit: 500 });
+    classes = classesResult.classes;
   } catch (err: unknown) {
     const errorMessage =
       err instanceof Error ? err.message : 'Unknown error occurred';
@@ -65,6 +69,7 @@ export default async function EditUserPage({
         <div className="bg-card border border-border p-6 rounded-lg">
           <UserForm
             organisations={organisations}
+            classes={classes}
             user={currentUser}
             mode="edit"
           />

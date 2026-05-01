@@ -14,6 +14,7 @@ import { Newspaper } from 'lucide-react';
 import type { AdminNews } from '@/app/admin/news/actions';
 import { deleteNews } from '@/app/admin/news/actions';
 import { formatDateLabel } from '@/utils/date-format';
+import { isHtmlContent } from '@/utils/rich-text';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
@@ -22,8 +23,6 @@ import { useConfirmAction } from '@/hooks/useConfirmAction';
 type NewsManagementTableProps = {
   news: AdminNews[];
 };
-
-const DESC_PREVIEW_LENGTH = 60;
 
 export default function NewsManagementTable({
   news: newsItems
@@ -85,13 +84,16 @@ export default function NewsManagementTable({
                 {formatDateLabel(item.date)}
               </TableCell>
               <TableCell className="text-muted-foreground text-sm max-w-[280px]">
-                <span title={item.description ?? ''}>
-                  {item.description
-                    ? item.description.length > DESC_PREVIEW_LENGTH
-                      ? `${item.description.slice(0, DESC_PREVIEW_LENGTH)}…`
-                      : item.description
-                    : '—'}
-                </span>
+                {isHtmlContent(item.description) ? (
+                  <div
+                    className="rich-text-preview"
+                    dangerouslySetInnerHTML={{ __html: item.description || '' }}
+                  />
+                ) : (
+                  <span className="line-clamp-3" title={item.description ?? ''}>
+                    {item.description || '—'}
+                  </span>
+                )}
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {item.order}

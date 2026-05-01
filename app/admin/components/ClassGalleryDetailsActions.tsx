@@ -7,7 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Edit, Trash2 } from 'lucide-react';
 import { deleteGalleryItem } from '@/app/admin/class-gallery/actions';
 
-export function ClassGalleryDetailsActions({ itemId }: { itemId: string }) {
+export function ClassGalleryDetailsActions({
+  itemId,
+  basePath = '/admin/class-gallery'
+}: {
+  itemId: string;
+  basePath?: string;
+}) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -17,7 +23,7 @@ export function ClassGalleryDetailsActions({ itemId }: { itemId: string }) {
     try {
       const result = await deleteGalleryItem(itemId);
       if (result.success) {
-        router.push('/admin/class-gallery');
+        router.push(basePath);
         router.refresh();
       } else {
         alert(result.error ?? 'Failed to delete');
@@ -33,7 +39,7 @@ export function ClassGalleryDetailsActions({ itemId }: { itemId: string }) {
   return (
     <div className="flex gap-3">
       <Button asChild variant="outline">
-        <Link href={`/admin/class-gallery/${itemId}/edit`}>
+        <Link href={`${basePath}/${itemId}/edit`}>
           <Edit className="h-4 w-4 mr-2" />
           Edit
         </Link>

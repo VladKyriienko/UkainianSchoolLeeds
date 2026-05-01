@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/utils/auth-helpers/server';
-import { hasAdminRole } from '@/utils/auth-helpers/roles';
+import { hasAdminRole, hasTeacherRole } from '@/utils/auth-helpers/roles';
 import { redirect } from 'next/navigation';
 import { PublicHomeClient } from './client';
 import { PublicLayout } from '@/components/common/RootLayout/PublicLayout';
@@ -12,6 +12,9 @@ export default async function HomePage() {
 
   if (user && hasAdminRole(profileData)) {
     redirect('/admin');
+  }
+  if (user && hasTeacherRole(profileData)) {
+    redirect('/teacher');
   }
 
   const allNews = await getNews();

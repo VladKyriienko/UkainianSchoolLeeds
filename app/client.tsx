@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
 import { HOME_CONTENT } from '@/content/home';
@@ -30,6 +31,18 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
   const { language } = useLanguage();
   const content = HOME_CONTENT[language];
   const isUk = language === 'uk';
+
+  useEffect(() => {
+    // Supabase invite/OTP links can land on "/" with tokens in hash.
+    // Forward to the dedicated callback page that sets the session.
+    const hash = window.location.hash;
+    if (!hash) return;
+    const hasAuthTokens =
+      hash.includes('access_token=') && hash.includes('refresh_token=');
+    if (!hasAuthTokens) return;
+
+    window.location.replace(`/auth/callback-client?redirectTo=/${hash}`);
+  }, []);
 
   return (
     <div className="public-page w-full overflow-hidden pb-12">

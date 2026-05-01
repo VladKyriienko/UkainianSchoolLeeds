@@ -22,6 +22,7 @@ import { useConfirmAction } from '@/hooks/useConfirmAction';
 type ClassGalleryManagementTableProps = {
   items: AdminGalleryItem[];
   classTitleMap: Map<string, string>;
+  basePath?: string;
 };
 
 function getPhotoUrl(photoPath: string): string {
@@ -32,7 +33,8 @@ function getPhotoUrl(photoPath: string): string {
 
 export default function ClassGalleryManagementTable({
   items,
-  classTitleMap
+  classTitleMap,
+  basePath = '/admin/class-gallery'
 }: ClassGalleryManagementTableProps) {
   const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -107,8 +109,8 @@ export default function ClassGalleryManagementTable({
               <TableCell>
                 <RowActionMenu
                   isLoading={loadingId === item.id}
-                  onView={() => router.push(`/admin/class-gallery/${item.id}`)}
-                  onEdit={() => router.push(`/admin/class-gallery/${item.id}/edit`)}
+                  onView={() => router.push(`${basePath}/${item.id}`)}
+                  onEdit={() => router.push(`${basePath}/${item.id}/edit`)}
                   onDelete={() => handleDelete(item.id)}
                 />
               </TableCell>
