@@ -34,8 +34,9 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
+        // Use stable locale to avoid server/client text mismatches on hydration.
         formatMonthDropdown: (date) =>
-          date.toLocaleString('default', { month: 'short' }),
+          new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date),
         ...formatters
       }}
       classNames={{
