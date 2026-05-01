@@ -5,7 +5,8 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { createClient, UserWithRoles } from '@/utils/supabase/server';
 import { hasAdminRole } from '@/utils/auth-helpers/roles';
 import { redirect } from 'next/navigation';
-import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+import { getErrorRedirect, getStatusRedirect } from 'utils/helpers';
+import { getAuthEmailRedirectUrl } from '@/utils/auth-email-redirect';
 import type { User } from '@supabase/supabase-js';
 
 function isValidEmail(email: string) {
@@ -190,7 +191,7 @@ export async function updateEmail(formData: FormData) {
 
   const supabase = createClient();
 
-  const callbackUrl = getURL(
+  const callbackUrl = await getAuthEmailRedirectUrl(
     getStatusRedirect('/', 'Success!', `Your email has been updated.`)
   );
 
@@ -359,7 +360,9 @@ export async function requestPasswordReset(formData: FormData) {
 
     // Send password reset email
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: getURL('/auth/callback?redirectTo=/auth/update-password')
+      redirectTo: await getAuthEmailRedirectUrl(
+        '/auth/callback?redirectTo=/auth/update-password'
+      )
     });
 
     if (error) {

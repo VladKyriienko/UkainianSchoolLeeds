@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { revalidatePath } from 'next/cache';
+import { getAuthEmailRedirectUrl } from '@/utils/auth-email-redirect';
 
 /**
  * Update profile data
@@ -260,11 +261,13 @@ export async function changeEmailAction(newEmail: string): Promise<{
     const isAdmin = roleRows?.some((role) => role.role === 'admin') ?? false;
     const profileRedirectPath = isAdmin ? '/admin/profile' : '/teacher/profile';
 
+    const emailRedirectTo = await getAuthEmailRedirectUrl(profileRedirectPath);
+
     // Update email (this will send confirmation emails to both addresses)
     const { error: updateError } = await supabase.auth.updateUser(
       { email: newEmail },
       {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${profileRedirectPath}`
+        emailRedirectTo
       }
     );
 
