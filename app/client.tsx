@@ -49,7 +49,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
       <section className="public-hero relative isolate overflow-hidden md:-mx-6 lg:-mx-8">
         <div className="public-hero-image-desktop absolute inset-y-0 right-0 hidden w-[64%] bg-cover bg-center lg:block" />
         <div className="absolute inset-y-0 right-0 hidden w-[64%] bg-gradient-to-b from-white/10 via-transparent to-white/40 lg:block" />
-        <div className="relative z-10 grid min-h-[540px] items-center gap-8 px-4 py-12 md:px-8 lg:grid-cols-[0.52fr_0.48fr] lg:px-14 lg:py-16">
+        <div className="relative z-10 grid min-h-[540px] items-center gap-8 px-0 py-12 pb-0 md:px-8 lg:grid-cols-[0.52fr_0.48fr] lg:px-14 lg:py-16">
           <div className="max-w-xl">
             <h1 className="public-title text-5xl font-bold leading-[0.94] tracking-tight md:text-6xl lg:text-[4.7rem]">
               {content.hero.titleLines.map((line) => (
@@ -89,7 +89,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           </div>
 
           <div className="relative min-h-[330px] lg:min-h-[430px]">
-            <div className="public-hero-image-mobile absolute inset-0 overflow-hidden rounded-[1.5rem] bg-cover bg-center shadow-xl shadow-slate-900/10 lg:hidden" />
+            <div className="public-hero-image-mobile absolute inset-0 overflow-hidden bg-cover bg-center shadow-xl shadow-slate-900/10 lg:hidden" />
             <div className="public-floating-card absolute bottom-5 right-4 max-w-[20rem] rounded-2xl border p-5 shadow-xl shadow-slate-900/10 backdrop-blur md:right-8 lg:hidden">
               <div className="flex gap-4">
                 <span className="public-icon-warm flex h-14 w-14 shrink-0 items-center justify-center rounded-full">
