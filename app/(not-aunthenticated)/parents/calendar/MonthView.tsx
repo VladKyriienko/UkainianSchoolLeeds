@@ -309,8 +309,8 @@ export function MonthView({ events, schedules }: MonthViewProps) {
                         className={cn(
                           'block text-xs p-1 rounded truncate hover:opacity-80',
                           item.event.start_time
-                            ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
-                            : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                            ? 'bg-secondary text-secondary-foreground dark:bg-primary/30 dark:text-foreground'
+                            : 'bg-muted text-foreground dark:bg-muted'
                         )}
                         title={title}
                       >

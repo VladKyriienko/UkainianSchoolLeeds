@@ -21,30 +21,36 @@ export function PublicFooter({ className }: PublicFooterProps) {
   const content = FOOTER_CONTENT[language];
 
   return (
-    <footer className={className ?? 'border-t border-ukraine-yellow py-8 bg-ukraine-header-bg text-ukraine-header-fg'}>
-      <div className="container mx-auto px-4 text-center text-sm text-ukraine-header-muted">
+    <footer className={className ?? 'border-t border-ukraine-yellow bg-ukraine-header-bg py-8 text-ukraine-header-fg'}>
+      <div className="container mx-auto px-4 text-center text-base text-ukraine-header-muted">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Useful Information */}
           <div>
-            <h3 className="font-bold text-lg mb-4 text-ukraine-header-fg">{content.usefulInfoTitle}</h3>
-            <p className="text-sm leading-relaxed">{content.usefulInfoDescription}</p>
+            <p className="mb-4 text-base font-semibold text-ukraine-header-fg">{content.usefulInfoTitle}</p>
+            <p className="leading-relaxed">{content.usefulInfoDescription}</p>
           </div>
 
           {/* Contact Us */}
           <div>
-            <h3 className="font-bold text-lg mb-4 text-ukraine-header-fg">{content.contactTitle}</h3>
-            <div className="text-sm space-y-2">
+            <p className="mb-4 text-base font-semibold text-ukraine-header-fg">{content.contactTitle}</p>
+            <div className="space-y-2">
               {content.contactAddress.map((line, index) => (
                 <p key={index}>{line}</p>
               ))}
               <p>
-                <a href={`mailto:${content.contactEmail}`} className="hover:text-ukraine-yellow hover:underline transition-colors">
+                <a
+                  href={`mailto:${content.contactEmail}`}
+                  className="transition-colors hover:text-ukraine-yellow hover:underline"
+                >
                   {content.contactEmail}
                 </a>
               </p>
               <p>
-                <a href={`tel:${content.contactPhone.replace(/\s/g, '')}`} className="hover:text-ukraine-yellow hover:underline transition-colors">
+                <a
+                  href={`tel:${content.contactPhone.replace(/\s/g, '')}`}
+                  className="transition-colors hover:text-ukraine-yellow hover:underline"
+                >
                   {content.contactPhone}
                 </a>
               </p>
@@ -53,9 +59,7 @@ export function PublicFooter({ className }: PublicFooterProps) {
 
           {/* Social Media */}
           <div>
-            <h3 className="font-bold text-lg mb-4 text-ukraine-header-fg">
-              {content.socialTitle}
-            </h3>
+            <p className="mb-4 text-base font-semibold text-ukraine-header-fg">{content.socialTitle}</p>
             <nav className="flex items-center justify-center gap-4">
               {content.socialLinks.map((link) => {
                 const Icon = SOCIAL_ICON_BY_LABEL[link.label];
@@ -67,9 +71,9 @@ export function PublicFooter({ className }: PublicFooterProps) {
                     target="_blank"
                     rel="noreferrer noopener"
                     aria-label={link.label}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-ukraine-yellow/40 text-ukraine-header-fg/90 hover:text-ukraine-yellow hover:border-ukraine-yellow transition-colors"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-ukraine-yellow/40 text-ukraine-header-fg/90 transition-colors hover:border-ukraine-yellow hover:text-ukraine-yellow"
                   >
-                    {Icon ? <Icon className="h-5 w-5" /> : <span className="text-xs">{link.label}</span>}
+                    {Icon ? <Icon className="h-5 w-5" /> : <span className="text-base">{link.label}</span>}
                   </a>
                 );
               })}
@@ -79,13 +83,13 @@ export function PublicFooter({ className }: PublicFooterProps) {
 
         {/* Bottom Section */}
         <div className="border-t border-ukraine-yellow pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+          <div className="flex flex-col items-center justify-between gap-4 text-base md:flex-row">
             <p>{content.copyright}</p>
             <div className="flex gap-4">
-              <Link href="/cookies-policy" className="hover:text-ukraine-yellow hover:underline transition-colors">
+              <Link href="/cookies-policy" className="transition-colors hover:text-ukraine-yellow hover:underline">
                 {content.cookiesPolicy}
               </Link>
-              <Link href="/privacy-policy" className="hover:text-ukraine-yellow hover:underline transition-colors">
+              <Link href="/privacy-policy" className="transition-colors hover:text-ukraine-yellow hover:underline">
                 {content.privacyPolicy}
               </Link>
             </div>
@@ -95,4 +99,3 @@ export function PublicFooter({ className }: PublicFooterProps) {
     </footer>
   );
 }
-

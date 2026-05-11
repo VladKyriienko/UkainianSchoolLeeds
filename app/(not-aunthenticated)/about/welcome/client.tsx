@@ -88,17 +88,17 @@ export default function WelcomeContent() {
         return (
           <section
             key={section.title}
-            className="public-section-divider border-b pb-10 last:border-b-0 last:pb-0"
+            className="border-b border-border pb-10 last:border-b-0 last:pb-0"
           >
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
-              <span className="public-icon-soft flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
                 <Icon className="h-5 w-5" />
               </span>
-              <h2 className="public-title text-3xl font-bold leading-tight">
+              <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground">
                 {section.title}
               </h2>
             </div>
-            <div className="public-text space-y-4 text-base leading-7 md:text-lg md:leading-8">
+            <div className="space-y-4 text-muted-foreground">
               {section.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}

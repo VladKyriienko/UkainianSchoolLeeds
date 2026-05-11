@@ -259,10 +259,8 @@ export default async function UserDetailsPage({
                         return (
                           <Card key={index} className="border-dashed">
                             <CardContent className="pt-4">
-                              <h3 className="font-semibold text-sm">
-                                {org.organisation?.name}
-                              </h3>
-                              <p className="text-xs text-muted-foreground">
+                              <h3 className="font-semibold leading-snug font-display text-foreground">{org.organisation?.name}</h3>
+                              <p className="text-muted-foreground">
                                 /{org.organisation?.slug}
                               </p>
                               <Badge

@@ -102,10 +102,8 @@ export function CompletionBanner({
               <div className="flex items-center gap-2">
                 {getStatusIcon(completionData.percentage)}
                 <div>
-                  <h3 className="font-semibold text-sm">
-                    Complete Your Profile
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
+                  <h3 className="font-semibold leading-snug font-display text-foreground">Complete Your Profile</h3>
+                  <p className="text-muted-foreground">
                     {completionData.percentage}% complete (
                     {completionData.completedFields.length} of{' '}
                     {completionData.totalFields} fields)
@@ -130,7 +128,7 @@ export function CompletionBanner({
 
             {completionData.missingFields.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground">
                   Missing: {getMissingFieldLabels().join(', ')}
                   {completionData.missingFields.length > 3 &&
                     ` and ${completionData.missingFields.length - 3} more`}

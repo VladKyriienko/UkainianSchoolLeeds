@@ -16,14 +16,14 @@ export default function LanguageToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleLanguage}
-      className="h-9 px-2 gap-1.5"
+      className="h-9 gap-1.5 px-2 text-base"
       aria-label={language === 'en' ? 'Switch to Ukrainian' : 'Перемкнути на англійську'}
       title={language === 'en' ? 'Switch to Ukrainian' : 'Перемкнути на англійську'}
     >
       <span className="text-base leading-none">
         {targetFlag}
       </span>
-      <span className="text-xs font-medium">
+      <span className="font-medium leading-none text-base">
         {targetLabel}
       </span>
     </Button>

@@ -12,8 +12,8 @@ export default async function TeacherClassPage() {
         description="Your assigned class details."
       >
         <div className="mt-8 rounded-lg border bg-card p-6">
-          <h2 className="mb-2 text-xl font-semibold">No class assigned</h2>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="font-semibold leading-snug font-display text-foreground">No class assigned</h3>
+          <p className="text-muted-foreground">
             You currently do not have a class assigned. Please contact an admin.
           </p>
         </div>
@@ -27,28 +27,28 @@ export default async function TeacherClassPage() {
       description="Your assigned class details."
     >
       <div className="mt-8 rounded-lg border bg-card p-6">
-        <h2 className="mb-2 text-xl font-semibold">{assignedClass.title}</h2>
+        <h3 className="font-semibold leading-snug font-display text-foreground">{assignedClass.title}</h3>
         {assignedClass.title_uk && (
-          <p className="text-sm text-muted-foreground mb-3">{assignedClass.title_uk}</p>
+          <p className="mb-3 text-muted-foreground">{assignedClass.title_uk}</p>
         )}
         {(() => {
           const description =
             assignedClass.description || assignedClass.description_uk || '';
           if (!description) {
             return (
-              <p className="text-sm text-muted-foreground">No description.</p>
+              <p className="text-muted-foreground">No description.</p>
             );
           }
           if (isHtmlContent(description)) {
             return (
               <div
-                className="rich-text-content text-sm text-muted-foreground"
+                className="rich-text-content text-muted-foreground"
                 dangerouslySetInnerHTML={{ __html: description }}
               />
             );
           }
           return (
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+            <p className="whitespace-pre-wrap text-muted-foreground">
               {description}
             </p>
           );

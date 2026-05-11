@@ -11,8 +11,8 @@ export default async function TeacherHomePage() {
       description="Teacher dashboard for Ukrainia School."
     >
       <div className="mt-8 rounded-lg border bg-card p-6">
-        <h2 className="mb-2 text-xl font-semibold">Teacher workspace</h2>
-        <p className="text-sm text-muted-foreground">
+        <h3 className="font-semibold leading-snug font-display text-foreground">Teacher workspace</h3>
+        <p className="text-muted-foreground">
           This is your teacher dashboard. Additional teacher tools can be added
           here.
         </p>

@@ -38,7 +38,7 @@ export default async function NewsViewPage({
   const supabaseAdmin = createAdminClient();
   const photoUrl = item.photo
     ? supabaseAdmin.storage.from('news-photos').getPublicUrl(item.photo).data
-        .publicUrl
+      .publicUrl
     : null;
 
   return (

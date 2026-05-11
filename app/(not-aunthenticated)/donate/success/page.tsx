@@ -12,7 +12,7 @@ export default function DonateSuccessPage() {
 
   return (
     <div className="max-w-md mx-auto">
-      <Card>
+      <Card hoverable={false}>
         <CardHeader>
           <CardTitle className="text-2xl text-ukraine-blue">{content.successTitle}</CardTitle>
         </CardHeader>

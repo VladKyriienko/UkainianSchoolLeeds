@@ -40,7 +40,7 @@ function getToolbarButtonClass(isActive: boolean): string {
   return cn(
     toolbarButtonClass,
     isActive &&
-    'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60'
+    'bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/25 dark:text-primary dark:hover:bg-primary/35'
   );
 }
 

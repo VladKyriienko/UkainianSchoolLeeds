@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Mail, Phone, MapPin, Clock, AlertCircle, Navigation } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
 import { CONTACT_CONTENT } from '@/content/contact';
+import { cn } from '@/utils/cn';
 
 export default function ContactContent() {
   const { language } = useLanguage();
@@ -64,7 +65,7 @@ export default function ContactContent() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Contact Form */}
-      <Card className="min-w-0">
+      <Card hoverable={false} className="min-w-0">
         <CardHeader>
           <CardTitle>{content.formTitle}</CardTitle>
         </CardHeader>
@@ -156,7 +157,7 @@ export default function ContactContent() {
 
       {/* Contact Information */}
       <div className="space-y-6 min-w-0">
-        <Card className="min-w-0">
+        <Card hoverable={false} className="min-w-0">
           <CardHeader>
             <CardTitle>{content.infoTitle}</CardTitle>
           </CardHeader>
@@ -164,8 +165,8 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <MapPin className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div className="min-w-0">
-                <h3 className="font-semibold mb-1">{content.addressTitle}</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
+                <h3 className={cn('font-semibold leading-snug font-display text-foreground', 'mb-1')}>{content.addressTitle}</h3>
+                <p className="text-muted-foreground whitespace-pre-line wrap-break-word">
                   {content.addressText}
                 </p>
               </div>
@@ -174,10 +175,10 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Phone className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div className="min-w-0">
-                <h3 className="font-semibold mb-1">{content.phoneTitle}</h3>
+                <h3 className={cn('font-semibold leading-snug font-display text-foreground', 'mb-1')}>{content.phoneTitle}</h3>
                 <a
                   href={`tel:${content.phoneValue}`}
-                  className="text-sm text-muted-foreground hover:underline break-words"
+                  className="text-muted-foreground hover:underline wrap-break-word"
                 >
                   {content.phoneValue}
                 </a>
@@ -187,10 +188,10 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Mail className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div className="min-w-0">
-                <h3 className="font-semibold mb-1">{content.emailTitle}</h3>
+                <h3 className={cn('font-semibold leading-snug font-display text-foreground', 'mb-1')}>{content.emailTitle}</h3>
                 <a
                   href={`mailto:${content.emailValue}`}
-                  className="text-sm text-muted-foreground hover:underline break-all"
+                  className="text-muted-foreground hover:underline break-all"
                 >
                   {content.emailValue}
                 </a>
@@ -200,8 +201,8 @@ export default function ContactContent() {
             <div className="flex items-start gap-4">
               <Clock className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
               <div className="min-w-0">
-                <h3 className="font-semibold mb-1">{content.hoursTitle}</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
+                <h3 className={cn('font-semibold leading-snug font-display text-foreground', 'mb-1')}>{content.hoursTitle}</h3>
+                <p className="text-muted-foreground whitespace-pre-line wrap-break-word">
                   {content.hoursText}
                 </p>
               </div>
@@ -209,12 +210,12 @@ export default function ContactContent() {
           </CardContent>
         </Card>
 
-        <Card className="min-w-0">
+        <Card hoverable={false} className="min-w-0">
           <CardHeader>
             <CardTitle>{content.emergencyTitle}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm">{content.emergencyText}</p>
+            <p>{content.emergencyText}</p>
           </CardContent>
         </Card>
       </div>
@@ -222,15 +223,15 @@ export default function ContactContent() {
       {/* Map — full-width section without card container */}
       <section className="lg:col-span-2 min-w-0 space-y-4">
         <div className="space-y-3">
-          <h2 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-            <MapPin className="h-5 w-5" />
+          <h2 className="max-md:text-2xl font-bold tracking-tight md:text-h2 font-display text-foreground flex items-center gap-2">
+            <MapPin className="h-5 w-5 shrink-0" />
             {content.addressTitle}
           </h2>
           <div className="flex items-start gap-4">
-            <Navigation className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+            <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
             <div className="min-w-0">
-              <h3 className="font-semibold mb-1 text-sm">{content.directionsTitle}</h3>
-              <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
+              <h3 className={cn('font-semibold leading-snug font-display text-foreground', 'mb-1')}>{content.directionsTitle}</h3>
+              <p className="text-muted-foreground whitespace-pre-line wrap-break-word">
                 {content.directionsText}
               </p>
             </div>

@@ -44,8 +44,6 @@ export function PageWrapper({
   const translatedTitle = typeof title === 'string' ? title : title[language];
   const translatedDescription = getTranslatedText(description, language);
 
-  const hasHeaderActions = goBackButton || actions;
-
   return (
     <div className={cn('w-full', className)}>
       {(goBackButton || actions) ? (
@@ -54,15 +52,24 @@ export function PageWrapper({
           <div className="order-2">{actions}</div>
         </div>
       ) : null}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{translatedTitle}</h1>
+      <header className="mb-8 space-y-2">
+        <h1 className="mb-2 font-display text-5xl font-bold leading-tight tracking-tight text-foreground">
+          {translatedTitle}
+        </h1>
         {translatedDescription ? (
-          <p className="text-muted-foreground">{translatedDescription}</p>
+          typeof translatedDescription === 'string' ? (
+            <h2 className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">
+              {translatedDescription}
+            </h2>
+          ) : (
+            <div className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">
+              {translatedDescription}
+            </div>
+          )
         ) : null}
-      </div>
+      </header>
 
       {children}
     </div>
   );
 }
-

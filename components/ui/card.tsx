@@ -2,19 +2,41 @@ import * as React from 'react';
 
 import { cn } from '@/utils/cn';
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'rounded-lg border bg-card text-card-foreground shadow-sm',
-      className
-    )}
-    {...props}
-  />
-));
+/** Card border, radius, and base shadow — no hover motion. */
+export const CARD_SURFACE_STATIC_CLASSNAME =
+  'rounded-2xl border border-border/60 bg-card text-card-foreground shadow-md shadow-primary/5';
+
+/** Hover / focus-style elevation (use with `CARD_SURFACE_STATIC_CLASSNAME`). */
+export const CARD_SURFACE_HOVER_CLASSNAME =
+  'transition duration-400 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/20';
+
+/** Full default surface including hover — for custom elements (e.g. `<article>`). */
+export const CARD_SURFACE_CLASSNAME = cn(
+  CARD_SURFACE_STATIC_CLASSNAME,
+  CARD_SURFACE_HOVER_CLASSNAME
+);
+
+export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
+  /**
+   * When `false`, keeps the same surface but disables lift and stronger shadow on hover.
+   * @default true
+   */
+  hoverable?: boolean;
+};
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, hoverable = true, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        CARD_SURFACE_STATIC_CLASSNAME,
+        hoverable && CARD_SURFACE_HOVER_CLASSNAME,
+        className
+      )}
+      {...props}
+    />
+  )
+);
 Card.displayName = 'Card';
 
 const CardHeader = React.forwardRef<
@@ -30,13 +52,13 @@ const CardHeader = React.forwardRef<
 CardHeader.displayName = 'CardHeader';
 
 const CardTitle = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <div
+  <h3
     ref={ref}
     className={cn(
-      'text-2xl font-semibold leading-none tracking-tight',
+      'font-display font-semibold leading-snug tracking-tight',
       className
     )}
     {...props}

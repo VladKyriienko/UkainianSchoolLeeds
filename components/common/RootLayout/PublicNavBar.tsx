@@ -134,22 +134,21 @@ export function PublicNavBar({
 
   const linkClass = (isActive: boolean) =>
     cn(
-      'inline-flex items-center gap-1 px-1 pb-2 text-sm font-medium transition-colors',
-      'text-ukraine-header-muted hover:text-ukraine-header-fg',
-      'border-b-2 border-transparent hover:border-ukraine-yellow/50',
-      isActive && 'text-ukraine-header-fg border-ukraine-yellow'
+      'inline-flex items-center gap-1 px-1 pb-2 text-base font-medium leading-snug transition-colors',
+      'border-b-2 border-transparent text-ukraine-header-muted hover:border-ukraine-yellow/50 hover:text-ukraine-header-fg',
+      isActive && 'border-ukraine-yellow text-ukraine-header-fg'
     );
 
   return (
-    <header className="border-b-[3px] border-ukraine-yellow bg-ukraine-header-bg text-ukraine-header-fg fixed top-0 left-0 right-0 z-[200] min-h-[4.5rem] flex items-center isolate">
+    <header className="border-b-[3px] border-ukraine-yellow bg-ukraine-header-bg text-ukraine-header-fg fixed top-0 left-0 right-0 z-200 min-h-18 flex items-center isolate">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between w-full">
         {/* Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity text-ukraine-header-fg"
         >
-          <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
-          <span className="flex flex-col text-xs font-semibold leading-tight">
+          <Image src="/logo.png" alt="Ukrainia School" width={48} height={48} className="h-12 w-12 object-contain shrink-0" />
+          <span className="flex flex-col text-base font-semibold leading-tight text-ukraine-header-fg">
             <span>{BRAND_NAME_LINES[language].line1}</span>
             <span>{BRAND_NAME_LINES[language].line2}</span>
           </span>
@@ -157,7 +156,7 @@ export function PublicNavBar({
 
         {/* Desktop Navigation */}
         {showNavigation && (
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-4 lg:gap-3 xl:gap-8">
             {navigationItems.map((item) => {
               const isActive = activeKey === item.key;
               const hasChildren = item.key === 'keyInfo' || !!item.children?.length;
@@ -219,7 +218,7 @@ export function PublicNavBar({
                               key={child.href}
                               href={child.href}
                               className={cn(
-                                'block rounded-lg px-4 py-3 text-sm transition-colors text-ukraine-header-fg',
+                                'block rounded-lg px-4 py-3 text-base transition-colors text-ukraine-header-fg',
                                 childActive
                                   ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
                                   : 'hover:bg-ukraine-yellow hover:text-ukraine-blue'
@@ -232,7 +231,7 @@ export function PublicNavBar({
                           );
                         })
                       ) : isKeyInfo ? (
-                        <p className="px-4 py-3 text-sm text-ukraine-header-muted">
+                        <p className="px-4 py-3 text-base text-ukraine-header-muted">
                           {keyInfoMenuContent.empty}
                         </p>
                       ) : null}
@@ -306,7 +305,7 @@ export function PublicNavBar({
                 aria-describedby={undefined}
                 className={cn(
                   'w-[300px] sm:w-[400px] overflow-y-auto px-4 bg-ukraine-header-bg text-ukraine-header-fg border-0 shadow-none',
-                  '!top-[4.5rem] h-[calc(100vh-4.5rem)]'
+                  'top-18! h-[calc(100vh-4.5rem)]'
                 )}
                 overlayClassName="!top-[4.5rem] h-[calc(100vh-4.5rem)]"
                 overlayStyle={{
@@ -335,7 +334,7 @@ export function PublicNavBar({
                             key={item.key}
                             href={item.href}
                             className={cn(
-                              'block rounded-lg px-4 py-3 text-sm font-medium transition-colors text-ukraine-header-fg',
+                              'block rounded-lg px-4 py-3 text-base font-medium transition-colors text-ukraine-header-fg',
                               isActive
                                 ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
                                 : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
@@ -354,7 +353,7 @@ export function PublicNavBar({
                           <button
                             type="button"
                             className={cn(
-                              'w-full flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors text-ukraine-header-fg',
+                              'w-full flex items-center justify-between rounded-lg px-4 py-3 text-base font-medium transition-colors text-ukraine-header-fg',
                               isActive
                                 ? 'bg-ukraine-yellow/30 text-ukraine-yellow'
                                 : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
@@ -385,7 +384,7 @@ export function PublicNavBar({
                                       key={child.href}
                                       href={child.href}
                                       className={cn(
-                                        'block rounded-lg px-4 py-2 text-sm transition-colors',
+                                        'block rounded-lg px-4 py-2 text-base transition-colors',
                                         childActive
                                           ? 'bg-ukraine-yellow/20 text-ukraine-yellow font-medium'
                                           : 'text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg'
@@ -397,7 +396,7 @@ export function PublicNavBar({
                                   );
                                 })
                               ) : isKeyInfo ? (
-                                <p className="px-4 py-2 text-sm text-ukraine-header-muted">
+                                <p className="px-4 py-2 text-base text-ukraine-header-muted">
                                   {keyInfoMenuContent.empty}
                                 </p>
                               ) : null}
