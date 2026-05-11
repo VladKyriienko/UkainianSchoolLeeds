@@ -81,11 +81,13 @@ export function CookieConsentPopup() {
   if (!isReady || !isOpen) return null;
 
   return (
-    <div className="cookie-consent-banner fixed inset-x-0 bottom-0 z-[1200] border-t shadow-2xl shadow-slate-950/20 backdrop-blur">
+    <div className="border-t border-primary/40 bg-primary/95 text-primary-foreground supports-[backdrop-filter]:bg-primary/90 fixed inset-x-0 bottom-0 z-[1200] shadow-2xl shadow-slate-950/20 backdrop-blur">
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6 md:py-5">
         <div className="min-w-0">
-          <h2 className="text-base font-semibold">{content.title}</h2>
-          <p className="mt-1 text-sm text-white/85">
+          <h2 className="font-sans text-lg font-semibold leading-normal text-primary-foreground">
+            {content.title}
+          </h2>
+          <p className="mt-1 text-base text-white/85">
             {content.description}{' '}
             <Link href="/cookies-policy" className="underline underline-offset-2 text-white">
               {content.policy}
@@ -99,7 +101,7 @@ export function CookieConsentPopup() {
             variant="outline"
             size="default"
             onClick={handleReject}
-            className="public-button-outline"
+            className="border border-primary-foreground/70 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
           >
             {content.reject}
           </Button>
@@ -107,7 +109,7 @@ export function CookieConsentPopup() {
             type="button"
             size="default"
             onClick={handleAccept}
-            className="public-button-yellow"
+            className="bg-ukraine-yellow text-foreground hover:bg-[rgb(234,179,8)]"
           >
             {content.accept}
           </Button>

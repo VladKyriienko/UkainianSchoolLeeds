@@ -74,8 +74,8 @@ function ProfileCard({ teacher, aboutMeLabel, compact }: ProfileCardProps) {
             {initials}
           </AvatarFallback>
         </Avatar>
-        <h3 className="font-bold text-foreground mb-1">{name}</h3>
-        <p className="text-sm text-muted-foreground mb-4 leading-snug min-h-[2.5rem]">
+        <h3 className={cn('font-semibold leading-snug font-display text-foreground', 'mb-1')}>{name}</h3>
+        <p className="mb-4 min-h-[2.5rem] leading-snug text-muted-foreground">
           {title}
         </p>
         <Button variant="secondary" size="sm" className="rounded-lg" asChild>
@@ -120,7 +120,7 @@ export default function WhosWhoContent({ teachers }: WhosWhoContentProps) {
 
       {coreTeam.length > 0 && (
         <>
-          <h2 className="text-2xl font-bold text-center mb-8">{coreTeamTitle}</h2>
+          <h2 className="mb-8 max-md:text-2xl font-bold tracking-tight md:text-h2 font-display text-foreground text-center">{coreTeamTitle}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {coreTeam.map((teacher) => (
               <ProfileCard

@@ -19,6 +19,9 @@ type HomeContent = {
     description: string;
     cta: string;
     imageAlt: string;
+    /** Hero image for the “more than a school” block */
+    imageSrc: string;
+    highlights: string[];
   };
   news: {
     eyebrow: string;
@@ -26,10 +29,69 @@ type HomeContent = {
     viewAll: string;
     emptyMessage: string;
   };
+  parentVoices: {
+    titleBefore: string;
+    titleHighlight: string;
+    titleAfter: string;
+    items: { quote: string; attribution: string }[];
+  };
+  faq: {
+    titleBefore: string;
+    titleHighlight: string;
+    titleAfter: string;
+    items: { question: string; answer: string }[];
+  };
   cta: {
-    title: string;
+    titleBefore: string;
+    /** Place name in the CTA headline (e.g. Leeds / Лідсі). */
+    titleHighlight: string;
+    /** Trailing punctuation (e.g. `!`) — heart icon is rendered immediately after. */
+    titleAfter: string;
     description: string;
-    button: string;
+    submit: string;
+    placeholders: {
+      parentName: string;
+      phone: string;
+      email: string;
+      childAge: string;
+    };
+    /** Inbox subject for this lead (home page form). */
+    messageSubject: string;
+    submitting: string;
+    successMessage: string;
+    errorMessage: string;
+    fillAllFields: string;
+  };
+  whyChooseUs: {
+    heading: string;
+    cards: {
+      image: string;
+      title: string;
+      description: string;
+    }[];
+  };
+  programs: {
+    headingBefore: string;
+    headingHighlight: string;
+    learnMore: string;
+    cards: {
+      image: string;
+      title: string;
+      subtitle: string;
+      description: string;
+      href?: string;
+    }[];
+  };
+  /** Photo strip: heading + CTA + gallery */
+  schoolAtmosphere: {
+    heading: string;
+    cta: string;
+    ctaHref: string;
+    images: { src: string; alt: string }[];
+  };
+  /** Row under hero CTAs: icon + two-line label (language via HOME_CONTENT). */
+  heroTrust: {
+    items: { line1: string; line2: string }[];
   };
 };
 
@@ -39,7 +101,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       titleLines: ['Ukrainian Saturday School'],
       titleAccent: 'in Leeds',
       subtitle:
-        'Ukrainian School is a modern educational space where every child discovers their potential, gains knowledge, and grows into a confident person.',
+        "Ukrainian School Leeds is a space where children learn, communicate in Ukrainian, and feel connected to their family's culture.",
       primaryCta: 'Learn more',
       secondaryCta: 'View school life',
       mission:
@@ -68,13 +130,18 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       }
     ],
     about: {
-      eyebrow: 'About school',
-      title: 'General information about the school',
+      eyebrow: 'About our school',
+      title: 'More than a school',
       description:
-        'Lessons take place every Saturday from 14:00 to 17:30. The school has three age groups for children aged 5 to 14 and teaches Ukrainian and English languages, history, culture, geography, music, drama, and art.',
-      cta: 'Read more',
-      imageAlt:
-        'Building of the Association of Ukrainians in Great Britain Leeds Branch'
+        'Ukrainian School Leeds is a space where children not only learn, but also feel pride in their culture, communicate in Ukrainian, and find friends for life.',
+      cta: 'About our school',
+      imageAlt: 'Children with the Ukrainian flag in Leeds',
+      imageSrc: '/home-hero-school.png',
+      highlights: [
+        'Modern approach to learning',
+        'Safe and friendly environment',
+        'Support for children and families'
+      ]
     },
     news: {
       eyebrow: 'News and events',
@@ -82,11 +149,201 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       viewAll: 'All news',
       emptyMessage: 'No news yet. Check back later.'
     },
+    parentVoices: {
+      titleBefore: 'What ',
+      titleHighlight: 'parents',
+      titleAfter: ' say',
+      items: [
+        {
+          quote:
+            'Our daughter looks forward to Saturdays. She speaks Ukrainian more confidently and has made friends who share the same roots.',
+          attribution: "Maria, Sofia's mum"
+        },
+        {
+          quote:
+            'The teachers are warm and professional. We feel welcome as a family and always know what is happening at school.',
+          attribution: 'Olena, mum of two'
+        },
+        {
+          quote:
+            'Traditions, songs, and community events mean a lot to us. The school helps our children stay close to Ukraine while growing up in Leeds.',
+          attribution: "Andriy, Marko's dad"
+        },
+        {
+          quote:
+            'I appreciate the clear communication and the care for every child. It is more than lessons — it is a second home for our grandchildren.',
+          attribution: "Iryna, Hanka's grandmother"
+        },
+        {
+          quote:
+            'We were new to the city and found support here immediately. The school connects families and keeps our language alive.',
+          attribution: "Petro, Yurko's dad"
+        }
+      ]
+    },
+    faq: {
+      titleBefore: 'Frequently asked ',
+      titleHighlight: 'questions',
+      titleAfter: '',
+      items: [
+        {
+          question: 'Where do classes take place?',
+          answer:
+            'Lessons are held at our venue in Leeds on Saturdays during term time. The exact address and room details are shared with families after enrolment.'
+        },
+        {
+          question: 'What ages is the school for?',
+          answer:
+            'We welcome children roughly from ages 4 to 16, grouped by age so that activities and language level match their stage of development.'
+        },
+        {
+          question: 'Do children need to speak Ukrainian fluently?',
+          answer:
+            'No. Some families speak Ukrainian at home and others are just beginning. Teachers support every child so they can grow in confidence step by step.'
+        },
+        {
+          question: 'How are classes organised?',
+          answer:
+            'Groups combine Ukrainian language, culture, and creative activities. The timetable includes breaks and varies by age group - see class pages for more detail.'
+        },
+        {
+          question: 'How can I book a trial lesson?',
+          answer:
+            'Contact us by email or phone and we will suggest a suitable Saturday visit. You can meet the team and see how your child responds to the group.'
+        },
+        {
+          question: 'How much does tuition cost?',
+          answer:
+            'Fees depend on the group and number of siblings. We will send the current fee schedule when you get in touch so you have clear information before enrolling.'
+        }
+      ]
+    },
     cta: {
-      title: 'Ready to become part of our school family?',
+      titleBefore: 'Join Ukrainian School in ',
+      titleHighlight: 'Leeds',
+      titleAfter: '!',
       description:
-        'We invite you to get to know the school and join our community.',
-      button: 'Contact us'
+        "Leave your details - we'll get in touch with groups, timetable, and learning options.",
+      submit: 'Register my child',
+      placeholders: {
+        parentName: "Parent's name",
+        phone: 'Phone',
+        email: 'Email',
+        childAge: "Child's age"
+      },
+      messageSubject: 'Home page — child registration',
+      submitting: 'Sending…',
+      successMessage: 'Thank you! We will contact you soon.',
+      errorMessage:
+        'Something went wrong. Please try again or use the contact page.',
+      fillAllFields: 'Please fill in all fields.'
+    },
+    heroTrust: {
+      items: [
+        {
+          line1: 'For children',
+          line2: '4–16 years'
+        },
+        {
+          line1: 'Classes',
+          line2: 'in Leeds'
+        },
+        {
+          line1: 'Ukrainian language,',
+          line2: 'culture and traditions'
+        }
+      ]
+    },
+    whyChooseUs: {
+      heading: 'Why families choose our school',
+      cards: [
+        {
+          image: '/hero/hero-card-1.png',
+          title: 'Ukrainian language',
+          description:
+            'Children learn, practise, and confidently use Ukrainian in daily life and conversation.'
+        },
+        {
+          image: '/hero/hero-card-2.png',
+          title: 'Culture and traditions',
+          description:
+            'Holidays, creativity, songs, history, and Ukrainian customs - we keep our roots together.'
+        },
+        {
+          image: '/hero/hero-card-3.png',
+          title: 'Caring teachers',
+          description:
+            'A professional approach, attention to every child, and modern teaching methods.'
+        },
+        {
+          image: '/hero/hero-card-4.png',
+          title: 'Ukrainian community',
+          description:
+            'Children find friends, and families find support and the feeling of a wider Ukrainian family in Leeds.'
+        }
+      ]
+    },
+    schoolAtmosphere: {
+      heading: "Our school's atmosphere",
+      cta: 'See more photos',
+      ctaHref: '/parents/news',
+      images: [
+        {
+          src: '/hero-home-classroom.png',
+          alt: 'Children drawing and learning together at a desk'
+        },
+        {
+          src: '/hero-home-classroom.png',
+          alt: 'Children outdoors with the Ukrainian flag'
+        },
+        {
+          src: '/hero-home-classroom.png',
+          alt: 'Children celebrating Ukrainian culture at school'
+        },
+        {
+          src: '/hero-home-classroom.png',
+          alt: 'Pupils taking part in a classroom activity'
+        }
+      ]
+    },
+    programs: {
+      headingBefore: 'Educational ',
+      headingHighlight: 'programs',
+      learnMore: 'Learn more',
+      cards: [
+        {
+          image: '/hero-home-classroom.png',
+          title: 'Junior group',
+          subtitle: 'Ages 4–7',
+          description:
+            'Play-based learning, speech development, reading, writing, and creative activities.',
+          href: '/parents/class-pages'
+        },
+        {
+          image: '/hero-home-classroom.png',
+          title: 'Middle group',
+          subtitle: 'Ages 8–11',
+          description:
+            'Deeper study of Ukrainian language, literature, history, and culture.',
+          href: '/parents/class-pages'
+        },
+        {
+          image: '/hero-home-classroom.png',
+          title: 'Senior group',
+          subtitle: 'Ages 12–16',
+          description:
+            'Advanced learning, projects, discussions, and preparation for Ukrainian language assessments.',
+          href: '/parents/class-pages'
+        },
+        {
+          image: '/hero-home-classroom.png',
+          title: 'Creative activities',
+          subtitle: 'All age groups',
+          description:
+            'Masterclasses, folk dance, vocals, theatre clubs, and festive cultural events.',
+          href: '/parents/class-pages'
+        }
+      ]
     }
   },
   uk: {
@@ -94,11 +351,11 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       titleLines: ['Українська суботня школа'],
       titleAccent: 'у Лідсі',
       subtitle:
-        'Українська школа — це сучасний освітній простір, де кожна дитина розкриває свій потенціал, здобуває знання та зростає щасливою особистістю.',
+        "Ukrainian School Leeds - це простір, де діти навчаються, спілкуються українською та відчувають зв'язок із культурою своєї родини.",
       primaryCta: 'Дізнатися більше',
       secondaryCta: 'Дивитися шкільне життя',
       mission:
-        'Наша місія — виховати покоління свідомих, творчих та відповідальних громадян України.'
+        'Наша місія - виховати покоління свідомих, творчих та відповідальних громадян України.'
     },
     features: [
       {
@@ -123,13 +380,18 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       }
     ],
     about: {
-      eyebrow: 'Про школу',
-      title: 'Загальна інформація про школу',
+      eyebrow: 'Про нашу школу',
+      title: 'Більше ніж школа',
       description:
-        'Навчання проходить кожної суботи з 14:00 до 17:30. Школа має три вікові групи для дітей від 5 до 14 років, де викладаються українська та англійська мови, історія, культурологія, географія, музика, акторська майстерність і образотворче мистецтво.',
-      cta: 'Читати більше',
-      imageAlt:
-        'Будівля Association of Ukrainians in Great Britain Leeds Branch'
+        'Ukrainian School Leeds - це простір, де діти не тільки вчаться, а й відчувають гордість за свою культуру, спілкуються українською та знаходять друзів на все життя.',
+      cta: 'Про нашу школу',
+      imageAlt: 'Діти з прапором України у Лідсі',
+      imageSrc: '/home-hero-school.png',
+      highlights: [
+        'Сучасний підхід до навчання',
+        'Безпечне та дружнє середовище',
+        'Підтримка дітей та родин'
+      ]
     },
     news: {
       eyebrow: 'Новини та події',
@@ -137,10 +399,201 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       viewAll: 'Всі новини',
       emptyMessage: 'Новини поки немає. Завітайте пізніше.'
     },
+    parentVoices: {
+      titleBefore: 'Що ',
+      titleHighlight: 'кажуть',
+      titleAfter: ' батьки',
+      items: [
+        {
+          quote:
+            'Наша дочка з нетерпінням чекає на суботу. Вона впевненіше говорить українською й знайшла друзів зі спільними коренями.',
+          attribution: 'Марія, мама Софійки'
+        },
+        {
+          quote:
+            'Викладачі теплі й професійні. Ми відчуваємо себе бажаними родиною і завжди в курсі шкільних подій.',
+          attribution: 'Олена, мама двох дітей'
+        },
+        {
+          quote:
+            'Традиції, пісні та спільні заходи для нас важливі. Школа допомагає дітям бути ближче до України, зростаючи в Лідсі.',
+          attribution: 'Андрій, тато Марка'
+        },
+        {
+          quote:
+            'Ціную зрозумілу комунікацію й турботу про кожну дитину. Це більше ніж уроки — це другий дім для онуків.',
+          attribution: 'Ірина, бабуся Ганки'
+        },
+        {
+          quote:
+            'Ми нещодавно переїхали в місто й одразу знайшли підтримку тут. Школа з’єднує родини й береже нашу мову.',
+          attribution: 'Петро, тато Юрка'
+        }
+      ]
+    },
+    faq: {
+      titleBefore: 'Часті ',
+      titleHighlight: 'запитання',
+      titleAfter: '',
+      items: [
+        {
+          question: 'Де проходять заняття?',
+          answer:
+            'Заняття відбуваються у Лідсі по суботах упродовж навчального року. Точну адресу та деталі класу ми надсилаємо родинам після запису.'
+        },
+        {
+          question: 'Для якого віку школа?',
+          answer:
+            'Ми запрошуємо дітей приблизно від 4 до 16 років: групи формуються за віком, щоб завдання та мовне навантаження відповідали розвитку дитини.'
+        },
+        {
+          question: 'Чи потрібно добре знати українську?',
+          answer:
+            'Ні. У когось українська — рідна мова вдома, у когось - тільки початок. Викладачі підтримують кожну дитину, щоб вона впевнено росла крок за кроком.'
+        },
+        {
+          question: 'Як проходять заняття?',
+          answer:
+            'Уроки поєднують мову, культуру та творчі активності. Розклад залежить від віку групи; детальніше — на сторінках класів.'
+        },
+        {
+          question: 'Як записатися на пробне заняття?',
+          answer:
+            'Напишіть або зателефонуйте - запропонуємо зручну суботу для візиту. Ви познайомитеся з командою й побачите, як дитині у групі.'
+        },
+        {
+          question: 'Скільки коштує навчання?',
+          answer:
+            'Вартість залежить від групи та кількості дітей у родині. Актуальний прайс надсилаємо після звернення, щоб ви мали всю інформацію перед записом.'
+        }
+      ]
+    },
     cta: {
-      title: 'Готові стати частиною нашої шкільної родини?',
-      description: 'Запрошуємо на знайомство зі школою та до нашої спільноти.',
-      button: 'Контакт з нами'
+      titleBefore: 'Приєднуйтесь до Української Школи в ',
+      titleHighlight: 'Лідсі',
+      titleAfter: '!',
+      description:
+        'Залиште заявку - ми зв’яжемося з вами та розповімо про групи, розклад і навчання.',
+      submit: 'Записати дитину',
+      placeholders: {
+        parentName: "Ім'я батька",
+        phone: 'Телефон',
+        email: 'Email',
+        childAge: 'Вік дитини'
+      },
+      messageSubject: 'Головна - заявка на запис дитини',
+      submitting: 'Надсилаємо…',
+      successMessage: 'Дякуємо! Ми зв’яжемося з вами найближчим часом.',
+      errorMessage:
+        'Не вдалося надіслати. Спробуйте ще раз або сторінку «Контакти».',
+      fillAllFields: 'Будь ласка, заповніть усі поля.'
+    },
+    heroTrust: {
+      items: [
+        {
+          line1: 'Для дітей',
+          line2: '4–16 років'
+        },
+        {
+          line1: 'Заняття',
+          line2: 'у Leeds'
+        },
+        {
+          line1: 'Українська мова,',
+          line2: 'культура та традиції'
+        }
+      ]
+    },
+    whyChooseUs: {
+      heading: 'Чому родини обирають нашу школу',
+      cards: [
+        {
+          image: '/hero/hero-card-1.png',
+          title: 'Українська мова',
+          description:
+            'Діти вивчають, практикують і впевнено використовують українську у житті та спілкуванні.'
+        },
+        {
+          image: '/hero/hero-card-2.png',
+          title: 'Культура та традиції',
+          description:
+            'Свята, творчість, пісні, історія та українські звичаї - зберігаємо наше коріння разом.'
+        },
+        {
+          image: '/hero/hero-card-3.png',
+          title: 'Турботливі викладачі',
+          description:
+            'Професійний підхід, увага до кожної дитини та сучасні методи навчання.'
+        },
+        {
+          image: '/hero/hero-card-4.png',
+          title: 'Українська спільнота',
+          description:
+            'Діти знаходять друзів, а родини - підтримку та відчуття великої української родини в Лідсі.'
+        }
+      ]
+    },
+    schoolAtmosphere: {
+      heading: 'Атмосфера нашої школи',
+      cta: 'Дивитися більше фото',
+      ctaHref: '/parents/news',
+      images: [
+        {
+          src: '/hero-home-classroom.png',
+          alt: 'Діти малюють та навчаються за партою'
+        },
+        {
+          src: '/home-hero-school.png',
+          alt: 'Діти на вулиці з прапором України'
+        },
+        {
+          src: '/hero/hero-card-1.png',
+          alt: 'Святкування української культури у школі'
+        },
+        {
+          src: '/hero/hero-card-2.png',
+          alt: 'Учні під час заняття в класі'
+        }
+      ]
+    },
+    programs: {
+      headingBefore: 'Програми ',
+      headingHighlight: 'навчання',
+      learnMore: 'Дізнатися більше',
+      cards: [
+        {
+          image: '/hero/hero-card-1.png',
+          title: 'Молодша група',
+          subtitle: '4–7 років',
+          description:
+            'Ігрова форма навчання, розвиток мовлення, читання, письмо, творчі заняття.',
+          href: '/parents/class-pages'
+        },
+        {
+          image: '/hero/hero-card-2.png',
+          title: 'Середня група',
+          subtitle: '8–11 років',
+          description:
+            'Поглиблене вивчення мови, літератури, історії та культури України.',
+          href: '/parents/class-pages'
+        },
+        {
+          image: '/hero/hero-card-3.png',
+          title: 'Старша група',
+          subtitle: '12–16 років',
+          description:
+            'Поглиблене навчання, проєкти, дискусії, підготовка до екзаменів з української мови.',
+          href: '/parents/class-pages'
+        },
+        {
+          image: '/hero/hero-card-4.png',
+          title: 'Творчі заняття',
+          subtitle: 'Для всіх вікових груп',
+          description:
+            'Майстер-класи, народні танці, вокал, театральні гуртки, святкові та культурні події.',
+          href: '/parents/class-pages'
+        }
+      ]
     }
   }
 };

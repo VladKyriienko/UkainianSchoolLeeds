@@ -287,9 +287,7 @@ export function ListView({ events, schedules }: ListViewProps) {
               return (
                 <div key={dateKey}>
                   {showMonthHeader && (
-                    <h2 className="text-base font-normal mb-6 text-muted-foreground">
-                      {monthYear}
-                    </h2>
+                    <h2 className="mb-6 font-sans text-body font-semibold text-muted-foreground">{monthYear}</h2>
                   )}
 
                   <div className="space-y-6">
@@ -331,14 +329,14 @@ export function ListView({ events, schedules }: ListViewProps) {
                             </div>
 
                             <div className="flex-1">
-                              <div className="text-sm text-foreground/60 mb-1">
+                              <div className="mb-1 text-base text-foreground/60">
                                 {format(eventDate, 'MMMM d', { locale: dateLocale })}
                               </div>
-                              <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                              <h3 className="font-semibold leading-snug font-display text-foreground mb-1 flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 {title}
                               </h3>
-                              <div className="text-sm text-muted-foreground mt-1">
+                              <div className="mt-1 text-base text-muted-foreground">
                                 {content.schedule.openPdf}
                               </div>
                             </div>
@@ -362,7 +360,7 @@ export function ListView({ events, schedules }: ListViewProps) {
                           </div>
 
                           <div className="flex-1">
-                            <div className="text-sm text-foreground/60 mb-1">
+                            <div className="mb-1 text-base text-foreground/60">
                               {format(eventDate, 'MMMM d', { locale: dateLocale })}
                               {!isSchedule && event.start_time && (
                                 <>
@@ -373,12 +371,12 @@ export function ListView({ events, schedules }: ListViewProps) {
                               )}
                             </div>
 
-                            <h3 className="text-lg font-semibold mb-1">
+                            <h3 className="font-semibold leading-snug font-display text-foreground mb-1">
                               {title}
                             </h3>
 
                             {location && (
-                              <div className="text-sm text-muted-foreground">
+                              <div className="text-base text-muted-foreground">
                                 <span className="font-medium">Meanwood School</span> {location}
                               </div>
                             )}
@@ -390,7 +388,7 @@ export function ListView({ events, schedules }: ListViewProps) {
                                   dangerouslySetInnerHTML={{ __html: description }}
                                 />
                               ) : (
-                                <div className="text-sm text-muted-foreground mt-1">
+                                <div className="mt-1 text-base text-muted-foreground">
                                   {description}
                                 </div>
                               )

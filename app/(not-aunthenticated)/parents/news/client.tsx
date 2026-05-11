@@ -42,7 +42,7 @@ export default function NewsContent({ news }: Props) {
 
           return (
             <li key={item.id}>
-              <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
+              <Card className="h-full overflow-hidden">
                 {item.photoUrl ? (
                   <div className="aspect-video w-full overflow-hidden bg-muted">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -56,12 +56,12 @@ export default function NewsContent({ news }: Props) {
                 <CardContent className="pt-4 pb-4">
                   <p className="text-xs text-muted-foreground mb-2">
                     {item.date
-                    ? format(new Date(item.date), 'd MMM yyyy', {
+                      ? format(new Date(item.date), 'd MMM yyyy', {
                         locale: language === 'uk' ? uk : enUS
                       })
-                    : ''}
+                      : ''}
                   </p>
-                  <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-2">
+                  <h3 className="font-semibold leading-snug font-display text-foreground mb-2 line-clamp-2">
                     {title}
                   </h3>
                   {description ? (
@@ -71,7 +71,7 @@ export default function NewsContent({ news }: Props) {
                         dangerouslySetInnerHTML={{ __html: description }}
                       />
                     ) : (
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                      <p className="mb-4 line-clamp-3 text-muted-foreground">
                         {description}
                       </p>
                     )

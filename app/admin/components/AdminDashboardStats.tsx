@@ -67,7 +67,7 @@ export function AdminDashboardStats({
         const value = stats[key];
         return (
           <Link key={href} href={href}>
-            <Card className="h-full transition-shadow hover:shadow-md">
+            <Card className="h-full">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
                   <Icon className="h-5 w-5 text-muted-foreground" />

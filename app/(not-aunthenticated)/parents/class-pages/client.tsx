@@ -43,9 +43,9 @@ export default function ClassPagesContent({ classes }: Props) {
 
           return (
             <li key={cls.id}>
-              <Card className="h-full transition-shadow hover:shadow-md">
+              <Card className="h-full">
                 <CardContent className="pt-6 pb-6">
-                  <h3 className="font-semibold text-lg text-foreground mb-2">{title}</h3>
+                  <h3 className="font-semibold leading-snug font-display text-foreground mb-2">{title}</h3>
                   {description ? (
                     isHtmlContent(description) ? (
                       <div
@@ -53,7 +53,7 @@ export default function ClassPagesContent({ classes }: Props) {
                         dangerouslySetInnerHTML={{ __html: description }}
                       />
                     ) : (
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                      <p className="mb-4 line-clamp-3 text-muted-foreground">
                         {description}
                       </p>
                     )

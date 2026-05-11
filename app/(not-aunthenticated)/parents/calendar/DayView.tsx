@@ -185,13 +185,13 @@ export function DayView({ events, schedules }: DayViewProps) {
                         <FileText className="h-4 w-4 mt-1" />
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm text-foreground/60 mb-2">
+                        <div className="mb-2 text-base text-foreground/60">
                           {format(currentDate, 'MMMM d', { locale: dateLocale })}
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">
+                        <h3 className="font-semibold leading-snug font-display text-foreground mb-2">
                           {content.schedule.title}
                         </h3>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-base text-muted-foreground">
                           {content.schedule.openPdf}
                         </div>
                       </div>
@@ -228,7 +228,7 @@ export function DayView({ events, schedules }: DayViewProps) {
                     {/* Event Content */}
                     <div className="flex-1">
                       {/* Date and Time */}
-                      <div className="text-sm text-foreground/60 mb-2">
+                      <div className="mb-2 text-base text-foreground/60">
                         {format(eventDate, 'MMMM d', { locale: dateLocale })}
                         {event.start_time && (
                           <>
@@ -240,13 +240,13 @@ export function DayView({ events, schedules }: DayViewProps) {
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-xl font-semibold mb-2">
+                      <h3 className="font-semibold leading-snug font-display text-foreground mb-2">
                         {title}
                       </h3>
 
                       {/* Location */}
                       {location && (
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-base text-muted-foreground">
                           <span className="font-medium">Meanwood School</span> {location}
                         </div>
                       )}
@@ -259,7 +259,7 @@ export function DayView({ events, schedules }: DayViewProps) {
                             dangerouslySetInnerHTML={{ __html: description }}
                           />
                         ) : (
-                          <div className="text-sm text-muted-foreground mt-2">
+                          <div className="mt-2 text-base text-muted-foreground">
                             {description}
                           </div>
                         )

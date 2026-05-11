@@ -1,10 +1,24 @@
 import { Metadata } from 'next';
 import { PropsWithChildren } from 'react';
+import { Inter, Manrope } from 'next/font/google';
 import { getURL } from '@/utils/helpers';
 import { cookies } from 'next/headers';
 import Providers from '@/providers/providers';
 import 'styles/main.css';
 import { getCurrentUser } from '@/utils/auth-helpers/server';
+import { cn } from '@/utils/cn';
+
+const inter = Inter({
+  subsets: ['latin', 'cyrillic-ext'],
+  variable: '--font-inter',
+  display: 'swap'
+});
+
+const manrope = Manrope({
+  subsets: ['latin', 'cyrillic-ext'],
+  variable: '--font-manrope',
+  display: 'swap'
+});
 
 const title = 'Ukrainia School';
 const description = 'Ukrainia School is a school for Ukrainian children.';
@@ -30,7 +44,11 @@ export default async function Layout({ children }: PropsWithChildren) {
   const { user, profileData } = await getCurrentUser();
 
   return (
-    <html lang="en" className={theme || 'light'} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${manrope.variable} ${theme || 'light'}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           async
@@ -39,7 +57,15 @@ export default async function Layout({ children }: PropsWithChildren) {
         />
       </head>
       <Providers user={user} userData={profileData}>
-        <body suppressHydrationWarning>{children}</body>
+        <body
+          className={cn(
+            inter.className,
+            'min-h-full bg-background text-foreground antialiased text-body'
+          )}
+          suppressHydrationWarning
+        >
+          {children}
+        </body>
       </Providers>
     </html>
   );

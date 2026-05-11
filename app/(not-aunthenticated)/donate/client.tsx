@@ -60,7 +60,7 @@ export default function DonateClient() {
   };
 
   return (
-    <Card className="max-w-md mx-auto">
+    <Card hoverable={false} className="max-w-md mx-auto">
       <CardHeader>
         <CardTitle>{content.formTitle}</CardTitle>
       </CardHeader>

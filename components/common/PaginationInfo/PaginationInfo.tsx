@@ -17,7 +17,7 @@ export function PaginationInfo({
 }: PaginationInfoProps) {
   if (totalItems === 0) {
     return (
-      <p className={`text-sm text-gray-600 ${className}`}>
+      <p className={`text-sm text-muted-foreground ${className}`}>
         No {itemName} found
       </p>
     );
@@ -25,7 +25,7 @@ export function PaginationInfo({
 
   if (totalPages <= 1) {
     return (
-      <p className={`text-sm text-gray-600 ${className}`}>
+      <p className={`text-sm text-muted-foreground ${className}`}>
         Showing {totalItems}{' '}
         {totalItems === 1 ? itemName.slice(0, -1) : itemName}
       </p>
@@ -36,7 +36,7 @@ export function PaginationInfo({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <p className={`text-sm text-gray-600 ${className}`}>
+    <p className={`text-sm text-muted-foreground ${className}`}>
       Showing {startItem}-{endItem} of {totalItems} {itemName} (Page{' '}
       {currentPage} of {totalPages})
     </p>

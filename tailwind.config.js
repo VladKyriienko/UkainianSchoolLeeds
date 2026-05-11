@@ -1,4 +1,5 @@
-import { fontFamily } from 'tailwindcss/defaultTheme';
+import defaultTheme from 'tailwindcss/defaultTheme';
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -18,7 +19,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', ...fontFamily.sans]
+        sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
+        display: ['var(--font-manrope)', 'var(--font-inter)', ...defaultTheme.fontFamily.sans]
+      },
+      fontSize: {
+        body: ['1.125rem', { lineHeight: '1.75' }],
+        h1: ['4rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        h2: ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        h4: ['1.375rem', { lineHeight: '1.35', letterSpacing: '-0.01em' }]
       },
       keyframes: {
         'accordion-down': {
@@ -88,6 +96,13 @@ export default {
           'header-fg': 'rgb(var(--ukraine-header-fg))',
           'header-muted': 'rgb(var(--ukraine-header-muted))'
         },
+        brand: {
+          blue: '#2563EB',
+          'blue-light': '#EFF6FF',
+          yellow: '#FACC15',
+          ink: '#111827',
+          muted: '#6B7280'
+        },
         sidebar: {
           DEFAULT: 'rgb(var(--sidebar))',
           foreground: 'rgb(var(--sidebar-foreground))',
@@ -101,5 +116,5 @@ export default {
       }
     }
   },
-  plugins: [require('tailwindcss-animate')]
+  plugins: [tailwindcssAnimate]
 };

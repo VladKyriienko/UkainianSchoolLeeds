@@ -14,7 +14,7 @@ export default async function AdminHomePage() {
       description="Admin dashboard for Ukrainia School."
     >
       <div className="mt-8">
-        <h2 className="mb-4 text-2xl font-semibold">Statistics</h2>
+        <h2 className="max-md:text-2xl font-bold tracking-tight md:text-h2 font-display text-foreground mb-4">Statistics</h2>
         <AdminDashboardStats stats={stats} />
       </div>
     </PageWrapper>

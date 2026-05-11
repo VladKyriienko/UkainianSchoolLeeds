@@ -22,7 +22,7 @@ export function DocumentContent({ document }: DocumentContentProps) {
   const content = CONTENT[language];
 
   if (!document) {
-    return <p className="public-text text-base leading-7">{content.noDocument}</p>;
+    return <p className="text-base leading-7 text-muted-foreground">{content.noDocument}</p>;
   }
 
   const documentContent =
@@ -37,7 +37,7 @@ export function DocumentContent({ document }: DocumentContentProps) {
           dangerouslySetInnerHTML={{ __html: documentContent }}
         />
       ) : (
-        <p className="public-text whitespace-pre-line text-base leading-7">
+        <p className="whitespace-pre-line text-base leading-7 text-muted-foreground">
           {documentContent}
         </p>
       )}
