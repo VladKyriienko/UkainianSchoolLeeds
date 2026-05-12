@@ -90,11 +90,11 @@ export default function WelcomeContent() {
             key={section.title}
             className="border-b border-border pb-10 last:border-b-0 last:pb-0"
           >
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="mb-6 flex flex-row items-start gap-4">
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
                 <Icon className="h-5 w-5" />
               </span>
-              <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground">
+              <h2 className="font-display text-2xl md:text-4xl font-bold leading-tight tracking-tight text-foreground">
                 {section.title}
               </h2>
             </div>

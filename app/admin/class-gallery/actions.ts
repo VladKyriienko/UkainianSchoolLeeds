@@ -60,6 +60,7 @@ function ensureClassAccess(ctx: GalleryAccessContext, classId: string) {
 }
 
 function revalidateGalleryPaths(id?: string) {
+  revalidatePath('/');
   revalidatePath('/admin/class-gallery');
   revalidatePath('/teacher/class-gallery');
   if (id) {

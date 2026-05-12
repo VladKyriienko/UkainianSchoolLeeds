@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useLanguage } from '@/providers/language-provider';
 import { NEWS_CONTENT } from '@/content/news';
-import type { PublicNews } from './actions';
+import type { PublicNews } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Newspaper, ChevronRight } from 'lucide-react';

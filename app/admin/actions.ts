@@ -9,6 +9,7 @@ import { listDocuments } from '@/app/admin/documents/actions';
 import { listNews } from '@/app/admin/news/actions';
 import { listClasses } from '@/app/admin/classes/actions';
 import { listGalleryItems } from '@/app/admin/class-gallery/actions';
+import { listReviews } from '@/app/admin/reviews/actions';
 
 export type AdminDashboardStats = {
   usersCount: number;
@@ -18,6 +19,7 @@ export type AdminDashboardStats = {
   donationsTotal: number;
   documentsTotal: number;
   newsTotal: number;
+  reviewsTotal: number;
   classesTotal: number;
   galleryTotal: number;
 };
@@ -31,6 +33,7 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     donationsResult,
     documentsResult,
     newsResult,
+    reviewsResult,
     classesResult,
     galleryResult
   ] = await Promise.all([
@@ -41,6 +44,7 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     listDonations({ page: 1, limit: 1 }),
     listDocuments({ page: 1, limit: 1 }),
     listNews({ page: 1, limit: 1 }),
+    listReviews({ page: 1, limit: 1 }),
     listClasses({ page: 1, limit: 1 }),
     listGalleryItems({ page: 1, limit: 1 })
   ]);
@@ -53,6 +57,7 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     donationsTotal: donationsResult.total,
     documentsTotal: documentsResult.total,
     newsTotal: newsResult.total,
+    reviewsTotal: reviewsResult.total,
     classesTotal: classesResult.total,
     galleryTotal: galleryResult.total
   };

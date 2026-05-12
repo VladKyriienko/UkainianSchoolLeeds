@@ -47,43 +47,49 @@ export function ScheduleSearchForm({
   }, [router, pathname, dateFrom, dateTo, searchParams]);
 
   return (
-    <div className="space-y-4 sm:flex sm:flex-wrap sm:items-end sm:gap-4">
-      <div className="flex gap-4 flex-wrap items-end">
-        <div className="space-y-1">
-          <Label htmlFor="schedule-dateFrom" className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            Date from
-          </Label>
-          <DatePicker
-            date={parseInputDate(dateFrom)}
-            onDateChange={(date) => {
-              const next = toInputDateValue(date);
-              setDateFrom(next);
-              if (dateTo && next && next > dateTo) {
-                setDateTo(next);
-              }
-            }}
-            placeholder="Date from"
-            buttonClassName="h-10 w-[180px]"
-            disabled={(date) => {
-              const to = parseInputDate(dateTo);
-              return to ? date > to : false;
-            }}
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="schedule-dateTo">Date to</Label>
-          <DatePicker
-            date={parseInputDate(dateTo)}
-            onDateChange={(date) => setDateTo(toInputDateValue(date))}
-            placeholder="Date to"
-            buttonClassName="h-10 w-[180px]"
-            disabled={(date) => {
-              const from = parseInputDate(dateFrom);
-              return from ? date < from : false;
-            }}
-          />
-        </div>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label
+          htmlFor="schedule-dateFrom"
+          className="flex min-h-10 shrink-0 items-end gap-1.5 text-sm font-medium leading-snug"
+        >
+          <Calendar className="size-4 shrink-0" aria-hidden />
+          <span>Date from</span>
+        </Label>
+        <DatePicker
+          date={parseInputDate(dateFrom)}
+          onDateChange={(date) => {
+            const next = toInputDateValue(date);
+            setDateFrom(next);
+            if (dateTo && next && next > dateTo) {
+              setDateTo(next);
+            }
+          }}
+          placeholder="Date from"
+          buttonClassName="h-10 w-[160px]"
+          disabled={(date) => {
+            const to = parseInputDate(dateTo);
+            return to ? date > to : false;
+          }}
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label
+          htmlFor="schedule-dateTo"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
+        >
+          Date to
+        </Label>
+        <DatePicker
+          date={parseInputDate(dateTo)}
+          onDateChange={(date) => setDateTo(toInputDateValue(date))}
+          placeholder="Date to"
+          buttonClassName="h-10 w-[160px]"
+          disabled={(date) => {
+            const from = parseInputDate(dateFrom);
+            return from ? date < from : false;
+          }}
+        />
       </div>
     </div>
   );

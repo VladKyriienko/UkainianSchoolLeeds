@@ -2,10 +2,7 @@
 
 import { createAdminClient } from '@/utils/supabase/admin';
 import type { Tables } from '@/utils/supabase/types';
-
-export type PublicNews = Tables<'news'> & {
-  photoUrl: string | null;
-};
+import type { PublicNews } from '@/types';
 
 function withPhotoUrl(supabase: ReturnType<typeof createAdminClient>, item: Tables<'news'>): PublicNews {
   const photoUrl = item.photo
