@@ -81,38 +81,51 @@ export function CookieConsentPopup() {
   if (!isReady || !isOpen) return null;
 
   return (
-    <div className="border-t border-primary/40 bg-primary/95 text-primary-foreground supports-[backdrop-filter]:bg-primary/90 fixed inset-x-0 bottom-0 z-[1200] shadow-2xl shadow-slate-950/20 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6 md:py-5">
-        <div className="min-w-0">
-          <h2 className="font-sans text-lg font-semibold leading-normal text-primary-foreground">
-            {content.title}
-          </h2>
-          <p className="mt-1 text-base text-white/85">
-            {content.description}{' '}
-            <Link href="/cookies-policy" className="underline underline-offset-2 text-white">
-              {content.policy}
-            </Link>
-          </p>
-        </div>
+    <div className="fixed inset-x-0 bottom-0 z-1200 px-2 pb-2 pt-0 md:px-4 md:pb-3">
+      <div
+        role="dialog"
+        aria-labelledby="cookie-consent-title"
+        className="mx-auto w-full max-w-[1400px] rounded-t-2xl border border-border bg-card text-card-foreground shadow-[0_-12px_40px_rgba(0,0,0,0.18)] ring-1 ring-black/5 dark:ring-white/10"
+      >
+        <div className="h-1 w-full rounded-t-[inherit] bg-linear-to-r" aria-hidden />
+        <div className="flex w-full flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6 md:py-5">
+          <div className="min-w-0">
+            <h2
+              id="cookie-consent-title"
+              className="font-sans text-lg font-semibold leading-normal text-foreground"
+            >
+              {content.title}
+            </h2>
+            <p className="mt-1 text-base text-muted-foreground">
+              {content.description}{' '}
+              <Link
+                href="/cookies-policy"
+                className="font-medium text-primary underline underline-offset-2 hover:text-primary/90"
+              >
+                {content.policy}
+              </Link>
+            </p>
+          </div>
 
-        <div className="flex shrink-0 items-center gap-2 self-end md:self-auto">
-          <Button
-            type="button"
-            variant="outline"
-            size="default"
-            onClick={handleReject}
-            className="border border-primary-foreground/70 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
-          >
-            {content.reject}
-          </Button>
-          <Button
-            type="button"
-            size="default"
-            onClick={handleAccept}
-            className="bg-ukraine-yellow text-foreground hover:bg-[rgb(234,179,8)]"
-          >
-            {content.accept}
-          </Button>
+          <div className="flex shrink-0 items-center gap-2 self-end md:self-auto">
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={handleReject}
+              className="border-border bg-background text-foreground hover:bg-muted"
+            >
+              {content.reject}
+            </Button>
+            <Button
+              type="button"
+              size="default"
+              onClick={handleAccept}
+              className="bg-ukraine-yellow text-foreground hover:bg-[rgb(234,179,8)]"
+            >
+              {content.accept}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
