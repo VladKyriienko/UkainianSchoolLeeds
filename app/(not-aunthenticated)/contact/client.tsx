@@ -223,7 +223,7 @@ export default function ContactContent() {
       {/* Map — full-width section without card container */}
       <section className="lg:col-span-2 min-w-0 space-y-4">
         <div className="space-y-3">
-          <h2 className="max-md:text-2xl font-bold tracking-tight md:text-h2 font-display text-foreground flex items-center gap-2">
+          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight font-display text-foreground flex items-center gap-2">
             <MapPin className="h-5 w-5 shrink-0" />
             {content.addressTitle}
           </h2>

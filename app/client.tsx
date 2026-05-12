@@ -2,8 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -62,69 +61,310 @@ const ABOUT_SNOWFLAKES = [
 
 type ParentVoiceItem = { quote: string; attribution: string };
 
-/** Parent testimonial carousel (Embla). Copy lives in `HOME_CONTENT.*.parentVoices`. */
+function clampScrollLeft(root: HTMLDivElement, left: number): number {
+  const max = Math.max(0, root.scrollWidth - root.clientWidth);
+  return Math.min(max, Math.max(0, left));
+}
+
+function scrollSlideIntoView(
+  root: HTMLDivElement,
+  slide: HTMLElement,
+  align: 'center' | 'start',
+  behavior: ScrollBehavior = 'smooth'
+): void {
+  const rootRect = root.getBoundingClientRect();
+  const slideRect = slide.getBoundingClientRect();
+  const slideLeftInScroller = slideRect.left - rootRect.left + root.scrollLeft;
+  const target =
+    align === 'center'
+      ? slideLeftInScroller - (root.clientWidth - slideRect.width) / 2
+      : slideLeftInScroller;
+  root.scrollTo({ left: clampScrollLeft(root, Math.round(target)), behavior });
+}
+
+const PARENT_VOICES_LOOP_SETS = 3;
+
+/** Parent testimonials: horizontal scroll + snap; triple DOM loop for infinite wrap; flex-basis % (peek / 3-up). */
 function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: 'start',
-    containScroll: 'trimSnaps',
-    watchDrag: true
-  });
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const jumpingRef = useRef(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  const n = items.length;
+  const totalSlides = n * PARENT_VOICES_LOOP_SETS;
+
+  const getFocusedPhysicalIndex = useCallback((): number => {
+    const root = scrollerRef.current;
+    const slides = slideRefs.current;
+    if (!root || totalSlides === 0) return 0;
+
+    const rootRect = root.getBoundingClientRect();
+    const isDesktopThreeUp = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
+
+    if (isDesktopThreeUp) {
+      let bestLeft = Infinity;
+      let bestIdx = 0;
+      for (let i = 0; i < totalSlides; i++) {
+        const el = slides[i];
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (r.right <= rootRect.left + 1 || r.left >= rootRect.right - 1) continue;
+        if (r.left < bestLeft) {
+          bestLeft = r.left;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
+    }
+
+    const viewportCenter = rootRect.left + rootRect.width / 2;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < totalSlides; i++) {
+      const el = slides[i];
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      const slideCenter = r.left + r.width / 2;
+      const d = Math.abs(slideCenter - viewportCenter);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }, [totalSlides]);
+
+  const updateSelectedFromScroll = useCallback(() => {
+    if (n === 0) return;
+    const physical = getFocusedPhysicalIndex();
+    setSelectedIndex(((physical % n) + n) % n);
+  }, [getFocusedPhysicalIndex, n]);
+
+  const jumpLoopIfNeeded = useCallback(() => {
+    const root = scrollerRef.current;
+    const slides = slideRefs.current;
+    if (!root || n <= 1 || jumpingRef.current) return;
+
+    const pi = getFocusedPhysicalIndex();
+    let delta = 0;
+    const leftEdge = slides[pi];
+    const midEdge = slides[pi + n];
+    const prevEdge = slides[pi - n];
+    if (pi < n && leftEdge && midEdge) {
+      delta = midEdge.offsetLeft - leftEdge.offsetLeft;
+    } else if (pi >= 2 * n && leftEdge && prevEdge) {
+      delta = prevEdge.offsetLeft - leftEdge.offsetLeft;
+    }
+    if (delta === 0) return;
+
+    jumpingRef.current = true;
+    const prevBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    root.scrollLeft = clampScrollLeft(root, root.scrollLeft + delta);
+    root.style.scrollBehavior = prevBehavior;
+    requestAnimationFrame(() => {
+      jumpingRef.current = false;
+    });
+  }, [getFocusedPhysicalIndex, n]);
+
   useEffect(() => {
-    if (!emblaApi) return undefined;
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
-    emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
-    onSelect();
-    return () => {
-      emblaApi.off('select', onSelect);
-      emblaApi.off('reInit', onSelect);
+    slideRefs.current = new Array(totalSlides).fill(null);
+  }, [totalSlides]);
+
+  useLayoutEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || n === 0) return;
+
+    const mid = slideRefs.current[n];
+    if (!mid) return;
+
+    const centerPeek =
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+    root.style.scrollBehavior = 'auto';
+    scrollSlideIntoView(root, mid, centerPeek ? 'center' : 'start', 'auto');
+    root.style.scrollBehavior = '';
+    setSelectedIndex(0);
+  }, [n, items]);
+
+  /** When all slides fit (no horizontal overflow), center the row; avoids lopsided peek / clipped edges. */
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || n === 0) return undefined;
+
+    const syncJustify = () => {
+      const overflow = root.scrollWidth - root.clientWidth;
+      root.style.justifyContent = overflow <= 2 ? 'center' : 'flex-start';
     };
-  }, [emblaApi]);
+
+    syncJustify();
+    const ro = new ResizeObserver(syncJustify);
+    ro.observe(root);
+    return () => ro.disconnect();
+  }, [n, items]);
+
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || n === 0) return undefined;
+
+    const onScroll = () => {
+      if (!jumpingRef.current) updateSelectedFromScroll();
+    };
+    const onScrollEnd = () => {
+      updateSelectedFromScroll();
+      jumpLoopIfNeeded();
+    };
+
+    updateSelectedFromScroll();
+    root.addEventListener('scroll', onScroll, { passive: true });
+    root.addEventListener('scrollend', onScrollEnd);
+    window.addEventListener('resize', updateSelectedFromScroll);
+    return () => {
+      root.removeEventListener('scroll', onScroll);
+      root.removeEventListener('scrollend', onScrollEnd);
+      window.removeEventListener('resize', updateSelectedFromScroll);
+    };
+  }, [items, n, updateSelectedFromScroll, jumpLoopIfNeeded]);
+
+  /** Scroll snap fights programmatic `scrollTo` — disable snap briefly when jumping via dots/keyboard. */
+  const scrollToPhysical = useCallback((physicalIdx: number) => {
+    const root = scrollerRef.current;
+    const el = slideRefs.current[physicalIdx];
+    if (!root || !el) return;
+
+    const centerPeek =
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+
+    const prevSnap = root.style.scrollSnapType;
+    root.style.scrollSnapType = 'none';
+
+    scrollSlideIntoView(root, el, centerPeek ? 'center' : 'start', 'smooth');
+
+    const restoreSnap = () => {
+      root.style.scrollSnapType = prevSnap || '';
+      updateSelectedFromScroll();
+    };
+
+    root.addEventListener('scrollend', restoreSnap, { once: true });
+    window.setTimeout(restoreSnap, 500);
+  }, [updateSelectedFromScroll]);
+
+  /** Scroll to logical slide using the middle copy (stable loop). */
+  const scrollToSlide = useCallback(
+    (logicalIdx: number) => {
+      if (n === 0) return;
+      const i = ((logicalIdx % n) + n) % n;
+      requestAnimationFrame(() => {
+        scrollToPhysical(n + i);
+      });
+    },
+    [n, scrollToPhysical]
+  );
+
+  const goNext = useCallback(() => {
+    if (n <= 1) return;
+    scrollToSlide(selectedIndex + 1);
+  }, [n, scrollToSlide, selectedIndex]);
+
+  const goPrev = useCallback(() => {
+    if (n <= 1) return;
+    scrollToSlide(selectedIndex - 1);
+  }, [n, scrollToSlide, selectedIndex]);
+
+  if (n === 0) return null;
 
   return (
     <>
       <div
-        ref={emblaRef}
-        className="-mx-2 -my-10 touch-pan-x cursor-grab overflow-hidden px-2 py-10 active:cursor-grabbing sm:-mx-3 sm:px-3"
+        className="mx-auto w-full max-w-full py-10 outline-none"
+        tabIndex={0}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Parent testimonials"
+        onKeyDown={(e) => {
+          if (n <= 1) return;
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            goNext();
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            goPrev();
+          }
+        }}
       >
-        <div className="flex -ml-4 items-stretch">
-          {items.map((item, index) => (
-            <div
-              key={`${item.attribution}-${index}`}
-              className="flex min-h-0 min-w-0 shrink-0 grow-0 basis-full flex-col pl-4 md:basis-1/2 lg:basis-1/3"
-            >
-              <article
-                className={`relative z-0 flex min-h-[220px] h-full flex-col p-6 hover:z-10 ${CARD_SURFACE_CLASSNAME}`}
-              >
-                <Quote className="mb-4 h-8 w-8 shrink-0 text-primary/35" aria-hidden />
-                <p className="flex-1 text-pretty text-sm leading-relaxed text-muted-foreground">{item.quote}</p>
-                <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/50 pt-4">
-                  <p className="text-sm font-semibold text-foreground">{item.attribution}</p>
+        <div
+          ref={scrollerRef}
+          className="flex w-full min-w-0 snap-x snap-mandatory items-stretch gap-4 overflow-x-auto overflow-y-visible overscroll-x-contain px-2 scroll-pl-2 scroll-pr-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none sm:gap-5 sm:px-3 sm:scroll-pl-3 sm:scroll-pr-3 lg:gap-6 lg:px-3 lg:scroll-pl-3 lg:scroll-pr-3 [&::-webkit-scrollbar]:hidden"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          {Array.from({ length: PARENT_VOICES_LOOP_SETS }, (_, set) =>
+            items.map((item, index) => {
+              const physicalIndex = set * n + index;
+              return (
+                <div
+                  key={`pv-${set}-${index}`}
+                  ref={(el) => {
+                    slideRefs.current[physicalIndex] = el;
+                  }}
+                  className="flex min-h-0 shrink-0 grow-0 snap-center flex-col basis-[85%] md:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-3rem)/3)] lg:snap-start"
+                  aria-hidden={set !== 1}
+                >
+                  <article
+                    className={`relative flex min-h-[220px] flex-1 flex-col p-6 ${CARD_SURFACE_STATIC_CLASSNAME}`}
+                  >
+                    <Quote className="mb-4 h-8 w-8 shrink-0 text-primary/35" aria-hidden />
+                    <p className="flex-1 text-pretty text-sm leading-relaxed text-muted-foreground">{item.quote}</p>
+                    <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/50 pt-4">
+                      <p className="text-sm font-semibold text-foreground">{item.attribution}</p>
+                    </div>
+                  </article>
                 </div>
-              </article>
-            </div>
-          ))}
+              );
+            })
+          ).flat()}
         </div>
       </div>
-      <div className="mt-8 flex justify-center gap-2">
+
+      <div className="mt-8 flex justify-center gap-2 px-2">
         {items.map((_, idx) => (
           <button
             key={idx}
             type="button"
             className={`h-2.5 w-2.5 rounded-full transition-colors ${idx === selectedIndex
               ? 'bg-primary'
-              : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+              : 'bg-muted-foreground/30'
               }`}
             aria-label={`Slide ${idx + 1}`}
             aria-current={idx === selectedIndex ? true : undefined}
-            onClick={() => emblaApi?.scrollTo(idx)}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSlide(idx);
+            }}
           />
         ))}
       </div>
     </>
+  );
+}
+
+function HeroFloatingChipTitle({
+  title,
+  heroTitleLines
+}: {
+  title: string;
+  heroTitleLines?: readonly [string, string];
+}) {
+  return (
+    <h3 className="text-base font-semibold leading-snug text-foreground">
+      {heroTitleLines ? (
+        <>
+          <span className="block">{heroTitleLines[0]}</span>
+          <span className="block">{heroTitleLines[1]}</span>
+        </>
+      ) : (
+        title
+      )}
+    </h3>
   );
 }
 
@@ -179,11 +419,11 @@ function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: 
   };
 
   return (
-    <section className="mt-6 w-full min-w-0 max-w-full pb-10">
+    <section className="mt-6 w-full min-w-0 max-w-full pb-0 md:pb-10">
       <div className="w-full min-w-0 overflow-visible rounded-4xl bg-primary px-6 py-10 text-primary-foreground shadow-xl shadow-primary/20 md:px-10 md:py-12 lg:px-12 lg:py-14">
         <div className="flex flex-col items-stretch gap-10 lg:flex-row lg:items-stretch lg:gap-10 xl:gap-14">
           <div className="relative flex min-w-0 shrink-0 flex-col justify-center lg:max-w-xl">
-            <h2 className="text-balance font-display text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            <h2 className="text-balance font-display text-2xl font-bold leading-tight tracking-tight md:text-4xl">
               <span>{cta.titleBefore}</span>
               <span>{cta.titleHighlight}</span>
               <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -305,10 +545,11 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
 
   return (
     <div className="w-full min-w-0 pb-12 text-foreground">
-      {/* Section: Hero — main H1, subtitle, primary/secondary CTAs, trust row, hero image with floating feature chips (`content.hero`, `content.heroTrust`, `content.features`). */}
-      <section className="relative isolate overflow-x-hidden rounded-t-[2.25rem] bg-card py-10 md:-mx-6 md:px-10 md:py-10 md:pb-12 lg:-mx-8 lg:px-12 lg:py-12 lg:pb-14">
-        <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
-          <div className="max-w-2xl">
+      {/* Section: Hero — mobile: H1+lead → image+chips → trust row → CTAs; lg: two columns, left column H1+lead / CTAs / trust (`content.hero`, `content.heroTrust`, `content.features`). */}
+      <section className="relative isolate overflow-x-hidden rounded-t-[2.25rem] bg-card py-6 md:-mx-6 md:px-10 md:py-10 md:pb-12 lg:-mx-8 lg:px-12 lg:py-12 lg:pb-14">
+        <div className="relative z-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
+          {/* Mobile order: copy → photo → trust row → CTAs. Desktop col 1: copy, CTAs, trust; col 2: photo (rows 1–3). */}
+          <div className="max-w-2xl lg:col-start-1 lg:row-start-1 lg:self-start">
             <h1 className="font-display font-bold leading-[1.02] tracking-tight text-foreground max-md:text-4xl md:text-h1">
               {content.hero.titleLines.map((line) => (
                 <span key={line} className="block">
@@ -328,53 +569,9 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
               </span>
             </h1>
             <p className="mt-6 max-w-140 text-muted-foreground">{content.hero.subtitle}</p>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                asChild
-                className="h-12 rounded-full bg-primary px-8 text-primary-foreground shadow-lg shadow-primary/10 transition-colors duration-150 ease-in-out hover:bg-[rgb(29,78,216)]"
-              >
-                <Link href="/about/whos-who" className="gap-2">
-                  {content.hero.primaryCta}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="h-12 rounded-full border border-border bg-card px-8 text-foreground transition-colors duration-150 ease-in-out hover:bg-secondary"
-              >
-                <Link href="/parents/calendar" className="gap-2">
-                  {content.hero.secondaryCta}
-                </Link>
-              </Button>
-            </div>
-
-            <div className="mt-8 flex w-fit max-w-full flex-col gap-5 self-start sm:flex-row sm:flex-nowrap sm:items-center sm:gap-6 lg:gap-10">
-              {content.heroTrust.items.map((item, index) => (
-                <div key={`${item.line1}-${index}`} className="flex shrink-0 items-center gap-3 text-left">
-                  <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary ring-1 ring-primary/15">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={HERO_TRUST_ICON_PATHS[index] ?? HERO_TRUST_ICON_PATHS[0]}
-                      alt=""
-                      className="h-8 w-8 object-contain"
-                    />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold leading-snug text-foreground">{item.line1}</p>
-                    <p className="mt-0.5 text-sm font-semibold leading-snug text-muted-foreground">
-                      {item.line2}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
-          <div className="relative pb-6 lg:pb-8">
+          <div className="relative pb-6 lg:col-span-1 lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:pb-8">
             <div className="relative overflow-hidden rounded-[2.4rem] border border-background/60 shadow-xl shadow-primary/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -389,20 +586,22 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={heroPngIcons.teacher} alt="" className="h-12 w-12 object-contain" />
                 </span>
-                <h3 className="text-base font-semibold leading-snug text-foreground">
-                  {content.features[0]?.title}
-                </h3>
+                <HeroFloatingChipTitle
+                  title={content.features[0]!.title}
+                  heroTitleLines={content.features[0]!.heroTitleLines!}
+                />
               </div>
             </div>
-            <div className="absolute -left-6 bottom-20 z-20 rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-lg backdrop-blur">
+            <div className="absolute bottom-20 left-0 z-20 rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-lg backdrop-blur md:-left-6">
               <div className="flex items-center gap-4">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={heroPngIcons.community} alt="" className="h-12 w-12 object-contain" />
                 </span>
-                <h3 className="text-base font-semibold leading-snug text-foreground">
-                  {content.features[1]?.title}
-                </h3>
+                <HeroFloatingChipTitle
+                  title={content.features[1]!.title}
+                  heroTitleLines={content.features[1]!.heroTitleLines!}
+                />
               </div>
             </div>
             <div className="absolute -bottom-3 right-4 z-20 rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-lg backdrop-blur">
@@ -411,11 +610,56 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={heroPngIcons.creative} alt="" className="h-12 w-12 object-contain" />
                 </span>
-                <h3 className="text-base font-semibold leading-snug text-foreground">
-                  {content.features[2]?.title}
-                </h3>
+                <HeroFloatingChipTitle
+                  title={content.features[2]!.title}
+                  heroTitleLines={content.features[2]!.heroTitleLines!}
+                />
               </div>
             </div>
+          </div>
+
+          <div className="flex w-fit max-w-full flex-col gap-5 self-start sm:flex-row sm:flex-nowrap sm:items-center sm:gap-6 lg:col-start-1 lg:row-start-3 lg:gap-10 lg:self-start">
+            {content.heroTrust.items.map((item, index) => (
+              <div key={`${item.line1}-${index}`} className="flex shrink-0 items-center gap-3 text-left">
+                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary ring-1 ring-primary/15">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={HERO_TRUST_ICON_PATHS[index] ?? HERO_TRUST_ICON_PATHS[0]}
+                    alt=""
+                    className="h-8 w-8 object-contain"
+                  />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold leading-snug text-foreground">{item.line1}</p>
+                  <p className="mt-0.5 text-sm font-semibold leading-snug text-muted-foreground">
+                    {item.line2}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row lg:col-start-1 lg:row-start-2">
+            <Button
+              size="lg"
+              asChild
+              className="h-12 rounded-full bg-primary px-8 text-primary-foreground shadow-lg shadow-primary/10 transition-colors duration-150 ease-in-out hover:bg-[rgb(29,78,216)]"
+            >
+              <Link href="/about/whos-who" className="gap-2">
+                {content.hero.primaryCta}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
+              className="h-12 rounded-full border border-border bg-card px-8 text-foreground transition-colors duration-150 ease-in-out hover:bg-secondary"
+            >
+              <Link href="/parents/calendar" className="gap-2">
+                {content.hero.secondaryCta}
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -424,7 +668,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
       <section
         id="why-choose-us"
         aria-labelledby="why-choose-us-heading"
-        className="-mx-4 w-[calc(100%+2rem)] max-w-none scroll-mt-24 py-12 md:-mx-6 md:w-[calc(100%+3rem)] md:py-16 lg:-mx-8 lg:w-[calc(100%+4rem)]"
+        className="-mx-4 w-[calc(100%+2rem)] max-w-none scroll-mt-24 py-6 md:-mx-6 md:w-[calc(100%+3rem)] md:py-16 lg:-mx-8 lg:w-[calc(100%+4rem)]"
       >
         <div className="flex flex-col items-center px-4 text-center md:px-6 lg:px-8">
           <div className="relative mb-4 flex flex-col items-center">
@@ -447,7 +691,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           </div>
           <h2
             id="why-choose-us-heading"
-            className="mx-auto max-w-3xl text-center font-display text-4xl font-bold leading-tight tracking-tight text-foreground"
+            className="mx-auto max-w-3xl text-center font-display text-2xl font-bold leading-tight tracking-tight text-foreground md:text-4xl"
           >
             {content.whyChooseUs.heading}
           </h2>
@@ -478,16 +722,16 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
         </div>
       </section>
 
-      {/* Section: Programs / offerings — horizontal scroll of program cards with images and links (`content.programs`). Anchor: #programs. */}
+      {/* Section: Programs — same layout pattern as school atmosphere strip: in-flow width, snap row, room for hover shadow (`content.programs`). Anchor: #programs. */}
       <section
         id="programs"
         aria-labelledby="programs-heading"
-        className="-mx-4 w-[calc(100%+2rem)] max-w-none scroll-mt-24 py-12 md:-mx-6 md:w-[calc(100%+3rem)] md:py-16 lg:-mx-8 lg:w-[calc(100%+4rem)]"
+        className="scroll-mt-24 py-6 md:py-14"
       >
-        <div className="px-4 text-center md:px-6 lg:px-8">
+        <div className="text-center">
           <h2
             id="programs-heading"
-            className="font-display text-balance text-4xl font-bold leading-tight tracking-tight text-foreground"
+            className="font-display text-balance text-2xl font-bold leading-tight tracking-tight text-foreground md:text-4xl"
           >
             <span>{content.programs.headingBefore}</span>
             <span className="relative inline-block">
@@ -500,47 +744,49 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           </h2>
         </div>
 
-        <div className="p-10 md:px-6 lg:px-8">
-          <div className="flex justify-center snap-x snap-mandatory gap-4 overflow-x-auto pb-10 pt-10 [-ms-overflow-style:none] scrollbar-thin md:gap-6 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border">
-            {content.programs.cards.map((card, index) => (
+        <div className="mt-8 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible py-8 pb-10 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:gap-4 [&::-webkit-scrollbar]:hidden">
+          {content.programs.cards.map((card, index) => (
+            <div key={`program-card-${index}`} className="flex shrink-0 snap-start flex-col">
               <article
-                key={`${card.title}-${index}`}
-                className={`flex w-[min(85vw,320px)] shrink-0 snap-start flex-col overflow-hidden text-left sm:w-[300px] ${CARD_SURFACE_CLASSNAME}`}
+                className={cn(
+                  'flex min-h-0 flex-1 flex-col text-left w-[min(85vw,280px)] sm:w-[280px] md:w-[min(85vw,320px)]',
+                  CARD_SURFACE_CLASSNAME
+                )}
               >
-                <div className="relative aspect-4/2 w-full shrink-0 overflow-hidden bg-muted/30">
+                <div className="relative aspect-4/2 w-full shrink-0 overflow-hidden rounded-t-2xl bg-muted/30">
                   <Image
                     src={card.image}
-                    alt={card.title}
+                    alt=""
                     fill
-                    sizes="320px"
+                    sizes="(max-width: 768px) 85vw, 320px"
                     className="object-cover"
                     loading="lazy"
                   />
                 </div>
-                <div className="flex flex-1 flex-col gap-3 px-5 pb-5 pt-4">
-                  <div>
-                    <h3 className="font-bold leading-snug text-foreground">{card.title}</h3>
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3 rounded-b-2xl bg-card px-5 pb-5 pt-4">
+                  <div className="min-w-0 shrink-0">
+                    <h3 className="text-pretty font-bold leading-snug text-foreground">{card.title}</h3>
                     <p className="mt-1 text-sm font-medium text-primary">{card.subtitle}</p>
                   </div>
-                  <p className="flex-1 text-sm leading-relaxed text-muted-foreground">{card.description}</p>
+                  <p className="min-h-0 min-w-0 flex-1 text-pretty text-sm leading-relaxed text-muted-foreground">{card.description}</p>
                   <Link
                     href={card.href ?? '/parents/class-pages'}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+                    className="mt-auto inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
                   >
                     {content.programs.learnMore}
                     <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
                   </Link>
                 </div>
               </article>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Section: About the school — full-bleed split layout: photo + text, highlights grid, CTA to welcome page (`content.about`). */}
       <section
         aria-labelledby="about-school-heading"
-        className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 scroll-mt-24 py-10 lg:py-14"
+        className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 scroll-mt-24 py-6 lg:py-14"
       >
         <div className="w-full overflow-hidden rounded-none bg-card lg:grid lg:min-h-[min(28rem,65vh)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)]">
           <div className="relative aspect-5/4 min-h-[220px] lg:aspect-auto lg:min-h-[min(28rem,65vh)]">
@@ -595,7 +841,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
             </p>
             <h2
               id="about-school-heading"
-              className="relative mt-5 max-w-xl font-display text-4xl font-bold leading-tight tracking-tight text-foreground"
+              className="relative mt-5 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-foreground md:text-4xl"
             >
               {content.about.title}
             </h2>
@@ -603,15 +849,18 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
               {content.about.description}
             </p>
 
-            <ul className="relative mt-8 inline-grid w-fit max-w-full grid-cols-3 gap-2">
+            <ul className="relative mt-8 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-3 lg:grid-cols-3 lg:gap-2 [&>li:last-child]:sm:col-span-2 [&>li:last-child]:sm:flex [&>li:last-child]:sm:justify-center lg:[&>li:last-child]:col-span-1 lg:[&>li:last-child]:justify-start">
               {content.about.highlights.map((label, index) => {
                 const Icon = ABOUT_HIGHLIGHT_ICONS[index] ?? Users;
                 return (
-                  <li key={label} className="flex min-w-0 items-start gap-1.5 sm:gap-2">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary sm:h-10 sm:w-10 sm:rounded-xl">
-                      <Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden />
+                  <li
+                    key={label}
+                    className="flex min-w-0 flex-row items-center gap-2 text-left"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" aria-hidden />
                     </span>
-                    <span className="min-w-0 flex-1 text-pretty text-[0.75rem] font-medium leading-snug text-foreground sm:max-w-36 sm:flex-none sm:text-sm">
+                    <span className="min-w-0 flex-1 text-pretty text-sm font-medium leading-snug text-foreground">
                       {label}
                     </span>
                   </li>
@@ -637,12 +886,12 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
       <section
         id="school-atmosphere"
         aria-labelledby="school-atmosphere-heading"
-        className="scroll-mt-24 py-10 md:py-14"
+        className="scroll-mt-24 py-6 md:py-14"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2
             id="school-atmosphere-heading"
-            className="font-display text-balance text-4xl font-bold leading-tight tracking-tight text-foreground"
+            className="font-display text-balance text-2xl font-bold leading-tight tracking-tight text-foreground md:text-4xl"
           >
             {content.schoolAtmosphere.heading}
           </h2>
@@ -678,7 +927,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
       </section>
 
       {/* Section: Latest news — eyebrow, title, “view all” link, grid of news cards from `initialNews` prop (`content.news` for labels / empty state). */}
-      <section className="py-10">
+      <section className="py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="relative text-sm font-semibold tracking-wide text-primary">
@@ -690,7 +939,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
                 />
               </span>
             </p>
-            <h2 className="mt-5 font-display text-4xl font-bold leading-tight text-foreground">{content.news.title}</h2>
+            <h2 className="mt-5 font-display text-2xl font-bold leading-tight text-foreground md:text-4xl">{content.news.title}</h2>
           </div>
           <Button
             variant="outline"
@@ -773,13 +1022,13 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
       <section
         id="parent-voices"
         aria-labelledby="parent-voices-heading"
-        className="scroll-mt-24 py-12 md:py-16"
+        className="scroll-mt-24 py-6 md:py-16"
       >
         <div className="mb-10 flex flex-col items-center text-center">
           <div className="flex flex-wrap items-end justify-center">
             <h2
               id="parent-voices-heading"
-              className="font-display inline-flex max-w-4xl flex-wrap items-center justify-center gap-x-1 text-4xl font-bold leading-tight text-foreground"
+              className="font-display inline-flex max-w-4xl flex-wrap items-center justify-center gap-x-1 text-2xl font-bold leading-tight text-foreground md:text-4xl"
             >
               <span>{content.parentVoices.titleBefore}</span>
               <span className="relative inline-block">
@@ -809,7 +1058,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,12rem)_1fr] lg:items-start lg:gap-14 xl:grid-cols-[minmax(0,14rem)_1fr]">
           <h2
             id="faq-heading"
-            className="font-display text-4xl font-bold leading-tight text-foreground mt-auto mb-auto lg:max-w-[14ch]"
+            className="font-display text-2xl font-bold leading-tight text-foreground md:text-4xl mt-auto mb-auto lg:max-w-[14ch]"
           >
             <span className="inline-flex flex-wrap items-center gap-x-1">
               <span>{content.faq.titleBefore}</span>
