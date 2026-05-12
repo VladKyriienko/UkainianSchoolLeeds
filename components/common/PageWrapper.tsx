@@ -53,7 +53,7 @@ export function PageWrapper({
         </div>
       ) : null}
       <header className="mb-8 space-y-2">
-        <h1 className="mb-2 font-display text-5xl font-bold leading-tight tracking-tight text-foreground">
+        <h1 className="mb-2 font-display text-4xl sm:text-5xl font-bold leading-tight tracking-tight text-foreground">
           {translatedTitle}
         </h1>
         {translatedDescription ? (

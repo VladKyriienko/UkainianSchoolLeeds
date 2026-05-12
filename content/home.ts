@@ -12,6 +12,8 @@ type HomeContent = {
   features: {
     title: string;
     description: string;
+    /** Hero image overlay chips: heading on two lines (EN/UK). */
+    heroTitleLines?: readonly [string, string];
   }[];
   about: {
     eyebrow: string;
@@ -95,6 +97,14 @@ type HomeContent = {
   };
 };
 
+/** Hero art for program cards — identical in every locale so images do not change when switching language. */
+const PROGRAM_CARD_IMAGES = [
+  '/hero/hero-card-1.png',
+  '/hero/hero-card-2.png',
+  '/hero/hero-card-3.png',
+  '/hero/hero-card-4.png'
+] as const;
+
 export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
   en: {
     hero: {
@@ -110,16 +120,19 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     features: [
       {
         title: 'Quality education',
+        heroTitleLines: ['Quality', 'education'],
         description:
           'Modern programs and methods that support the full development of every child.'
       },
       {
         title: 'Care and support',
+        heroTitleLines: ['Care and', 'support'],
         description:
           'We create a safe and friendly learning environment for every student.'
       },
       {
         title: 'Talent development',
+        heroTitleLines: ['Talent', 'development'],
         description:
           'Clubs, projects, and events help children discover and grow their abilities.'
       },
@@ -312,7 +325,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       learnMore: 'Learn more',
       cards: [
         {
-          image: '/hero-home-classroom.png',
+          image: PROGRAM_CARD_IMAGES[0],
           title: 'Junior group',
           subtitle: 'Ages 4–7',
           description:
@@ -320,7 +333,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           href: '/parents/class-pages'
         },
         {
-          image: '/hero-home-classroom.png',
+          image: PROGRAM_CARD_IMAGES[1],
           title: 'Middle group',
           subtitle: 'Ages 8–11',
           description:
@@ -328,7 +341,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           href: '/parents/class-pages'
         },
         {
-          image: '/hero-home-classroom.png',
+          image: PROGRAM_CARD_IMAGES[2],
           title: 'Senior group',
           subtitle: 'Ages 12–16',
           description:
@@ -336,7 +349,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           href: '/parents/class-pages'
         },
         {
-          image: '/hero-home-classroom.png',
+          image: PROGRAM_CARD_IMAGES[3],
           title: 'Creative activities',
           subtitle: 'All age groups',
           description:
@@ -360,16 +373,19 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     features: [
       {
         title: 'Якісна освіта',
+        heroTitleLines: ['Якісна', 'освіта'],
         description:
           'Сучасні програми та методики навчання для всебічного розвитку дитини.'
       },
       {
         title: 'Турбота та підтримка',
+        heroTitleLines: ['Турбота та', 'підтримка'],
         description:
           'Ми створюємо безпечне та доброзичливе середовище для кожного учня.'
       },
       {
         title: 'Розвиток талантів',
+        heroTitleLines: ['Розвиток', 'талантів'],
         description:
           'Гуртки, проєкти та заходи, що допомагають знайти і розвивати здібності.'
       },
@@ -562,7 +578,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       learnMore: 'Дізнатися більше',
       cards: [
         {
-          image: '/hero/hero-card-1.png',
+          image: PROGRAM_CARD_IMAGES[0],
           title: 'Молодша група',
           subtitle: '4–7 років',
           description:
@@ -570,7 +586,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           href: '/parents/class-pages'
         },
         {
-          image: '/hero/hero-card-2.png',
+          image: PROGRAM_CARD_IMAGES[1],
           title: 'Середня група',
           subtitle: '8–11 років',
           description:
@@ -578,7 +594,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           href: '/parents/class-pages'
         },
         {
-          image: '/hero/hero-card-3.png',
+          image: PROGRAM_CARD_IMAGES[2],
           title: 'Старша група',
           subtitle: '12–16 років',
           description:
@@ -586,7 +602,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           href: '/parents/class-pages'
         },
         {
-          image: '/hero/hero-card-4.png',
+          image: PROGRAM_CARD_IMAGES[3],
           title: 'Творчі заняття',
           subtitle: 'Для всіх вікових груп',
           description:
