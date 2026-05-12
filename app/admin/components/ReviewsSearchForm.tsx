@@ -4,39 +4,33 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar, Search } from 'lucide-react';
+import { Search, Calendar } from 'lucide-react';
 import { DatePicker } from '@/app/admin/profile/components/DatePicker';
 import { parseInputDate, toInputDateValue } from '@/utils/date-format';
 
-type MessagesSearchFormProps = {
-  initialSearch?: string;
+type ReviewsSearchFormProps = {
+  initialParents?: string;
   initialDateFrom?: string;
   initialDateTo?: string;
 };
 
-export function MessagesSearchForm({
-  initialSearch = '',
+export function ReviewsSearchForm({
+  initialParents = '',
   initialDateFrom = '',
   initialDateTo = ''
-}: MessagesSearchFormProps) {
+}: ReviewsSearchFormProps) {
   const router = useRouter();
   const pathname = usePathname();
   const lastUrlRef = useRef<string | null>(null);
-  const [search, setSearch] = useState(initialSearch);
+  const [parents, setParents] = useState(initialParents);
   const [dateFrom, setDateFrom] = useState(initialDateFrom);
   const [dateTo, setDateTo] = useState(initialDateTo);
 
   useEffect(() => {
-    setSearch(initialSearch);
-  }, [initialSearch]);
-
-  useEffect(() => {
+    setParents(initialParents);
     setDateFrom(initialDateFrom);
-  }, [initialDateFrom]);
-
-  useEffect(() => {
     setDateTo(initialDateTo);
-  }, [initialDateTo]);
+  }, [initialParents, initialDateFrom, initialDateTo]);
 
   const searchParams = useSearchParams();
   useEffect(() => {
@@ -45,7 +39,7 @@ export function MessagesSearchForm({
       const params = new URLSearchParams();
       params.set('page', '1');
       params.set('limit', limit);
-      if (search.trim()) params.set('search', search.trim());
+      if (parents.trim()) params.set('parents', parents.trim());
       if (dateFrom) params.set('dateFrom', dateFrom);
       if (dateTo) params.set('dateTo', dateTo);
       const q = params.toString();
@@ -55,25 +49,25 @@ export function MessagesSearchForm({
       router.replace(nextUrl);
     }, 250);
     return () => clearTimeout(t);
-  }, [router, pathname, search, dateFrom, dateTo, searchParams]);
+  }, [router, pathname, parents, dateFrom, dateTo, searchParams]);
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-[200px]">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <Label
-          htmlFor="messages-search"
+          htmlFor="reviews-parents"
           className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
         >
-          Search messages
+          Filter by parents (attribution)
         </Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            id="messages-search"
+            id="reviews-parents"
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Email, name, subject or message..."
+            value={parents}
+            onChange={(e) => setParents(e.target.value)}
+            placeholder="e.g. Maria, Sofia's mum"
             className="h-10 pl-10"
           />
         </div>
@@ -81,11 +75,11 @@ export function MessagesSearchForm({
       <div className="flex flex-wrap gap-4 sm:flex-nowrap">
         <div className="flex flex-col gap-1.5">
           <Label
-            htmlFor="messages-date-from"
+            htmlFor="reviews-dateFrom"
             className="flex min-h-10 shrink-0 items-end gap-1.5 text-sm font-medium leading-snug"
           >
             <Calendar className="size-4 shrink-0" aria-hidden />
-            <span>From</span>
+            <span>Date from</span>
           </Label>
           <DatePicker
             date={parseInputDate(dateFrom)}
@@ -106,17 +100,14 @@ export function MessagesSearchForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <Label
-            htmlFor="messages-date-to"
+            htmlFor="reviews-dateTo"
             className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
           >
-            To
+            Date to
           </Label>
           <DatePicker
             date={parseInputDate(dateTo)}
-            onDateChange={(date) => {
-              const next = toInputDateValue(date);
-              setDateTo(next);
-            }}
+            onDateChange={(date) => setDateTo(toInputDateValue(date))}
             placeholder="To date"
             buttonClassName="h-10 w-[160px]"
             disabled={(date) => {

@@ -97,12 +97,12 @@ type HomeContent = {
   };
 };
 
-/** Hero art for program cards — identical in every locale so images do not change when switching language. */
+/** Program card art (shared EN/UK) — files in `public/home`. */
 const PROGRAM_CARD_IMAGES = [
-  '/hero/hero-card-1.png',
-  '/hero/hero-card-2.png',
-  '/hero/hero-card-3.png',
-  '/hero/hero-card-4.png'
+  '/home/program-junior.png',
+  '/home/program-middle.png',
+  '/home/program-senior.png',
+  '/home/program-creative.png'
 ] as const;
 
 export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
@@ -149,7 +149,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         'Ukrainian School Leeds is a space where children not only learn, but also feel pride in their culture, communicate in Ukrainian, and find friends for life.',
       cta: 'About our school',
       imageAlt: 'Children with the Ukrainian flag in Leeds',
-      imageSrc: '/home-hero-school.png',
+      imageSrc: '/home/about-school-photo.png',
       highlights: [
         'Modern approach to learning',
         'Safe and friendly environment',
@@ -271,25 +271,25 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       heading: 'Why families choose our school',
       cards: [
         {
-          image: '/hero/hero-card-1.png',
+          image: '/home/hero-card-1.png',
           title: 'Ukrainian language',
           description:
             'Children learn, practise, and confidently use Ukrainian in daily life and conversation.'
         },
         {
-          image: '/hero/hero-card-2.png',
+          image: '/home/hero-card-2.png',
           title: 'Culture and traditions',
           description:
             'Holidays, creativity, songs, history, and Ukrainian customs - we keep our roots together.'
         },
         {
-          image: '/hero/hero-card-3.png',
+          image: '/home/hero-card-3.png',
           title: 'Caring teachers',
           description:
             'A professional approach, attention to every child, and modern teaching methods.'
         },
         {
-          image: '/hero/hero-card-4.png',
+          image: '/home/hero-card-4.png',
           title: 'Ukrainian community',
           description:
             'Children find friends, and families find support and the feeling of a wider Ukrainian family in Leeds.'
@@ -402,7 +402,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         'Ukrainian School Leeds - це простір, де діти не тільки вчаться, а й відчувають гордість за свою культуру, спілкуються українською та знаходять друзів на все життя.',
       cta: 'Про нашу школу',
       imageAlt: 'Діти з прапором України у Лідсі',
-      imageSrc: '/home-hero-school.png',
+      imageSrc: '/home/about-school-photo.png',
       highlights: [
         'Сучасний підхід до навчання',
         'Безпечне та дружнє середовище',
@@ -524,25 +524,25 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
       heading: 'Чому родини обирають нашу школу',
       cards: [
         {
-          image: '/hero/hero-card-1.png',
+          image: '/home/hero-card-1.png',
           title: 'Українська мова',
           description:
             'Діти вивчають, практикують і впевнено використовують українську у житті та спілкуванні.'
         },
         {
-          image: '/hero/hero-card-2.png',
+          image: '/home/hero-card-2.png',
           title: 'Культура та традиції',
           description:
             'Свята, творчість, пісні, історія та українські звичаї - зберігаємо наше коріння разом.'
         },
         {
-          image: '/hero/hero-card-3.png',
+          image: '/home/hero-card-3.png',
           title: 'Турботливі викладачі',
           description:
             'Професійний підхід, увага до кожної дитини та сучасні методи навчання.'
         },
         {
-          image: '/hero/hero-card-4.png',
+          image: '/home/hero-card-4.png',
           title: 'Українська спільнота',
           description:
             'Діти знаходять друзів, а родини - підтримку та відчуття великої української родини в Лідсі.'
@@ -563,11 +563,11 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
           alt: 'Діти на вулиці з прапором України'
         },
         {
-          src: '/hero/hero-card-1.png',
+          src: '/home/hero-card-1.png',
           alt: 'Святкування української культури у школі'
         },
         {
-          src: '/hero/hero-card-2.png',
+          src: '/home/hero-card-2.png',
           alt: 'Учні під час заняття в класі'
         }
       ]

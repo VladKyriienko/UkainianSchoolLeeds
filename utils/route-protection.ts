@@ -60,6 +60,13 @@ export const navigationRoutes: RouteConfig[] = [
     requiresAuth: true
   },
   {
+    path: '/admin/reviews',
+    label: 'Reviews',
+    icon: 'Star',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
     path: '/admin/classes',
     label: 'Classes',
     icon: 'BookOpen',

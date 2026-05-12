@@ -54,27 +54,37 @@ export function DocumentsSearchForm({
   }, [router, pathname, search, type, searchParams]);
 
   return (
-    <div className="space-y-4 sm:flex sm:flex-wrap sm:items-end sm:gap-4">
-      <div className="flex-1 min-w-[200px]">
-        <Label htmlFor="documents-search" className="mb-1">Search documents</Label>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-[200px]">
+        <Label
+          htmlFor="documents-search"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
+        >
+          Search documents
+        </Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="documents-search"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Title..."
-            className="pl-10"
+            className="h-10 pl-10"
           />
         </div>
       </div>
-      <div className="sm:w-48">
-        <Label htmlFor="documents-type" className="mb-1">Type</Label>
+      <div className="flex min-w-0 flex-col gap-1.5 sm:w-48">
+        <Label
+          htmlFor="documents-type"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
+        >
+          Type
+        </Label>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+          <Filter className="absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Select value={type || 'all'} onValueChange={(v) => setType(v === 'all' ? '' : v)}>
-            <SelectTrigger id="documents-type" className="pl-10">
+            <SelectTrigger id="documents-type" className="h-10 pl-10">
               <SelectValue placeholder="All types" />
             </SelectTrigger>
             <SelectContent>

@@ -52,26 +52,34 @@ export function DonationsSearchForm({
   }, [router, pathname, search, dateFrom, dateTo, initialLimit]);
 
   return (
-    <div className="space-y-4 sm:flex sm:flex-wrap sm:items-end sm:gap-4">
-      <div className="flex-1 min-w-[200px]">
-        <Label htmlFor="donations-search" className="mb-1">Search by email</Label>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-[200px]">
+        <Label
+          htmlFor="donations-search"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
+        >
+          Search by email
+        </Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="donations-search"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Donor email..."
-            className="pl-10"
+            className="h-10 pl-10"
           />
         </div>
       </div>
-      <div className="flex gap-4 flex-wrap items-end">
-        <div className="space-y-1">
-          <Label htmlFor="donations-dateFrom" className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            From
+      <div className="flex flex-wrap gap-4 sm:flex-nowrap">
+        <div className="flex flex-col gap-1.5">
+          <Label
+            htmlFor="donations-dateFrom"
+            className="flex min-h-10 shrink-0 items-end gap-1.5 text-sm font-medium leading-snug"
+          >
+            <Calendar className="size-4 shrink-0" aria-hidden />
+            <span>From</span>
           </Label>
           <DatePicker
             date={parseInputDate(dateFrom)}
@@ -90,8 +98,13 @@ export function DonationsSearchForm({
             }}
           />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="donations-dateTo">To</Label>
+        <div className="flex flex-col gap-1.5">
+          <Label
+            htmlFor="donations-dateTo"
+            className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
+          >
+            To
+          </Label>
           <DatePicker
             date={parseInputDate(dateTo)}
             onDateChange={(date) => setDateTo(toInputDateValue(date))}

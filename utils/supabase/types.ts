@@ -355,6 +355,33 @@ export type Database = {
           },
         ]
       }
+      review: {
+        Row: {
+          content: string
+          content_uk: string | null
+          data: string
+          id: string
+          perens: string
+          perens_uk: string | null
+        }
+        Insert: {
+          content: string
+          content_uk?: string | null
+          data?: string
+          id?: string
+          perens: string
+          perens_uk?: string | null
+        }
+        Update: {
+          content?: string
+          content_uk?: string | null
+          data?: string
+          id?: string
+          perens?: string
+          perens_uk?: string | null
+        }
+        Relationships: []
+      }
       teachers: {
         Row: {
           category: Database["public"]["Enums"]["teacherCategoryEnum"]

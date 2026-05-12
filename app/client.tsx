@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,33 +17,28 @@ import { HOME_CONTENT } from '@/content/home';
 import { ArrowRight, Backpack, CalendarDays, HeartHandshake, Quote, Snowflake, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
-import type { PublicNews } from '@/app/(not-aunthenticated)/parents/news/actions';
-import type { Language } from '@/types';
+import type { Language, PublicHomeClientProps } from '@/types';
 import { createMessageAction } from '@/app/(not-aunthenticated)/contact/actions';
 import { isHtmlContent } from '@/utils/rich-text';
 import { cn } from '@/utils/cn';
-
-export type PublicHomeClientProps = {
-  initialNews: PublicNews[];
-};
 
 const heroMainImage = '/hero-home-classroom.png';
 
 /** Icons for the trust row under hero CTAs (order matches content.heroTrust.items). */
 const HERO_TRUST_ICON_PATHS = [
-  '/hero/hero-icon-learning.png',
-  '/hero/hero-icon-location.png',
-  '/hero/hero-icon-flag.png'
+  '/home/hero-icon-learning.png',
+  '/home/hero-icon-location.png',
+  '/home/hero-icon-flag.png'
 ] as const;
 
 const heroPngIcons = {
-  learning: '/hero/hero-icon-learning.png',
-  location: '/hero/hero-icon-location.png',
-  book: '/hero/hero-icon-book.png',
-  teacher: '/hero/hero-icon-teacher.png',
+  learning: '/home/hero-icon-learning.png',
+  location: '/home/hero-icon-location.png',
+  book: '/home/hero-icon-book.png',
+  teacher: '/home/hero-icon-teacher.png',
   /** Includes UA flag heart — used beside home lead CTA title. */
-  community: '/hero/hero-icon-community.png',
-  creative: '/hero/hero-icon-creative.png'
+  community: '/home/hero-icon-community.png',
+  creative: '/home/hero-icon-creative.png'
 } as const;
 
 const ABOUT_HIGHLIGHT_ICONS = [Backpack, HeartHandshake, Users] as const;
@@ -172,6 +167,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     slideRefs.current = new Array(totalSlides).fill(null);
   }, [totalSlides]);
 
+  /** Only when slide *count* changes — not when `items` is a new array reference (e.g. language) so viewport scroll and carousel position stay stable. */
   useLayoutEffect(() => {
     const root = scrollerRef.current;
     if (!root || n === 0) return;
@@ -185,7 +181,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     scrollSlideIntoView(root, mid, centerPeek ? 'center' : 'start', 'auto');
     root.style.scrollBehavior = '';
     setSelectedIndex(0);
-  }, [n, items]);
+  }, [n]);
 
   /** When all slides fit (no horizontal overflow), center the row; avoids lopsided peek / clipped edges. */
   useEffect(() => {
@@ -201,7 +197,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     const ro = new ResizeObserver(syncJustify);
     ro.observe(root);
     return () => ro.disconnect();
-  }, [n, items]);
+  }, [n]);
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -224,7 +220,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
       root.removeEventListener('scrollend', onScrollEnd);
       window.removeEventListener('resize', updateSelectedFromScroll);
     };
-  }, [items, n, updateSelectedFromScroll, jumpLoopIfNeeded]);
+  }, [n, updateSelectedFromScroll, jumpLoopIfNeeded]);
 
   /** Scroll snap fights programmatic `scrollTo` — disable snap briefly when jumping via dots/keyboard. */
   const scrollToPhysical = useCallback((physicalIdx: number) => {
@@ -276,7 +272,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
   return (
     <>
       <div
-        className="mx-auto w-full max-w-full py-10 outline-none"
+        className="mx-auto w-full max-w-full outline-none"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"
@@ -313,7 +309,16 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
                     className={`relative flex min-h-[220px] flex-1 flex-col p-6 ${CARD_SURFACE_STATIC_CLASSNAME}`}
                   >
                     <Quote className="mb-4 h-8 w-8 shrink-0 text-primary/35" aria-hidden />
-                    <p className="flex-1 text-pretty text-sm leading-relaxed text-muted-foreground">{item.quote}</p>
+                    {isHtmlContent(item.quote) ? (
+                      <div
+                        className="rich-text-preview flex-1 text-sm leading-relaxed text-muted-foreground"
+                        dangerouslySetInnerHTML={{ __html: item.quote }}
+                      />
+                    ) : (
+                      <p className="flex-1 text-pretty text-sm leading-relaxed text-muted-foreground">
+                        {item.quote}
+                      </p>
+                    )}
                     <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/50 pt-4">
                       <p className="text-sm font-semibold text-foreground">{item.attribution}</p>
                     </div>
@@ -430,7 +435,7 @@ function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: 
                 <span>{cta.titleAfter}</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/hero/hero-card-1.png"
+                  src="/home/hero-card-1.png"
                   alt=""
                   width={40}
                   height={40}
@@ -525,11 +530,36 @@ function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: 
   );
 }
 
-/** Public marketing home page (`/`). Sections use `HOME_CONTENT[language]`; news cards use the `initialNews` prop. */
-export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
+/** Public marketing home page (`/`). Sections use `HOME_CONTENT[language]`; news from `initialNews`; parent voices from `parentVoices`. */
+export function PublicHomeClient({
+  initialNews,
+  atmosphereGalleryImages,
+  parentVoices
+}: PublicHomeClientProps) {
   const { language } = useLanguage();
   const content = HOME_CONTENT[language];
   const isUk = language === 'uk';
+
+  const parentVoiceCarouselItems = useMemo(() => {
+    if (parentVoices.length === 0) return [];
+    return parentVoices.map((r) => ({
+      quote: isUk && r.content_uk?.trim() ? r.content_uk : r.content,
+      attribution: isUk && r.perens_uk?.trim() ? r.perens_uk : r.perens
+    }));
+  }, [parentVoices, isUk]);
+
+  const atmosphereStripImages =
+    atmosphereGalleryImages.length > 0
+      ? atmosphereGalleryImages.map((p) => ({
+        key: p.id,
+        src: p.src,
+        alt: isUk && p.altUk ? p.altUk : p.altEn
+      }))
+      : content.schoolAtmosphere.images.map((p, index) => ({
+        key: `static-${p.src}-${index}`,
+        src: p.src,
+        alt: p.alt
+      }));
 
   useEffect(() => {
     // Supabase invite/OTP links can land on "/" with tokens in hash.
@@ -546,7 +576,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
   return (
     <div className="w-full min-w-0 pb-12 text-foreground">
       {/* Section: Hero — mobile: H1+lead → image+chips → trust row → CTAs; lg: two columns, left column H1+lead / CTAs / trust (`content.hero`, `content.heroTrust`, `content.features`). */}
-      <section className="relative isolate overflow-x-hidden rounded-t-[2.25rem] bg-card py-6 md:-mx-6 md:px-10 md:py-10 md:pb-12 lg:-mx-8 lg:px-12 lg:py-12 lg:pb-14">
+      <section className="relative isolate overflow-x-hidden rounded-t-[2.25rem] bg-card pb-6 pt-12 md:-mx-6 md:px-10 md:py-10 md:pb-12 lg:-mx-8 lg:px-12 lg:py-12 lg:pb-14">
         <div className="relative z-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
           {/* Mobile order: copy → photo → trust row → CTAs. Desktop col 1: copy, CTAs, trust; col 2: photo (rows 1–3). */}
           <div className="max-w-2xl lg:col-start-1 lg:row-start-1 lg:self-start">
@@ -674,7 +704,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           <div className="relative mb-4 flex flex-col items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/hero/hero-card-1.png"
+              src="/home/hero-card-1.png"
               alt=""
               width={48}
               height={48}
@@ -697,7 +727,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           </h2>
         </div>
 
-        <div className="mt-10 grid w-full grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-5 md:px-6 lg:grid-cols-4 lg:gap-6 lg:px-8">
+        <div className="mt-8 grid w-full grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-5 md:px-6 lg:grid-cols-4 lg:gap-6 lg:px-8">
           {content.whyChooseUs.cards.map((card, index) => (
             <article
               key={`${card.title}-${index}`}
@@ -722,7 +752,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
         </div>
       </section>
 
-      {/* Section: Programs — same layout pattern as school atmosphere strip: in-flow width, snap row, room for hover shadow (`content.programs`). Anchor: #programs. */}
+      {/* Section: Programs — mobile: horizontal snap + vertical padding for hover shadow; md+: grid + overflow visible (same idea as school atmosphere strip). Anchor: #programs. */}
       <section
         id="programs"
         aria-labelledby="programs-heading"
@@ -744,12 +774,15 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
           </h2>
         </div>
 
-        <div className="mt-8 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible py-8 pb-10 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:gap-4 [&::-webkit-scrollbar]:hidden">
+        <div className="mt-8 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible py-10 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:py-0 [&::-webkit-scrollbar]:hidden">
           {content.programs.cards.map((card, index) => (
-            <div key={`program-card-${index}`} className="flex shrink-0 snap-start flex-col">
+            <div
+              key={`program-card-${index}`}
+              className="flex w-[min(85vw,280px)] shrink-0 snap-start flex-col sm:w-[280px] md:w-auto md:min-w-0"
+            >
               <article
                 className={cn(
-                  'flex min-h-0 flex-1 flex-col text-left w-[min(85vw,280px)] sm:w-[280px] md:w-[min(85vw,320px)]',
+                  'flex min-h-0 w-full flex-1 flex-col text-left',
                   CARD_SURFACE_CLASSNAME
                 )}
               >
@@ -804,11 +837,11 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
             />
             <div
               aria-hidden
-              className="absolute inset-y-0 right-0 hidden w-[min(40%,12rem)] bg-linear-to-l from-card from-25% via-card/70 to-transparent lg:block"
+              className="absolute -inset-y-1 -right-1 hidden w-[min(58%,22rem)] bg-linear-to-l from-card from-0% via-card/92 via-35% to-transparent lg:block"
             />
           </div>
 
-          <div className="relative flex flex-col justify-center bg-card px-6 py-10 lg:px-10 lg:py-12 xl:px-12">
+          <div className="relative flex flex-col justify-center bg-card px-6 pt-10 lg:px-10 lg:py-12 xl:px-12">
             <div
               aria-hidden
               className="pointer-events-none absolute top-0 right-0 h-[min(38%,13rem)] min-h-44 w-[min(92%,26rem)] overflow-hidden max-lg:max-h-48"
@@ -907,19 +940,20 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
             </Link>
           </Button>
         </div>
-        <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] scrollbar-thin md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border">
-          {content.schoolAtmosphere.images.map((photo, index) => (
+        <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible pb-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden">
+          {atmosphereStripImages.map((photo) => (
             <div
-              key={`${photo.src}-${index}`}
+              key={photo.key}
               className={`relative aspect-video w-[min(85vw,280px)] shrink-0 snap-start overflow-hidden md:w-auto ${CARD_SURFACE_STATIC_CLASSNAME}`}
             >
-              <Image
+              {/* Native img: Supabase public URLs + avoids next/image remote optimizer edge cases in dev. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={photo.src}
                 alt={photo.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 85vw, 25vw"
+                className="absolute inset-0 h-full w-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
             </div>
           ))}
@@ -1042,7 +1076,7 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
             </h2>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/hero/hero-card-1.png"
+              src="/home/hero-card-1.png"
               alt=""
               width={32}
               height={32}
@@ -1050,11 +1084,19 @@ export function PublicHomeClient({ initialNews }: PublicHomeClientProps) {
             />
           </div>
         </div>
-        <ParentVoicesCarousel items={content.parentVoices.items} />
+        {parentVoiceCarouselItems.length === 0 ? (
+          <p className="mx-auto max-w-md text-center text-sm text-muted-foreground">
+            {isUk
+              ? 'Тут зʼявляться відгуки батьків після додавання їх в адмін-панелі.'
+              : 'Parent testimonials will appear here once they are added in the admin.'}
+          </p>
+        ) : (
+          <ParentVoicesCarousel items={parentVoiceCarouselItems} />
+        )}
       </section>
 
       {/* Section: FAQ — split title + two-column accordion (`content.faq`). Anchor: #faq. */}
-      <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-24 overflow-visible py-12 md:py-16">
+      <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-24 overflow-visible py-6 md:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,12rem)_1fr] lg:items-start lg:gap-14 xl:grid-cols-[minmax(0,14rem)_1fr]">
           <h2
             id="faq-heading"

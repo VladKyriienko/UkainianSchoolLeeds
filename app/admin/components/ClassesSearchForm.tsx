@@ -38,18 +38,23 @@ export function ClassesSearchForm({ initialSearch = '' }: ClassesSearchFormProps
   }, [router, pathname, search, searchParams]);
 
   return (
-    <div className="space-y-4 sm:flex sm:items-end sm:gap-4">
-      <div className="flex-1 min-w-[200px]">
-        <Label htmlFor="classes-search" className="mb-1">Search classes</Label>
+    <div className="flex flex-col gap-4 sm:max-w-md">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-[200px]">
+        <Label
+          htmlFor="classes-search"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
+        >
+          Search classes
+        </Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="classes-search"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Title..."
-            className="pl-10"
+            className="h-10 pl-10"
           />
         </div>
       </div>

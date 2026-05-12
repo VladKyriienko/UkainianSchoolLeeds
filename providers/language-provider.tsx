@@ -13,10 +13,22 @@ type LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+/** After React/layout, restore viewport scroll (language switch can reflow and reset scroll). */
+function scheduleRestoreWindowScroll(left: number, top: number) {
+  requestAnimationFrame(() => {
+    window.scrollTo(left, top);
+    requestAnimationFrame(() => {
+      window.scrollTo(left, top);
+    });
+  });
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
 
   useEffect(() => {
+    const left = window.scrollX;
+    const top = window.scrollY;
     // Load saved language preference from localStorage
     const savedLanguage = localStorage.getItem('language') as Language | null;
     if (savedLanguage === 'en' || savedLanguage === 'uk') {
@@ -29,12 +41,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setLanguageState(defaultLang);
       document.documentElement.setAttribute('lang', defaultLang);
     }
+    scheduleRestoreWindowScroll(left, top);
   }, []);
 
   const setLanguage = (lang: Language) => {
+    const left = window.scrollX;
+    const top = window.scrollY;
     setLanguageState(lang);
     localStorage.setItem('language', lang);
     document.documentElement.setAttribute('lang', lang);
+    scheduleRestoreWindowScroll(left, top);
   };
 
   const toggleLanguage = () => {

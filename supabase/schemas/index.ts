@@ -623,6 +623,54 @@ export const donations = pgTable(
   }
 );
 
+/** Parent testimonials / reviews (`perens` = attribution line, `data` = review moment, timestamptz). */
+export const review = pgTable(
+  'review',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    perens: text('perens').notNull(),
+    perensUk: text('perens_uk'),
+    content: text('content').notNull(),
+    contentUk: text('content_uk'),
+    data: timestamp('data', { withTimezone: true }).defaultNow().notNull()
+  },
+  () => {
+    const isAdmin = sql`exists (
+      select 1
+      from roles
+      where roles.user_id = auth.uid()
+        and roles.role = 'admin'
+    )`;
+
+    return [
+      pgPolicy('review_public_select', {
+        for: 'select',
+        to: [anonRole, authenticatedRole],
+        using: sql`true`
+      }),
+      pgPolicy('review_admin_insert', {
+        for: 'insert',
+        to: authenticatedRole,
+        withCheck: isAdmin
+      }),
+      pgPolicy('review_admin_update', {
+        for: 'update',
+        to: authenticatedRole,
+        using: isAdmin,
+        withCheck: isAdmin
+      }),
+      pgPolicy('review_admin_delete', {
+        for: 'delete',
+        to: authenticatedRole,
+        using: isAdmin
+      })
+    ];
+  }
+);
+
 // Messages table (contact form submissions)
 export const messages = pgTable(
   'messages',

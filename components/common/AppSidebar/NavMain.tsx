@@ -43,7 +43,9 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
       <SidebarGroupLabel>Navigation</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isActive = pathname === item.path;
+          const isActive =
+            pathname === item.path ||
+            (item.path !== '/admin' && pathname.startsWith(`${item.path}/`));
           const hasSubItems = item.children && item.children.length > 0;
 
           // Check if any sub-item is active to keep parent expanded
@@ -110,7 +112,7 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
                         <SidebarMenuButton
                           tooltip={item.label}
                           isActive={isActive}
-                          className="w-full !p-2"
+                          className="w-full p-2!"
                         >
                           <div className="flex w-full items-center justify-center">
                             <Icon
@@ -140,7 +142,7 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
                                 className={cn(
                                   'block px-2 py-1 text-sm rounded-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors',
                                   isSubActive &&
-                                    'bg-sidebar-accent text-sidebar-accent-foreground'
+                                  'bg-sidebar-accent text-sidebar-accent-foreground'
                                 )}
                               >
                                 {subItem.label}
@@ -156,7 +158,7 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
                 <SidebarMenuButton
                   tooltip={item.label}
                   isActive={isActive}
-                  className={cn('w-full', 'group-data-[collapsible=icon]:!p-2')}
+                  className={cn('w-full', 'group-data-[collapsible=icon]:p-2!')}
                   asChild
                 >
                   <Link

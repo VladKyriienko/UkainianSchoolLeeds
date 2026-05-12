@@ -11,7 +11,8 @@ import {
   FileText,
   Newspaper,
   BookOpen,
-  Images
+  Images,
+  Star
 } from 'lucide-react';
 
 const STATS_CONFIG: {
@@ -47,6 +48,7 @@ const STATS_CONFIG: {
       icon: FileText
     },
     { key: 'newsTotal', label: 'News', href: '/admin/news', icon: Newspaper },
+    { key: 'reviewsTotal', label: 'Reviews', href: '/admin/reviews', icon: Star },
     { key: 'classesTotal', label: 'Classes', href: '/admin/classes', icon: BookOpen },
     {
       key: 'galleryTotal',

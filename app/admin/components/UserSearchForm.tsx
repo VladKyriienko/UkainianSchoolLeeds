@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -51,38 +52,38 @@ export function UserSearchForm({
   }, [router, pathname, search, role, searchParams]);
 
   return (
-    <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:items-end">
-      <div className="flex-1">
-        <label
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-[200px]">
+        <Label
           htmlFor="search"
-          className="block text-sm font-medium text-foreground mb-1"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
         >
           Search Users
-        </label>
+        </Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="search"
             type="text"
             placeholder="Search by email or name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="h-10 pl-10"
           />
         </div>
       </div>
 
-      <div className="sm:w-48">
-        <label
+      <div className="flex min-w-0 flex-col gap-1.5 sm:w-48">
+        <Label
           htmlFor="role"
-          className="block text-sm font-medium text-foreground mb-1"
+          className="flex min-h-10 shrink-0 items-end text-sm font-medium leading-snug"
         >
           Filter by Role
-        </label>
+        </Label>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
+          <Filter className="absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Select value={role} onValueChange={setRole}>
-            <SelectTrigger className="pl-10">
+            <SelectTrigger id="role" className="h-10 pl-10">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

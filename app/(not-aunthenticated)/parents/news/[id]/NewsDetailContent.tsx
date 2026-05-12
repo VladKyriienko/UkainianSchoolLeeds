@@ -3,7 +3,7 @@
 import { useLanguage } from '@/providers/language-provider';
 import { format } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
-import type { PublicNews } from '../actions';
+import type { PublicNews } from '@/types';
 import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
