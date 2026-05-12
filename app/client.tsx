@@ -551,15 +551,15 @@ export function PublicHomeClient({
   const atmosphereStripImages =
     atmosphereGalleryImages.length > 0
       ? atmosphereGalleryImages.map((p) => ({
-          key: p.id,
-          src: p.src,
-          alt: isUk && p.altUk ? p.altUk : p.altEn
-        }))
+        key: p.id,
+        src: p.src,
+        alt: isUk && p.altUk ? p.altUk : p.altEn
+      }))
       : content.schoolAtmosphere.images.map((p, index) => ({
-          key: `static-${p.src}-${index}`,
-          src: p.src,
-          alt: p.alt
-        }));
+        key: `static-${p.src}-${index}`,
+        src: p.src,
+        alt: p.alt
+      }));
 
   useEffect(() => {
     // Supabase invite/OTP links can land on "/" with tokens in hash.
@@ -837,7 +837,7 @@ export function PublicHomeClient({
             />
             <div
               aria-hidden
-              className="absolute inset-y-0 right-0 hidden w-[min(40%,12rem)] bg-linear-to-l from-card from-25% via-card/70 to-transparent lg:block"
+              className="absolute -inset-y-1 -right-1 hidden w-[min(58%,22rem)] bg-linear-to-l from-card from-0% via-card/92 via-35% to-transparent lg:block"
             />
           </div>
 

@@ -149,7 +149,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         'Ukrainian School Leeds is a space where children not only learn, but also feel pride in their culture, communicate in Ukrainian, and find friends for life.',
       cta: 'About our school',
       imageAlt: 'Children with the Ukrainian flag in Leeds',
-      imageSrc: '/home-hero-school.png',
+      imageSrc: '/home/about-school-photo.png',
       highlights: [
         'Modern approach to learning',
         'Safe and friendly environment',
@@ -402,7 +402,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         'Ukrainian School Leeds - це простір, де діти не тільки вчаться, а й відчувають гордість за свою культуру, спілкуються українською та знаходять друзів на все життя.',
       cta: 'Про нашу школу',
       imageAlt: 'Діти з прапором України у Лідсі',
-      imageSrc: '/home-hero-school.png',
+      imageSrc: '/home/about-school-photo.png',
       highlights: [
         'Сучасний підхід до навчання',
         'Безпечне та дружнє середовище',
