@@ -618,7 +618,7 @@ export function PublicHomeClient({
                 />
               </div>
             </div>
-            <div className="absolute bottom-20 left-0 z-20 rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-lg backdrop-blur md:-left-6">
+            <div className="absolute bottom-20 -left-4 z-20 rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-lg backdrop-blur md:-left-6">
               <div className="flex items-center gap-4">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -770,7 +770,7 @@ export function PublicHomeClient({
           </h2>
         </div>
 
-        <div className="mt-8 flex w-full min-w-0 max-w-full snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible py-10 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:py-0 [&::-webkit-scrollbar]:hidden">
+        <div className="mt-8 flex w-full min-w-0 max-w-full snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:py-0 [&::-webkit-scrollbar]:hidden">
           {content.programs.cards.map((card, index) => (
             <div
               key={`program-card-${index}`}
