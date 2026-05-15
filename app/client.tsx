@@ -95,24 +95,6 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     if (!root || totalSlides === 0) return 0;
 
     const rootRect = root.getBoundingClientRect();
-    const isDesktopThreeUp = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
-
-    if (isDesktopThreeUp) {
-      let bestLeft = Infinity;
-      let bestIdx = 0;
-      for (let i = 0; i < totalSlides; i++) {
-        const el = slides[i];
-        if (!el) continue;
-        const r = el.getBoundingClientRect();
-        if (r.right <= rootRect.left + 1 || r.left >= rootRect.right - 1) continue;
-        if (r.left < bestLeft) {
-          bestLeft = r.left;
-          bestIdx = i;
-        }
-      }
-      return bestIdx;
-    }
-
     const viewportCenter = rootRect.left + rootRect.width / 2;
     let bestIdx = 0;
     let bestDist = Infinity;
@@ -175,10 +157,8 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     const mid = slideRefs.current[n];
     if (!mid) return;
 
-    const centerPeek =
-      typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
     root.style.scrollBehavior = 'auto';
-    scrollSlideIntoView(root, mid, centerPeek ? 'center' : 'start', 'auto');
+    scrollSlideIntoView(root, mid, 'center', 'auto');
     root.style.scrollBehavior = '';
     setSelectedIndex(0);
   }, [n]);
@@ -203,12 +183,21 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     const root = scrollerRef.current;
     if (!root || n === 0) return undefined;
 
-    const onScroll = () => {
-      if (!jumpingRef.current) updateSelectedFromScroll();
-    };
-    const onScrollEnd = () => {
+    let scrollIdleTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const finishScroll = () => {
       updateSelectedFromScroll();
       jumpLoopIfNeeded();
+    };
+
+    const onScroll = () => {
+      if (!jumpingRef.current) updateSelectedFromScroll();
+      if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
+      scrollIdleTimer = setTimeout(finishScroll, 120);
+    };
+    const onScrollEnd = () => {
+      if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
+      finishScroll();
     };
 
     updateSelectedFromScroll();
@@ -216,6 +205,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     root.addEventListener('scrollend', onScrollEnd);
     window.addEventListener('resize', updateSelectedFromScroll);
     return () => {
+      if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
       root.removeEventListener('scroll', onScroll);
       root.removeEventListener('scrollend', onScrollEnd);
       window.removeEventListener('resize', updateSelectedFromScroll);
@@ -223,56 +213,62 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
   }, [n, updateSelectedFromScroll, jumpLoopIfNeeded]);
 
   /** Scroll snap fights programmatic `scrollTo` — disable snap briefly when jumping via dots/keyboard. */
-  const scrollToPhysical = useCallback((physicalIdx: number) => {
-    const root = scrollerRef.current;
-    const el = slideRefs.current[physicalIdx];
-    if (!root || !el) return;
+  const scrollToPhysical = useCallback(
+    (physicalIdx: number) => {
+      const root = scrollerRef.current;
+      const el = slideRefs.current[physicalIdx];
+      if (!root || !el) return;
 
-    const centerPeek =
-      typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+      const prevSnap = root.style.scrollSnapType;
+      root.style.scrollSnapType = 'none';
 
-    const prevSnap = root.style.scrollSnapType;
-    root.style.scrollSnapType = 'none';
+      scrollSlideIntoView(root, el, 'center', 'smooth');
 
-    scrollSlideIntoView(root, el, centerPeek ? 'center' : 'start', 'smooth');
+      const restoreSnap = () => {
+        root.style.scrollSnapType = prevSnap || '';
+        updateSelectedFromScroll();
+        jumpLoopIfNeeded();
+      };
 
-    const restoreSnap = () => {
-      root.style.scrollSnapType = prevSnap || '';
-      updateSelectedFromScroll();
-    };
+      root.addEventListener('scrollend', restoreSnap, { once: true });
+      window.setTimeout(restoreSnap, 500);
+    },
+    [updateSelectedFromScroll, jumpLoopIfNeeded]
+  );
 
-    root.addEventListener('scrollend', restoreSnap, { once: true });
-    window.setTimeout(restoreSnap, 500);
-  }, [updateSelectedFromScroll]);
-
-  /** Scroll to logical slide using the middle copy (stable loop). */
+  /** Scroll to logical slide via nearest physical copy (shortest path in the loop). */
   const scrollToSlide = useCallback(
     (logicalIdx: number) => {
       if (n === 0) return;
       const i = ((logicalIdx % n) + n) % n;
+      const currentPhysical = getFocusedPhysicalIndex();
+      const candidates = [i, i + n, i + 2 * n];
+      const targetPhysical = candidates.reduce((best, cand) =>
+        Math.abs(cand - currentPhysical) < Math.abs(best - currentPhysical) ? cand : best
+      );
       requestAnimationFrame(() => {
-        scrollToPhysical(n + i);
+        scrollToPhysical(targetPhysical);
       });
     },
-    [n, scrollToPhysical]
+    [n, getFocusedPhysicalIndex, scrollToPhysical]
   );
 
   const goNext = useCallback(() => {
     if (n <= 1) return;
-    scrollToSlide(selectedIndex + 1);
-  }, [n, scrollToSlide, selectedIndex]);
+    scrollToPhysical(getFocusedPhysicalIndex() + 1);
+  }, [n, getFocusedPhysicalIndex, scrollToPhysical]);
 
   const goPrev = useCallback(() => {
     if (n <= 1) return;
-    scrollToSlide(selectedIndex - 1);
-  }, [n, scrollToSlide, selectedIndex]);
+    scrollToPhysical(getFocusedPhysicalIndex() - 1);
+  }, [n, getFocusedPhysicalIndex, scrollToPhysical]);
 
   if (n === 0) return null;
 
   return (
     <>
       <div
-        className="mx-auto w-full max-w-full outline-none"
+        className="mx-auto w-full max-w-full overflow-visible outline-none"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"
@@ -290,7 +286,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
       >
         <div
           ref={scrollerRef}
-          className="flex w-full min-w-0 snap-x snap-mandatory items-stretch gap-4 overflow-x-auto overflow-y-visible overscroll-x-contain px-2 scroll-pl-2 scroll-pr-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none sm:gap-5 sm:px-3 sm:scroll-pl-3 sm:scroll-pr-3 lg:gap-6 lg:px-3 lg:scroll-pl-3 lg:scroll-pr-3 [&::-webkit-scrollbar]:hidden"
+          className="flex w-full min-w-0 snap-x snap-mandatory items-stretch gap-4 overflow-x-auto overflow-y-visible overscroll-x-contain px-2 py-5 scroll-pl-2 scroll-pr-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none sm:gap-5 sm:px-3 sm:scroll-pl-3 sm:scroll-pr-3 sm:py-6 lg:gap-6 lg:px-3 lg:scroll-pl-3 lg:scroll-pr-3 lg:py-6 [&::-webkit-scrollbar]:hidden"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {Array.from({ length: PARENT_VOICES_LOOP_SETS }, (_, set) =>
@@ -302,11 +298,11 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
                   ref={(el) => {
                     slideRefs.current[physicalIndex] = el;
                   }}
-                  className="flex min-h-0 shrink-0 grow-0 snap-center flex-col basis-[85%] md:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-3rem)/3)] lg:snap-start"
+                  className="flex min-h-0 shrink-0 grow-0 snap-center flex-col overflow-visible basis-[85%] py-1 md:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-3rem)/3)]"
                   aria-hidden={set !== 1}
                 >
                   <article
-                    className={`relative flex min-h-220px flex-1 flex-col p-6 ${CARD_SURFACE_STATIC_CLASSNAME}`}
+                    className={`relative flex min-h-220px flex-1 flex-col p-6 ${CARD_SURFACE_CLASSNAME}`}
                   >
                     <Quote className="mb-4 h-8 w-8 shrink-0 text-primary/35" aria-hidden />
                     {isHtmlContent(item.quote) ? (
@@ -330,7 +326,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-center gap-2 px-2">
+      <div className="mt-4 flex justify-center gap-2 px-2">
         {items.map((_, idx) => (
           <button
             key={idx}
