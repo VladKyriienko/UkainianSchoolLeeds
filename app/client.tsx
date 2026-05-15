@@ -24,6 +24,32 @@ import { cn } from '@/utils/cn';
 
 const heroMainImage = '/hero-home-classroom.png';
 
+const TEXT_HIGHLIGHT_UNDERLINE_SRC = '/home/text-highlight-underline.png';
+
+type TextHighlightUnderlineProps = {
+  className?: string;
+  /** Stretch underline across the full width of the parent (e.g. hero accent). */
+  fullWidth?: boolean;
+};
+
+function TextHighlightUnderline({ className, fullWidth }: TextHighlightUnderlineProps) {
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={TEXT_HIGHLIGHT_UNDERLINE_SRC}
+      alt=""
+      aria-hidden
+      className={cn(
+        'pointer-events-none absolute z-0 object-contain mix-blend-multiply dark:mix-blend-screen',
+        fullWidth
+          ? 'bottom-0 left-0 right-0 h-3 w-full max-h-4 object-cover object-center'
+          : '-bottom-1 left-1/2 h-2.5 w-[min(110%,14rem)] -translate-x-1/2 sm:h-3',
+        className
+      )}
+    />
+  );
+}
+
 /** Icons for the trust row under hero CTAs (order matches content.heroTrust.items). */
 const HERO_TRUST_ICON_PATHS = [
   '/home/hero-icon-learning.png',
@@ -582,16 +608,9 @@ export function PublicHomeClient({
                   {line}
                 </span>
               ))}
-              <span className="relative mt-1 inline-block pb-1.5 text-primary">
+              <span className="relative mt-1 inline-block pb-2 text-primary">
                 {content.hero.titleAccent}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute bottom-0 left-0 right-0 h-1 rounded-full bg-linear-to-r from-brand-yellow/25 via-brand-yellow to-brand-yellow/25"
-                />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-px left-0 right-0 h-3px rounded-full bg-brand-yellow/35 blur-[1px]"
-                />
+                <TextHighlightUnderline fullWidth />
               </span>
             </h1>
             <p className="mt-6 max-w-140 text-muted-foreground">{content.hero.subtitle}</p>
@@ -706,14 +725,7 @@ export function PublicHomeClient({
               height={48}
               className="relative z-10 h-10 w-10 object-contain"
             />
-            <span
-              aria-hidden
-              className="absolute bottom-0 left-1/2 h-1 w-24 -translate-x-1/2 rounded-[999px] bg-linear-to-r from-brand-yellow/10 via-brand-yellow to-brand-yellow/10"
-            />
-            <span
-              aria-hidden
-              className="absolute bottom-[-2px] left-1/2 h-[3px] w-20 -translate-x-1/2 rounded-[999px] bg-brand-yellow/35 blur-[1px]"
-            />
+            <TextHighlightUnderline className="bottom-0 h-2 w-24" />
           </div>
           <h2
             id="why-choose-us-heading"
@@ -762,10 +774,7 @@ export function PublicHomeClient({
             <span>{content.programs.headingBefore}</span>
             <span className="relative inline-block">
               {content.programs.headingHighlight}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -bottom-1 left-1/2 h-1 w-[90%] max-w-48 -translate-x-1/2 rounded-full bg-linear-to-r from-brand-yellow/25 via-brand-yellow to-brand-yellow/25"
-              />
+              <TextHighlightUnderline />
             </span>
           </h2>
         </div>
@@ -866,10 +875,7 @@ export function PublicHomeClient({
             <p className="relative text-sm font-semibold tracking-wide text-primary">
               <span className="relative inline-block">
                 {content.about.eyebrow}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-1 left-1/2 h-1 w-[90%] max-w-48 -translate-x-1/2 rounded-full bg-linear-to-r from-brand-yellow/25 via-brand-yellow to-brand-yellow/25"
-                />
+                <TextHighlightUnderline />
               </span>
             </p>
             <h2
@@ -967,10 +973,7 @@ export function PublicHomeClient({
             <p className="relative text-sm font-semibold tracking-wide text-primary">
               <span className="relative inline-block">
                 {content.news.eyebrow}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-1 left-1/2 h-1 w-[90%] max-w-48 -translate-x-1/2 rounded-full bg-linear-to-r from-brand-yellow/25 via-brand-yellow to-brand-yellow/25"
-                />
+                <TextHighlightUnderline />
               </span>
             </p>
             <h2 className="mt-5 font-display text-2xl font-bold leading-tight text-foreground md:text-4xl">{content.news.title}</h2>
@@ -1067,10 +1070,7 @@ export function PublicHomeClient({
               <span>{content.parentVoices.titleBefore}</span>
               <span className="relative inline-block">
                 {content.parentVoices.titleHighlight}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-1 left-1/2 h-1 w-[90%] max-w-48 -translate-x-1/2 rounded-full bg-linear-to-r from-brand-yellow/25 via-brand-yellow to-brand-yellow/25"
-                />
+                <TextHighlightUnderline />
               </span>
               <span>{content.parentVoices.titleAfter}</span>
             </h2>
@@ -1106,10 +1106,7 @@ export function PublicHomeClient({
               <span>{content.faq.titleBefore}</span>
               <span className="relative inline-block">
                 {content.faq.titleHighlight}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-1 left-1/2 h-1 w-[90%] max-w-48 -translate-x-1/2 rounded-full bg-linear-to-r from-brand-yellow/25 via-brand-yellow to-brand-yellow/25"
-                />
+                <TextHighlightUnderline />
               </span>
               <span>{content.faq.titleAfter}</span>
             </span>

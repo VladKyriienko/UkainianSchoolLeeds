@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { PropsWithChildren } from 'react';
 import { Inter, Manrope } from 'next/font/google';
 import { getURL } from '@/utils/helpers';
@@ -36,6 +36,13 @@ export const metadata: Metadata = {
   }
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false
+};
+
 export default async function Layout({ children }: PropsWithChildren) {
   const cookieStore = await cookies();
   const theme = cookieStore.get('theme')?.value;
@@ -60,7 +67,7 @@ export default async function Layout({ children }: PropsWithChildren) {
         <body
           className={cn(
             inter.className,
-            'min-h-full bg-background text-foreground antialiased text-body'
+            'min-h-full touch-manipulation bg-background text-foreground antialiased text-body'
           )}
           suppressHydrationWarning
         >
