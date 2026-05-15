@@ -306,7 +306,7 @@ function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
                   aria-hidden={set !== 1}
                 >
                   <article
-                    className={`relative flex min-h-[220px] flex-1 flex-col p-6 ${CARD_SURFACE_STATIC_CLASSNAME}`}
+                    className={`relative flex min-h-220px flex-1 flex-col p-6 ${CARD_SURFACE_STATIC_CLASSNAME}`}
                   >
                     <Quote className="mb-4 h-8 w-8 shrink-0 text-primary/35" aria-hidden />
                     {isHtmlContent(item.quote) ? (
@@ -424,7 +424,7 @@ function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: 
   };
 
   return (
-    <section className="mt-6 w-full min-w-0 max-w-full pb-0 md:pb-10">
+    <section className="w-full min-w-0 max-w-full">
       <div className="w-full min-w-0 overflow-visible rounded-4xl bg-primary px-6 py-10 text-primary-foreground shadow-xl shadow-primary/20 md:px-10 md:py-12 lg:px-12 lg:py-14">
         <div className="flex flex-col items-stretch gap-10 lg:flex-row lg:items-stretch lg:gap-10 xl:gap-14">
           <div className="relative flex min-w-0 shrink-0 flex-col justify-center lg:max-w-xl">
@@ -574,10 +574,10 @@ export function PublicHomeClient({
   }, []);
 
   return (
-    <div className="w-full min-w-0 pb-12 text-foreground">
+    <div className="flex w-full min-w-0 flex-col pt-8 gap-12 pb-12 text-foreground md:gap-24">
       {/* Section: Hero — mobile: H1+lead → image+chips → trust row → CTAs; lg: two columns, left column H1+lead / CTAs / trust (`content.hero`, `content.heroTrust`, `content.features`). */}
-      <section className="relative isolate overflow-x-hidden rounded-t-[2.25rem] bg-card pb-6 pt-12 md:-mx-6 md:px-10 md:py-10 md:pb-12 lg:-mx-8 lg:px-12 lg:py-12 lg:pb-14">
-        <div className="relative z-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
+      <section className="relative isolate -mx-4 w-[calc(100%+2rem)] max-w-none overflow-x-hidden rounded-t-[2.25rem] bg-card md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-8 lg:w-[calc(100%+4rem)]">
+        <div className="relative z-10 grid grid-cols-1 items-center gap-8 px-4 md:px-6 lg:grid-cols-[1.05fr_1fr] lg:px-8">
           {/* Mobile order: copy → photo → trust row → CTAs. Desktop col 1: copy, CTAs, trust; col 2: photo (rows 1–3). */}
           <div className="max-w-2xl lg:col-start-1 lg:row-start-1 lg:self-start">
             <h1 className="font-display font-bold leading-[1.02] tracking-tight text-foreground max-md:text-4xl md:text-h1">
@@ -594,7 +594,7 @@ export function PublicHomeClient({
                 />
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -bottom-px left-0 right-0 h-[3px] rounded-full bg-brand-yellow/35 blur-[1px]"
+                  className="pointer-events-none absolute -bottom-px left-0 right-0 h-3px rounded-full bg-brand-yellow/35 blur-[1px]"
                 />
               </span>
             </h1>
@@ -698,7 +698,7 @@ export function PublicHomeClient({
       <section
         id="why-choose-us"
         aria-labelledby="why-choose-us-heading"
-        className="-mx-4 w-[calc(100%+2rem)] max-w-none scroll-mt-24 py-6 md:-mx-6 md:w-[calc(100%+3rem)] md:py-16 lg:-mx-8 lg:w-[calc(100%+4rem)]"
+        className="-mx-4 w-[calc(100%+2rem)] max-w-none scroll-mt-24 md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-8 lg:w-[calc(100%+4rem)]"
       >
         <div className="flex flex-col items-center px-4 text-center md:px-6 lg:px-8">
           <div className="relative mb-4 flex flex-col items-center">
@@ -756,7 +756,7 @@ export function PublicHomeClient({
       <section
         id="programs"
         aria-labelledby="programs-heading"
-        className="scroll-mt-24 py-6 md:py-14"
+        className="scroll-mt-24"
       >
         <div className="text-center">
           <h2
@@ -774,7 +774,7 @@ export function PublicHomeClient({
           </h2>
         </div>
 
-        <div className="mt-8 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible py-10 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:py-0 [&::-webkit-scrollbar]:hidden">
+        <div className="mt-8 flex w-full min-w-0 max-w-full snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible py-10 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:py-0 [&::-webkit-scrollbar]:hidden">
           {content.programs.cards.map((card, index) => (
             <div
               key={`program-card-${index}`}
@@ -816,10 +816,10 @@ export function PublicHomeClient({
         </div>
       </section>
 
-      {/* Section: About the school — full-bleed split layout: photo + text, highlights grid, CTA to welcome page (`content.about`). */}
+      {/* Section: About the school — viewport full-bleed split layout (breaks out of `container` padding). */}
       <section
         aria-labelledby="about-school-heading"
-        className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 scroll-mt-24 py-6 lg:py-14"
+        className="relative left-1/2 w-dvw max-w-none -translate-x-1/2 scroll-mt-24"
       >
         <div className="w-full overflow-hidden rounded-none bg-card lg:grid lg:min-h-[min(28rem,65vh)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)]">
           <div className="relative aspect-5/4 min-h-[220px] lg:aspect-auto lg:min-h-[min(28rem,65vh)]">
@@ -837,7 +837,11 @@ export function PublicHomeClient({
             />
             <div
               aria-hidden
-              className="absolute -inset-y-1 -right-1 hidden w-[min(58%,22rem)] bg-linear-to-l from-card from-0% via-card/92 via-35% to-transparent lg:block"
+              className="absolute -inset-y-1 -left-1 hidden w-[min(38%,22rem)] bg-linear-to-r from-card from-0% via-card/92 via-35% to-transparent lg:block"
+            />
+            <div
+              aria-hidden
+              className="absolute -inset-y-1 -right-1 hidden w-[min(38%,22rem)] bg-linear-to-l from-card from-0% via-card/92 via-35% to-transparent lg:block"
             />
           </div>
 
@@ -919,7 +923,7 @@ export function PublicHomeClient({
       <section
         id="school-atmosphere"
         aria-labelledby="school-atmosphere-heading"
-        className="scroll-mt-24 py-6 md:py-14"
+        className="scroll-mt-24"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2
@@ -940,7 +944,7 @@ export function PublicHomeClient({
             </Link>
           </Button>
         </div>
-        <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible pb-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden">
+        <div className="mt-8 flex w-full min-w-0 max-w-full snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible pb-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden">
           {atmosphereStripImages.map((photo) => (
             <div
               key={photo.key}
@@ -961,7 +965,7 @@ export function PublicHomeClient({
       </section>
 
       {/* Section: Latest news — eyebrow, title, “view all” link, grid of news cards from `initialNews` prop (`content.news` for labels / empty state). */}
-      <section className="py-6">
+      <section>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="relative text-sm font-semibold tracking-wide text-primary">
@@ -1056,7 +1060,7 @@ export function PublicHomeClient({
       <section
         id="parent-voices"
         aria-labelledby="parent-voices-heading"
-        className="scroll-mt-24 py-6 md:py-16"
+        className="scroll-mt-24"
       >
         <div className="mb-10 flex flex-col items-center text-center">
           <div className="flex flex-wrap items-end justify-center">
@@ -1096,7 +1100,7 @@ export function PublicHomeClient({
       </section>
 
       {/* Section: FAQ — split title + two-column accordion (`content.faq`). Anchor: #faq. */}
-      <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-24 overflow-visible py-6 md:py-16">
+      <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-24 overflow-visible">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,12rem)_1fr] lg:items-start lg:gap-14 xl:grid-cols-[minmax(0,14rem)_1fr]">
           <h2
             id="faq-heading"
