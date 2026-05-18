@@ -4,11 +4,49 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAccess } from '@/utils/auth-helpers/server';
 import { revalidatePath } from 'next/cache';
 import type { Tables } from '@/utils/supabase/types';
+import { randomUUID } from 'crypto';
+import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
 
 export type AdminEvent = Tables<'events'>;
+
+async function uploadEventPhotoIfPresent(
+  photoFile: File | null
+): Promise<string | null> {
+  if (!photoFile || photoFile.size === 0) return null;
+
+  if (!photoFile.type.startsWith('image/')) {
+    throw new Error('Photo must be an image');
+  }
+
+  const maxBytes = 5 * 1024 * 1024;
+  if (photoFile.size > maxBytes) {
+    throw new Error('Photo is too large (max 5MB)');
+  }
+
+  const bucket = 'events-photos';
+  const originalName = photoFile.name || 'photo';
+  const safeName = sanitizeFilename(originalName);
+  const ext = safeName.includes('.') ? safeName.split('.').pop() : null;
+  const base = ext ? safeName.slice(0, -(ext.length + 1)) : safeName;
+  const filename = `${randomUUID()}-${base}${ext ? `.${ext}` : ''}`;
+  const path = `events/${filename}`;
+
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from(bucket)
+    .upload(path, photoFile, {
+      contentType: photoFile.type,
+      upsert: true
+    });
+
+  if (uploadError) {
+    throw new Error(`Failed to upload photo: ${uploadError.message}`);
+  }
+
+  return path;
+}
 
 function normalizeTimeField(value: FormDataEntryValue | null): string | null {
   return normalizeText(value);
@@ -114,6 +152,10 @@ export async function createEvent(
       return { success: false, error: 'Invalid date format' };
     }
 
+    const photoEntry = formData.get('photo');
+    const photoFile = photoEntry instanceof File ? photoEntry : null;
+    const photoPath = await uploadEventPhotoIfPresent(photoFile);
+
     const { error: insertError } = await supabaseAdmin.from('events').insert({
       title: title.trim(),
       title_uk: titleUk,
@@ -123,7 +165,8 @@ export async function createEvent(
       start_time: startTime || null,
       end_time: endTime || null,
       location: location || null,
-      location_uk: locationUk
+      location_uk: locationUk,
+      ...(photoPath && { photo: photoPath })
     });
 
     if (insertError) {
@@ -173,19 +216,40 @@ export async function updateEvent(
       return { success: false, error: 'Invalid date format' };
     }
 
+    const removePhoto = formData.get('remove_photo') === '1';
+    const photoEntry = formData.get('photo');
+    const photoFile = photoEntry instanceof File ? photoEntry : null;
+    const photoPath = await uploadEventPhotoIfPresent(photoFile);
+
+    const updatePayload: Record<string, unknown> = {
+      title: title.trim(),
+      title_uk: titleUk,
+      description,
+      description_uk: descriptionUk,
+      date: dateObj.toISOString(),
+      start_time: startTime || null,
+      end_time: endTime || null,
+      location: location || null,
+      location_uk: locationUk
+    };
+
+    if (removePhoto) {
+      const { data: existing } = await supabaseAdmin
+        .from('events')
+        .select('photo')
+        .eq('id', id)
+        .single();
+      if (existing?.photo) {
+        await supabaseAdmin.storage.from('events-photos').remove([existing.photo]);
+      }
+      updatePayload.photo = null;
+    } else if (photoPath) {
+      updatePayload.photo = photoPath;
+    }
+
     const { error: updateError } = await supabaseAdmin
       .from('events')
-      .update({
-        title: title.trim(),
-        title_uk: titleUk,
-        description,
-        description_uk: descriptionUk,
-        date: dateObj.toISOString(),
-        start_time: startTime || null,
-        end_time: endTime || null,
-        location: location || null,
-        location_uk: locationUk
-      })
+      .update(updatePayload)
       .eq('id', id);
 
     if (updateError) {
@@ -210,6 +274,16 @@ export async function deleteEvent(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAccess();
+
+    const { data: item, error: fetchError } = await supabaseAdmin
+      .from('events')
+      .select('photo')
+      .eq('id', id)
+      .single();
+
+    if (!fetchError && item?.photo) {
+      await supabaseAdmin.storage.from('events-photos').remove([item.photo]);
+    }
 
     const { error: deleteError } = await supabaseAdmin
       .from('events')

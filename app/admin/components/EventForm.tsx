@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminEvent } from '@/app/admin/events/actions';
 import { createEvent, updateEvent } from '@/app/admin/events/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
@@ -18,12 +19,14 @@ import { DatePicker } from '@/app/admin/profile/components/DatePicker';
 type EventFormProps = {
   mode: 'create' | 'edit';
   event?: AdminEvent | null;
+  currentPhotoUrl?: string | null;
 };
 
-export function EventForm({ mode, event }: EventFormProps) {
+export function EventForm({ mode, event, currentPhotoUrl }: EventFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [description, setDescription] = useState(event?.description || '');
   const [descriptionUk, setDescriptionUk] = useState(event?.description_uk || '');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
@@ -36,6 +39,7 @@ export function EventForm({ mode, event }: EventFormProps) {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+    if (photoFile) formData.set('photo', photoFile);
 
     try {
       let result;
@@ -169,6 +173,15 @@ export function EventForm({ mode, event }: EventFormProps) {
           />
         </div>
       </div>
+
+      <ImageUploadField
+        id="photo"
+        name="photo"
+        label="Photo (optional)"
+        currentImageUrl={currentPhotoUrl}
+        removePhotoFieldName="remove_photo"
+        onFileChange={setPhotoFile}
+      />
 
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>

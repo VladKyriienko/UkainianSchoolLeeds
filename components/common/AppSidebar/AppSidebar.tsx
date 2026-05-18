@@ -149,7 +149,7 @@ export function AppSidebar({
         <NavMain items={navItems} />
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border">
+      <SidebarFooter className="shrink-0 border-t border-sidebar-border bg-sidebar pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <NavUser />
       </SidebarFooter>
 

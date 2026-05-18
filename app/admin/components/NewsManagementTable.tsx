@@ -24,6 +24,13 @@ type NewsManagementTableProps = {
   news: AdminNews[];
 };
 
+function getNewsPhotoUrl(photoPath: string | null): string | null {
+  if (!photoPath) return null;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+  if (!base) return null;
+  return `${base}/storage/v1/object/public/news-photos/${photoPath}`;
+}
+
 export default function NewsManagementTable({
   news: newsItems
 }: NewsManagementTableProps) {
@@ -69,6 +76,7 @@ export default function NewsManagementTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[88px]">Photo</TableHead>
             <TableHead className="w-[220px]">Title</TableHead>
             <TableHead className="w-[120px]">Date</TableHead>
             <TableHead>Description</TableHead>
@@ -77,8 +85,24 @@ export default function NewsManagementTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {newsItems.map((item) => (
+          {newsItems.map((item) => {
+            const photoUrl = getNewsPhotoUrl(item.photo);
+            return (
             <TableRow key={item.id}>
+              <TableCell>
+                {photoUrl ? (
+                  <div className="size-14 rounded border overflow-hidden bg-muted shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photoUrl}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground text-xs">—</span>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{item.title}</TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {formatDateLabel(item.date)}
@@ -107,7 +131,8 @@ export default function NewsManagementTable({
                 />
               </TableCell>
             </TableRow>
-          ))}
+            );
+          })}
         </TableBody>
       </Table>
     </EntityTableShell>

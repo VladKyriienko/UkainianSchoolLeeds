@@ -16,6 +16,7 @@ export type Database = {
           id: string
           order: number
           photo: string
+          updated_at: string
         }
         Insert: {
           class_id: string
@@ -23,6 +24,7 @@ export type Database = {
           id?: string
           order?: number
           photo: string
+          updated_at?: string
         }
         Update: {
           class_id?: string
@@ -30,6 +32,7 @@ export type Database = {
           id?: string
           order?: number
           photo?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -50,6 +53,7 @@ export type Database = {
           order: number
           title: string
           title_uk: string | null
+          updated_at: string
         }
         Insert: {
           created_at?: string
@@ -59,6 +63,7 @@ export type Database = {
           order?: number
           title: string
           title_uk?: string | null
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -68,6 +73,7 @@ export type Database = {
           order?: number
           title?: string
           title_uk?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -80,6 +86,7 @@ export type Database = {
           title: string
           title_uk: string | null
           type: Database["public"]["Enums"]["typeDocumentEnum"]
+          updated_at: string
         }
         Insert: {
           content: string
@@ -89,6 +96,7 @@ export type Database = {
           title: string
           title_uk?: string | null
           type: Database["public"]["Enums"]["typeDocumentEnum"]
+          updated_at?: string
         }
         Update: {
           content?: string
@@ -98,6 +106,7 @@ export type Database = {
           title?: string
           title_uk?: string | null
           type?: Database["public"]["Enums"]["typeDocumentEnum"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -111,6 +120,7 @@ export type Database = {
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string
+          updated_at: string
         }
         Insert: {
           amount_cents: number
@@ -121,6 +131,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id: string
+          updated_at?: string
         }
         Update: {
           amount_cents?: number
@@ -131,6 +142,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -144,9 +156,11 @@ export type Database = {
           id: string
           location: string | null
           location_uk: string | null
+          photo: string | null
           start_time: string | null
           title: string
           title_uk: string | null
+          updated_at: string
         }
         Insert: {
           created_at?: string
@@ -157,9 +171,11 @@ export type Database = {
           id?: string
           location?: string | null
           location_uk?: string | null
+          photo?: string | null
           start_time?: string | null
           title: string
           title_uk?: string | null
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -170,9 +186,35 @@ export type Database = {
           id?: string
           location?: string | null
           location_uk?: string | null
+          photo?: string | null
           start_time?: string | null
           title?: string
           title_uk?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      gallery: {
+        Row: {
+          created_at: string
+          id: string
+          order: number
+          photo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order?: number
+          photo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order?: number
+          photo?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -186,6 +228,7 @@ export type Database = {
           phone: string | null
           read: boolean
           subject: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
@@ -196,6 +239,7 @@ export type Database = {
           phone?: string | null
           read?: boolean
           subject: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -206,6 +250,7 @@ export type Database = {
           phone?: string | null
           read?: boolean
           subject?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -220,6 +265,7 @@ export type Database = {
           photo: string | null
           title: string
           title_uk: string | null
+          updated_at: string
         }
         Insert: {
           created_at?: string
@@ -231,6 +277,7 @@ export type Database = {
           photo?: string | null
           title: string
           title_uk?: string | null
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -242,47 +289,33 @@ export type Database = {
           photo?: string | null
           title?: string
           title_uk?: string | null
-        }
-        Relationships: []
-      }
-      schedule: {
-        Row: {
-          created_at: string
-          date: string
-          file: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          date?: string
-          file: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          date?: string
-          file?: string
-          id?: string
+          updated_at?: string
         }
         Relationships: []
       }
       organisation_memberships: {
         Row: {
+          created_at: string
           id: string
           organisation_id: string
           role: string
+          updated_at: string
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
           organisation_id: string
           role: string
+          updated_at?: string
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
           organisation_id?: string
           role?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -329,20 +362,59 @@ export type Database = {
         }
         Relationships: []
       }
+      review: {
+        Row: {
+          content: string
+          content_uk: string | null
+          created_at: string
+          data: string
+          id: string
+          perens: string
+          perens_uk: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          content_uk?: string | null
+          created_at?: string
+          data?: string
+          id?: string
+          perens: string
+          perens_uk?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          content_uk?: string | null
+          created_at?: string
+          data?: string
+          id?: string
+          perens?: string
+          perens_uk?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       roles: {
         Row: {
+          created_at: string
           id: string
           role: Database["public"]["Enums"]["rolesEnum"]
+          updated_at: string
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["rolesEnum"]
+          updated_at?: string
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["rolesEnum"]
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -355,75 +427,27 @@ export type Database = {
           },
         ]
       }
-      review: {
+      schedule: {
         Row: {
-          content: string
-          content_uk: string | null
-          data: string
-          id: string
-          perens: string
-          perens_uk: string | null
-        }
-        Insert: {
-          content: string
-          content_uk?: string | null
-          data?: string
-          id?: string
-          perens: string
-          perens_uk?: string | null
-        }
-        Update: {
-          content?: string
-          content_uk?: string | null
-          data?: string
-          id?: string
-          perens?: string
-          perens_uk?: string | null
-        }
-        Relationships: []
-      }
-      teachers: {
-        Row: {
-          category: Database["public"]["Enums"]["teacherCategoryEnum"]
           created_at: string
-          description: string | null
-          description_uk: string | null
-          email: string | null
+          date: string
+          file: string
           id: string
-          name: string
-          name_uk: string | null
-          phone: string | null
-          photo: string | null
-          title: string | null
-          title_uk: string | null
+          updated_at: string
         }
         Insert: {
-          category?: Database["public"]["Enums"]["teacherCategoryEnum"]
           created_at?: string
-          description?: string | null
-          description_uk?: string | null
-          email?: string | null
+          date?: string
+          file: string
           id?: string
-          name: string
-          name_uk?: string | null
-          phone?: string | null
-          photo?: string | null
-          title?: string | null
-          title_uk?: string | null
+          updated_at?: string
         }
         Update: {
-          category?: Database["public"]["Enums"]["teacherCategoryEnum"]
           created_at?: string
-          description?: string | null
-          description_uk?: string | null
-          email?: string | null
+          date?: string
+          file?: string
           id?: string
-          name?: string
-          name_uk?: string | null
-          phone?: string | null
-          photo?: string | null
-          title?: string | null
-          title_uk?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -433,18 +457,21 @@ export type Database = {
           created_at: string
           id: string
           teacher_id: string
+          updated_at: string
         }
         Insert: {
           class_id: string
           created_at?: string
           id?: string
           teacher_id: string
+          updated_at?: string
         }
         Update: {
           class_id?: string
           created_at?: string
           id?: string
           teacher_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -462,6 +489,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      teachers: {
+        Row: {
+          category: Database["public"]["Enums"]["teacherCategoryEnum"]
+          created_at: string
+          description: string | null
+          description_uk: string | null
+          email: string | null
+          id: string
+          name: string
+          name_uk: string | null
+          phone: string | null
+          photo: string | null
+          title: string | null
+          title_uk: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["teacherCategoryEnum"]
+          created_at?: string
+          description?: string | null
+          description_uk?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          name_uk?: string | null
+          phone?: string | null
+          photo?: string | null
+          title?: string | null
+          title_uk?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["teacherCategoryEnum"]
+          created_at?: string
+          description?: string | null
+          description_uk?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          name_uk?: string | null
+          phone?: string | null
+          photo?: string | null
+          title?: string | null
+          title_uk?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_uploads: {
         Row: {
@@ -499,26 +574,32 @@ export type Database = {
         Row: {
           avatar_url: string | null
           birthdate: string | null
+          created_at: string
           full_name: string | null
           id: string
           is_active: boolean
           marketing_consent: boolean | null
+          updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           birthdate?: string | null
+          created_at?: string
           full_name?: string | null
           id?: string
           is_active?: boolean
           marketing_consent?: boolean | null
+          updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           birthdate?: string | null
+          created_at?: string
           full_name?: string | null
           id?: string
           is_active?: boolean
           marketing_consent?: boolean | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -530,7 +611,7 @@ export type Database = {
       keep_db_active: { Args: never; Returns: undefined }
     }
     Enums: {
-      rolesEnum: "admin" | "teacher" | "user"
+      rolesEnum: "admin" | "user" | "teacher"
       teacherCategoryEnum: "HEADTEACHER" | "TEACHER" | "STAF"
       typeDocumentEnum: "COOKIES_POLICY" | "PRIVACY_POLICY" | "DOCUMEND"
     }
@@ -660,7 +741,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      rolesEnum: ["admin", "teacher", "user"],
+      rolesEnum: ["admin", "user", "teacher"],
       teacherCategoryEnum: ["HEADTEACHER", "TEACHER", "STAF"],
       typeDocumentEnum: ["COOKIES_POLICY", "PRIVACY_POLICY", "DOCUMEND"],
     },

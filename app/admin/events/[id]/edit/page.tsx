@@ -1,3 +1,4 @@
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getEventById } from '@/app/admin/events/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { EventForm } from '@/app/admin/components/EventForm';
@@ -41,12 +42,18 @@ export default async function EditEventPage({ params }: EditEventPageProps) {
     );
   }
 
+  const supabaseAdmin = createAdminClient();
+  const currentPhotoUrl = event.photo
+    ? supabaseAdmin.storage.from('events-photos').getPublicUrl(event.photo).data
+        .publicUrl
+    : null;
+
   return (
     <PageWrapper
       title="Edit Event"
       description="Update event details"
     >
-      <EventForm mode="edit" event={event} />
+      <EventForm mode="edit" event={event} currentPhotoUrl={currentPhotoUrl} />
     </PageWrapper>
   );
 }

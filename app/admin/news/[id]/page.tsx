@@ -58,6 +58,18 @@ export default async function NewsViewPage({
             <div className="font-medium text-lg">{item.title}</div>
           </div>
 
+          {photoUrl && (
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Photo</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoUrl}
+                alt={item.title}
+                className="block h-auto w-auto max-w-full rounded-md border bg-muted/30"
+              />
+            </div>
+          )}
+
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>
             {isHtmlContent(item.description) ? (
@@ -80,20 +92,6 @@ export default async function NewsViewPage({
               <div className="font-medium">{item.order}</div>
             </div>
           </div>
-
-          {photoUrl && (
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Photo</div>
-              <div className="rounded-md border overflow-hidden max-w-md">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photoUrl}
-                  alt={item.title}
-                  className="w-full object-cover aspect-video"
-                />
-              </div>
-            </div>
-          )}
 
           {(item.title_uk || item.description_uk) && (
             <div className="pt-4 border-t space-y-2">

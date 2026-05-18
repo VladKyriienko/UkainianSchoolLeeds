@@ -4,6 +4,7 @@ import { getEventById } from '@/app/admin/events/actions';
 import { EventDetailsActions } from '@/app/admin/components/EventDetailsActions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
 
@@ -34,6 +35,12 @@ export default async function EventDetailsPage({
     }
   };
 
+  const supabaseAdmin = createAdminClient();
+  const photoUrl = event.photo
+    ? supabaseAdmin.storage.from('events-photos').getPublicUrl(event.photo).data
+      .publicUrl
+    : null;
+
   const formatTime = (timeString: string | null) => {
     if (!timeString) return '—';
     const parts = timeString.split(':');
@@ -62,6 +69,18 @@ export default async function EventDetailsPage({
             <div className="text-sm text-muted-foreground mb-1">Title</div>
             <div className="font-medium text-lg">{event.title}</div>
           </div>
+
+          {photoUrl && (
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Photo</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoUrl}
+                alt={event.title}
+                className="block h-auto w-auto max-w-sm rounded-md border bg-muted/30"
+              />
+            </div>
+          )}
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>

@@ -23,6 +23,13 @@ type EventManagementTableProps = {
   events: AdminEvent[];
 };
 
+function getEventPhotoUrl(photoPath: string | null): string | null {
+  if (!photoPath) return null;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+  if (!base) return null;
+  return `${base}/storage/v1/object/public/events-photos/${photoPath}`;
+}
+
 export default function EventManagementTable({
   events
 }: EventManagementTableProps) {
@@ -80,6 +87,7 @@ export default function EventManagementTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[88px]">Photo</TableHead>
             <TableHead className="w-[260px]">Title</TableHead>
             <TableHead className="w-[140px]">Date</TableHead>
             <TableHead className="w-[120px]">Start Time</TableHead>
@@ -89,8 +97,24 @@ export default function EventManagementTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {events.map((event) => (
+          {events.map((event) => {
+            const photoUrl = getEventPhotoUrl(event.photo);
+            return (
             <TableRow key={event.id}>
+              <TableCell>
+                {photoUrl ? (
+                  <div className="size-14 rounded border overflow-hidden bg-muted shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photoUrl}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground text-xs">—</span>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{event.title}</TableCell>
               <TableCell className="text-muted-foreground">
                 {formatDateLabel(event.date)}
@@ -113,7 +137,8 @@ export default function EventManagementTable({
                 />
               </TableCell>
             </TableRow>
-          ))}
+            );
+          })}
         </TableBody>
       </Table>
     </EntityTableShell>

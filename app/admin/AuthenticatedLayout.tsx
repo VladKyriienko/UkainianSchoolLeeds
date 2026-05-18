@@ -59,8 +59,8 @@ function AuthenticatedLayoutContent({
           />
         )}
 
-        <div className="flex w-full flex-1 flex-col gap-4 p-4 md:p-6">
-          <div className="mx-auto w-full max-w-6xl">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 md:p-6">
+          <div className="mx-auto w-full min-w-0 max-w-6xl">
             {children}
           </div>
         </div>
