@@ -28,11 +28,25 @@ export function HomeProgramsSection({ programs }: { programs: HomeContent['progr
         </h2>
       </div>
 
-      <div className="mt-8 flex w-full min-w-0 max-w-full snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overflow-y-visible [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:py-0 [&::-webkit-scrollbar]:hidden">
+      <div
+        className={cn(
+          'mt-8 w-full min-w-0 max-w-full gap-3',
+          'max-md:flex max-md:snap-x max-md:snap-mandatory max-md:items-stretch',
+          'max-md:overflow-x-auto max-md:overflow-y-visible max-md:px-1',
+          'max-md:scroll-smooth max-md:[-ms-overflow-style:none] max-md:scrollbar-none',
+          'md:grid md:grid-cols-2 md:gap-4',
+          'lg:grid-cols-4',
+          '[&::-webkit-scrollbar]:hidden'
+        )}
+      >
         {programs.cards.map((card, index) => (
           <div
             key={`program-card-${index}`}
-            className="flex w-min(85vw,70) shrink-0 snap-start flex-col sm:w-70 md:w-auto md:min-w-0"
+            className={cn(
+              'flex min-w-0 flex-col',
+              'max-md:w-[72vw] max-md:max-w-64 max-md:shrink-0 max-md:snap-center',
+              'md:w-auto md:max-w-none'
+            )}
           >
             <article
               className={cn(
@@ -45,7 +59,7 @@ export function HomeProgramsSection({ programs }: { programs: HomeContent['progr
                   src={card.image}
                   alt=""
                   fill
-                  sizes="(max-width: 768px) 85vw, 320px"
+                  sizes="(max-width: 767px) 72vw, (max-width: 1023px) 50vw, 320px"
                   className="object-cover"
                   loading="lazy"
                 />
