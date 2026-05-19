@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
-import Logo from '@/components/icons/Logo';
 import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
@@ -31,7 +31,7 @@ export function MobileHeader({
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+        'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60',
         className
       )}
     >
@@ -50,8 +50,14 @@ export function MobileHeader({
             </Button>
           )}
 
-          <Link href="/" className="flex items-center space-x-2">
-            <Logo className="h-8 w-8 shrink-0" />
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Image
+              src="/logo.png"
+              alt="Ukrainia School"
+              width={32}
+              height={32}
+              className="h-8 w-8 shrink-0 object-contain"
+            />
             <span className="flex flex-col text-xs font-semibold leading-tight">
               <span>{BRAND_NAME_LINES[language].line1}</span>
               <span>{BRAND_NAME_LINES[language].line2}</span>

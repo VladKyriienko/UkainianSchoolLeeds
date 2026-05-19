@@ -1,6 +1,6 @@
 export type HomeLanguage = 'en' | 'uk';
 
-type HomeContent = {
+export type HomeContent = {
   hero: {
     titleLines: string[];
     titleAccent: string;
@@ -28,8 +28,11 @@ type HomeContent = {
   news: {
     eyebrow: string;
     title: string;
-    viewAll: string;
+    viewAllNews: string;
+    viewAllEvents: string;
     emptyMessage: string;
+    eventLabel: string;
+    newsLabel: string;
   };
   parentVoices: {
     titleBefore: string;
@@ -159,8 +162,11 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     news: {
       eyebrow: 'News and events',
       title: 'Stay up to date with school life',
-      viewAll: 'All news',
-      emptyMessage: 'No news yet. Check back later.'
+      viewAllNews: 'All news',
+      viewAllEvents: 'Calendar',
+      emptyMessage: 'No news or events yet. Check back later.',
+      eventLabel: 'Event',
+      newsLabel: 'News'
     },
     parentVoices: {
       titleBefore: 'What ',
@@ -299,7 +305,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     schoolAtmosphere: {
       heading: "Our school's atmosphere",
       cta: 'See more photos',
-      ctaHref: '/parents/news',
+      ctaHref: '/parents/gallery',
       images: [
         {
           src: '/hero-home-classroom.png',
@@ -412,8 +418,11 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     news: {
       eyebrow: 'Новини та події',
       title: 'Будь в курсі шкільного життя',
-      viewAll: 'Всі новини',
-      emptyMessage: 'Новини поки немає. Завітайте пізніше.'
+      viewAllNews: 'Всі новини',
+      viewAllEvents: 'Календар',
+      emptyMessage: 'Новин і подій поки немає. Завітайте пізніше.',
+      eventLabel: 'Подія',
+      newsLabel: 'Новина'
     },
     parentVoices: {
       titleBefore: 'Що ',
@@ -552,7 +561,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     schoolAtmosphere: {
       heading: 'Атмосфера нашої школи',
       cta: 'Дивитися більше фото',
-      ctaHref: '/parents/news',
+      ctaHref: '/parents/gallery',
       images: [
         {
           src: '/hero-home-classroom.png',

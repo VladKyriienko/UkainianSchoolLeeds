@@ -6,42 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
+import type { AdminSchoolGalleryItem } from '@/app/admin/gallery/actions';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import type { AdminGalleryItem } from '@/app/admin/class-gallery/actions';
-import { createGalleryItem, updateGalleryItem } from '@/app/admin/class-gallery/actions';
-import type { AdminClass } from '@/app/admin/classes/actions';
+  createSchoolGalleryItem,
+  updateSchoolGalleryItem
+} from '@/app/admin/gallery/actions';
 import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 
-type ClassGalleryFormProps = {
+type GalleryFormProps = {
   mode: 'create' | 'edit';
-  item?: AdminGalleryItem | null;
-  classes: AdminClass[];
-  currentPhotoUrl?: string | null | undefined;
-  successRedirectPath?: string;
-  fixedClassId?: string;
-  hideClassSelect?: boolean;
+  item?: AdminSchoolGalleryItem | null;
+  currentPhotoUrl?: string | null;
 };
 
-export function ClassGalleryForm({
+export function GalleryForm({
   mode,
   item,
-  classes: classesList,
-  currentPhotoUrl,
-  successRedirectPath = '/admin/class-gallery',
-  fixedClassId,
-  hideClassSelect = false
-}: ClassGalleryFormProps) {
+  currentPhotoUrl
+}: GalleryFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [classId, setClassId] = useState<string>(fixedClassId ?? item?.class_id ?? '');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,30 +41,22 @@ export function ClassGalleryForm({
         fileToUpload = await prepareAdminPhotoForUpload(photoFile);
       }
 
-      const selectedClassId = fixedClassId ?? classId;
-      if (!selectedClassId) {
-        setError('Class is required');
-        setIsSubmitting(false);
-        return;
-      }
-
       const formData = new FormData(form);
-      formData.set('class_id', selectedClassId);
       if (fileToUpload) formData.set('photo', fileToUpload);
 
       let result;
       if (mode === 'create') {
-        result = await createGalleryItem(formData);
+        result = await createSchoolGalleryItem(formData);
       } else {
         if (!item?.id) throw new Error('Gallery item ID required');
-        result = await updateGalleryItem(item.id, formData);
+        result = await updateSchoolGalleryItem(item.id, formData);
       }
       if (!result.success) {
         setError(result.error ?? 'Failed to save');
         setIsSubmitting(false);
         return;
       }
-      router.push(successRedirectPath);
+      router.push('/admin/gallery');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save');
       setIsSubmitting(false);
@@ -93,34 +71,11 @@ export function ClassGalleryForm({
         </div>
       )}
 
-      {!hideClassSelect && (
-        <div className="space-y-2">
-          <Label>Class *</Label>
-          <Select
-            value={classId}
-            onValueChange={setClassId}
-            required
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select class" />
-            </SelectTrigger>
-            <SelectContent>
-              {classesList.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
       <ImageUploadField
         id="photo"
         name="photo"
         label={mode === 'create' ? 'Photo *' : 'Photo (optional, upload to replace)'}
         currentImageUrl={currentPhotoUrl}
-        removePhotoFieldName="remove_photo"
         onFileChange={setPhotoFile}
       />
 
@@ -139,7 +94,12 @@ export function ClassGalleryForm({
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : mode === 'create' ? 'Add photo' : 'Update'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()} disabled={isSubmitting}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
       </div>

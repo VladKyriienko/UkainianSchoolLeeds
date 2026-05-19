@@ -3,6 +3,7 @@
 import { useLanguage } from '@/providers/language-provider';
 import type { CalendarEventDetail } from '../actions';
 import { isHtmlContent } from '@/utils/rich-text';
+import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
 
 type Props = {
   event: CalendarEventDetail;
@@ -19,6 +20,7 @@ export function EventDetailContent({ event, timeLabel }: Props) {
   const location = isUk
     ? (event.location_uk ?? event.location)
     : event.location;
+  const title = isUk && event.title_uk ? event.title_uk : event.title;
 
   return (
     <article className="prose prose-neutral dark:prose-invert max-w-none">
@@ -68,6 +70,15 @@ export function EventDetailContent({ event, timeLabel }: Props) {
           </span>
         )}
       </div>
+
+      {event.photoUrl ? (
+        <AdminDetailPhoto
+          src={event.photoUrl}
+          alt={title}
+          showLabel={false}
+          className="mb-6"
+        />
+      ) : null}
 
       {description ? (
         isHtmlContent(description) ? (

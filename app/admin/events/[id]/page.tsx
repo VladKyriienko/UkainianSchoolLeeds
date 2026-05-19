@@ -7,6 +7,7 @@ import { BackButton } from '@/components/common/BackButton';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
+import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
 
 export default async function EventDetailsPage({
   params
@@ -60,7 +61,7 @@ export default async function EventDetailsPage({
       goBackButton={<BackButton />}
       actions={<EventDetailsActions eventId={event.id} eventTitle={event.title} />}
     >
-      <Card>
+      <Card className="min-w-0 overflow-hidden">
         <CardHeader>
           <CardTitle>Event Details</CardTitle>
         </CardHeader>
@@ -70,17 +71,7 @@ export default async function EventDetailsPage({
             <div className="font-medium text-lg">{event.title}</div>
           </div>
 
-          {photoUrl && (
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Photo</div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={photoUrl}
-                alt={event.title}
-                className="block h-auto w-auto max-w-sm rounded-md border bg-muted/30"
-              />
-            </div>
-          )}
+          {photoUrl && <AdminDetailPhoto src={photoUrl} alt={event.title} />}
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>

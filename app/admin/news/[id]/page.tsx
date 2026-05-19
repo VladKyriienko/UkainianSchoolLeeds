@@ -7,6 +7,7 @@ import { BackButton } from '@/components/common/BackButton';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
+import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
 
 export default async function NewsViewPage({
   params
@@ -38,7 +39,7 @@ export default async function NewsViewPage({
   const supabaseAdmin = createAdminClient();
   const photoUrl = item.photo
     ? supabaseAdmin.storage.from('news-photos').getPublicUrl(item.photo).data
-      .publicUrl
+        .publicUrl
     : null;
 
   return (
@@ -48,7 +49,7 @@ export default async function NewsViewPage({
       goBackButton={<BackButton />}
       actions={<NewsDetailsActions newsId={item.id} newsTitle={item.title} />}
     >
-      <Card>
+      <Card className="min-w-0 overflow-hidden">
         <CardHeader>
           <CardTitle>News Details</CardTitle>
         </CardHeader>
@@ -58,17 +59,7 @@ export default async function NewsViewPage({
             <div className="font-medium text-lg">{item.title}</div>
           </div>
 
-          {photoUrl && (
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Photo</div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={photoUrl}
-                alt={item.title}
-                className="block h-auto w-auto max-w-full rounded-md border bg-muted/30"
-              />
-            </div>
-          )}
+          {photoUrl && <AdminDetailPhoto src={photoUrl} alt={item.title} />}
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>
@@ -94,13 +85,13 @@ export default async function NewsViewPage({
           </div>
 
           {(item.title_uk || item.description_uk) && (
-            <div className="pt-4 border-t space-y-2">
+            <div className="space-y-4 border-t pt-4">
               {item.title_uk && (
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">
                     Title (Ukrainian)
                   </div>
-                  <div className="font-medium">{item.title_uk}</div>
+                  <div className="font-medium text-lg">{item.title_uk}</div>
                 </div>
               )}
               {item.description_uk && (

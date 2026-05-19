@@ -12,6 +12,7 @@ import { Toaster } from '@/components/ui/sonner';
 import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
 import type { CompletionData } from '@/components/common/CompletionBanner/types';
 import { RouteConfig } from '@/utils/route-protection';
+import { cn } from '@/utils/cn';
 
 export type AuthenticatedLayoutProps = {
   children: React.ReactNode;
@@ -34,16 +35,23 @@ export type AuthenticatedLayoutProps = {
   showDarkModeToggle?: boolean;
   defaultOpen?: boolean;
   mobileBurgerPosition?: 'left' | 'right';
+  /** Disable Card lift/shadow on hover (e.g. admin panel). */
+  disableCardHover?: boolean;
 };
 
 function AuthenticatedLayoutContent({
   children,
   showDarkModeToggle,
   mobileBurgerPosition,
-  showLanguageToggle
+  showLanguageToggle,
+  disableCardHover
 }: Pick<
   AuthenticatedLayoutProps,
-  'children' | 'showDarkModeToggle' | 'mobileBurgerPosition' | 'showLanguageToggle'
+  | 'children'
+  | 'showDarkModeToggle'
+  | 'mobileBurgerPosition'
+  | 'showLanguageToggle'
+  | 'disableCardHover'
 >) {
   const { isMobile } = useSidebar();
 
@@ -60,7 +68,13 @@ function AuthenticatedLayoutContent({
         )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 md:p-6">
-          <div className="mx-auto w-full min-w-0 max-w-6xl">
+          <div
+            className={cn(
+              'mx-auto w-full min-w-0 max-w-6xl',
+              disableCardHover &&
+                '**:data-card:transition-none **:data-card:hover:translate-y-0 **:data-card:hover:shadow-md **:data-card:hover:shadow-primary/5'
+            )}
+          >
             {children}
           </div>
         </div>
@@ -76,7 +90,8 @@ export function AuthenticatedLayout({
   showDarkModeToggle = true,
   showLanguageToggle = true,
   defaultOpen = true,
-  mobileBurgerPosition = 'right'
+  mobileBurgerPosition = 'right',
+  disableCardHover = false
 }: AuthenticatedLayoutProps) {
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
@@ -93,6 +108,7 @@ export function AuthenticatedLayout({
         showDarkModeToggle={showDarkModeToggle}
         mobileBurgerPosition={mobileBurgerPosition}
         showLanguageToggle={showLanguageToggle}
+        disableCardHover={disableCardHover}
       />
       <Toaster />
     </SidebarProvider>

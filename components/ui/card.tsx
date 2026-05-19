@@ -27,6 +27,7 @@ export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, hoverable = true, ...props }, ref) => (
     <div
+      data-card=""
       ref={ref}
       className={cn(
         CARD_SURFACE_STATIC_CLASSNAME,

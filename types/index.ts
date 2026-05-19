@@ -29,7 +29,11 @@ export type PublicNews = Tables<'news'> & {
   photoUrl: string | null;
 };
 
-/** Home “school atmosphere” strip — rows from `class_photo_galery` with public URLs. */
+import type { PublicEvent } from '@/app/(not-aunthenticated)/parents/calendar/actions';
+
+export type { PublicEvent };
+
+/** Home “school atmosphere” strip — rows from `gallery` with public URLs. */
 export type SchoolAtmosphereGalleryImage = {
   id: string;
   src: string;
@@ -46,7 +50,8 @@ export type PublicParentVoiceReview = Pick<
 /** Props for the public marketing home client (`/`). */
 export type PublicHomeClientProps = {
   initialNews: PublicNews[];
-  /** From `class_photo_galery`; when empty, `HOME_CONTENT.schoolAtmosphere.images` is used. */
+  initialEvents: PublicEvent[];
+  /** From `gallery`; when empty, `HOME_CONTENT.schoolAtmosphere.images` is used. */
   atmosphereGalleryImages: SchoolAtmosphereGalleryImage[];
   /** From `review`; when empty, the parent-voices carousel is hidden. */
   parentVoices: PublicParentVoiceReview[];

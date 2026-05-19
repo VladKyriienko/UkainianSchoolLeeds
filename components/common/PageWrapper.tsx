@@ -46,16 +46,14 @@ export function PageWrapper({
 
   return (
     <div className={cn('w-full', className)}>
-      {(goBackButton || actions) ? (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <div className="order-1">{goBackButton}</div>
-          <div className="order-2">{actions}</div>
-        </div>
-      ) : null}
+      {goBackButton ? <div className="mb-4">{goBackButton}</div> : null}
       <header className="mb-8 space-y-2">
-        <h1 className="mb-2 font-display text-4xl sm:text-5xl font-bold leading-tight tracking-tight text-foreground">
-          {translatedTitle}
-        </h1>
+        <div className="flex w-full items-center gap-3 sm:gap-4">
+          <h1 className="min-w-0 flex-1 font-display text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
+            {translatedTitle}
+          </h1>
+          {actions ? <div className="ml-auto shrink-0">{actions}</div> : null}
+        </div>
         {translatedDescription ? (
           typeof translatedDescription === 'string' ? (
             <h2 className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">

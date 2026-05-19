@@ -46,6 +46,7 @@ export default async function Layout({ children }: PropsWithChildren) {
       mobileBurgerPosition="right"
       showDarkModeToggle={false}
       defaultOpen={true}
+      disableCardHover
     >
       {children}
     </AuthenticatedLayout>

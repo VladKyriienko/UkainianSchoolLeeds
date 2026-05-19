@@ -6,9 +6,7 @@ export default function Layout({ children }: PropsWithChildren) {
   return (
     <>
       <PublicLayout showHeader={true} showDarkModeToggle={false} showFooter={true}>
-        <div className="flex h-full items-center justify-center py-8">
-          <div className="w-full">{children}</div>
-        </div>
+        <div className="w-full py-8">{children}</div>
       </PublicLayout>
       <Toaster />
     </>

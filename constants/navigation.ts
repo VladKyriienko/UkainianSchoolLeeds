@@ -34,6 +34,10 @@ export const NavItems: NavItem[] = [
         href: '/parents/news'
       },
       {
+        label: 'Photo gallery',
+        href: '/parents/gallery'
+      },
+      {
         label: 'Calendar',
         href: '/parents/calendar'
       },

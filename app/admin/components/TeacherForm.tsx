@@ -14,6 +14,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import type { AdminTeacher } from '@/app/admin/teachers/actions';
+import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 import {
   createTeacher,
   updateTeacher
@@ -43,11 +44,12 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
     setIsSubmitting(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    formData.set('category', category);
-    if (photoFile) formData.set('photo', photoFile);
-
     try {
+      const formData = new FormData(e.currentTarget);
+      formData.set('category', category);
+      if (photoFile) {
+        formData.set('photo', await prepareAdminPhotoForUpload(photoFile));
+      }
       if (mode === 'create') {
         await createTeacher(formData);
         router.push('/admin/teachers');

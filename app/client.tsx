@@ -14,13 +14,13 @@ import {
 import { CARD_SURFACE_CLASSNAME, CARD_SURFACE_STATIC_CLASSNAME } from '@/components/ui/card';
 import { useLanguage } from '@/providers/language-provider';
 import { HOME_CONTENT } from '@/content/home';
-import { ArrowRight, Backpack, CalendarDays, HeartHandshake, Quote, Snowflake, Users } from 'lucide-react';
-import { format } from 'date-fns';
-import { enUS, uk } from 'date-fns/locale';
+import { ArrowRight, Backpack, HeartHandshake, Quote, Snowflake, Users } from 'lucide-react';
 import type { Language, PublicHomeClientProps } from '@/types';
 import { createMessageAction } from '@/app/(not-aunthenticated)/contact/actions';
 import { isHtmlContent } from '@/utils/rich-text';
 import { cn } from '@/utils/cn';
+import { PhotoLightbox } from '@/components/common/PhotoLightbox';
+import { HomeNewsEventsSection } from '@/components/common/HomeNewsEventsSection';
 
 const heroMainImage = '/hero-home-classroom.png';
 
@@ -555,6 +555,7 @@ function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: 
 /** Public marketing home page (`/`). Sections use `HOME_CONTENT[language]`; news from `initialNews`; parent voices from `parentVoices`. */
 export function PublicHomeClient({
   initialNews,
+  initialEvents,
   atmosphereGalleryImages,
   parentVoices
 }: PublicHomeClientProps) {
@@ -582,6 +583,14 @@ export function PublicHomeClient({
         src: p.src,
         alt: p.alt
       }));
+
+  const [atmosphereLightboxOpen, setAtmosphereLightboxOpen] = useState(false);
+  const [atmosphereLightboxIndex, setAtmosphereLightboxIndex] = useState(0);
+
+  const atmosphereLightboxImages = useMemo(
+    () => atmosphereStripImages.map((p) => ({ src: p.src, alt: p.alt })),
+    [atmosphereStripImages]
+  );
 
   useEffect(() => {
     // Supabase invite/OTP links can land on "/" with tokens in hash.
@@ -940,120 +949,61 @@ export function PublicHomeClient({
             className="h-12 w-fit shrink-0 rounded-full border-primary/35 px-6 text-primary transition-colors hover:bg-primary/5"
             asChild
           >
-            <Link href={content.schoolAtmosphere.ctaHref} className="gap-2">
+            <Link href={content.schoolAtmosphere.ctaHref} scroll className="gap-2">
               {content.schoolAtmosphere.cta}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </Button>
         </div>
         <div className="mt-8 flex w-full min-w-0 max-w-full snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible pb-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none md:grid md:grid-cols-4 md:gap-4 md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden">
-          {atmosphereStripImages.map((photo) => (
-            <div
+          {atmosphereStripImages.map((photo, photoIndex) => (
+            <button
               key={photo.key}
-              className={`relative aspect-video w-[min(85vw,280px)] shrink-0 snap-start overflow-hidden md:w-auto ${CARD_SURFACE_STATIC_CLASSNAME}`}
+              type="button"
+              onClick={() => {
+                setAtmosphereLightboxIndex(photoIndex);
+                setAtmosphereLightboxOpen(true);
+              }}
+              className={cn(
+                'group relative aspect-video w-[min(85vw,280px)] shrink-0 snap-start overflow-hidden md:w-auto',
+                CARD_SURFACE_CLASSNAME,
+                'cursor-pointer',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+              )}
+              aria-label={
+                isUk
+                  ? `Відкрити фото ${photoIndex + 1} з ${atmosphereStripImages.length}`
+                  : `Open photo ${photoIndex + 1} of ${atmosphereStripImages.length}`
+              }
             >
               {/* Native img: Supabase public URLs + avoids next/image remote optimizer edge cases in dev. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photo.src}
                 alt={photo.alt}
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-400 ease-out group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </button>
           ))}
         </div>
+
+        <PhotoLightbox
+          images={atmosphereLightboxImages}
+          open={atmosphereLightboxOpen}
+          onOpenChange={setAtmosphereLightboxOpen}
+          startIndex={atmosphereLightboxIndex}
+          title={content.schoolAtmosphere.heading}
+        />
       </section>
 
-      {/* Section: Latest news — eyebrow, title, “view all” link, grid of news cards from `initialNews` prop (`content.news` for labels / empty state). */}
-      <section>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="relative text-sm font-semibold tracking-wide text-primary">
-              <span className="relative inline-block">
-                {content.news.eyebrow}
-                <TextHighlightUnderline />
-              </span>
-            </p>
-            <h2 className="mt-5 font-display text-2xl font-bold leading-tight text-foreground md:text-4xl">{content.news.title}</h2>
-          </div>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-12 w-fit shrink-0 rounded-full border-primary/35 px-6 text-primary transition-colors hover:bg-primary/5"
-            asChild
-          >
-            <Link href="/parents/news" className="gap-2">
-              {content.news.viewAll}
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {initialNews.length === 0 ? (
-            <div className="col-span-full rounded-2xl border border-dashed border-border bg-card/70 p-8 text-center text-sm text-muted-foreground">
-              {content.news.emptyMessage}
-            </div>
-          ) : (
-            initialNews.map((item) => {
-              const title = isUk && item.title_uk ? item.title_uk : item.title;
-              const description =
-                isUk && item.description_uk
-                  ? item.description_uk
-                  : item.description ?? '';
-              const hasHtmlDescription = isHtmlContent(description);
-              const date = item.date ? new Date(item.date) : null;
-              const dayLabel = date ? format(date, 'd', { locale: isUk ? uk : enUS }) : '';
-              const monthLabel = date ? format(date, 'MMM', { locale: isUk ? uk : enUS }) : '';
-
-              return (
-                <article
-                  key={item.id}
-                  className={`group overflow-hidden ${CARD_SURFACE_CLASSNAME}`}
-                >
-                  <Link href={`/parents/news/${item.id}`} className="block">
-                    <div className="relative aspect-16/10 overflow-hidden bg-secondary">
-                      {item.photoUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={item.photoUrl}
-                          alt=""
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-secondary to-ukraine-yellow/35 text-primary">
-                          <CalendarDays className="h-12 w-12" />
-                        </div>
-                      )}
-                      {date ? (
-                        <div className="absolute bottom-4 left-4 rounded-lg bg-card px-4 py-3 text-center shadow-lg shadow-black/10">
-                          <div className="text-xl font-bold leading-none text-foreground">{dayLabel}</div>
-                          <div className="mt-1 text-[11px] font-semibold uppercase text-muted-foreground">
-                            {monthLabel}
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="p-5">
-                      <h3 className="font-bold leading-snug text-foreground">{title}</h3>
-                      {hasHtmlDescription ? (
-                        <div
-                          className="rich-text-preview mt-3 text-muted-foreground"
-                          dangerouslySetInnerHTML={{ __html: description }}
-                        />
-                      ) : (
-                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">{description}</p>
-                      )}
-                    </div>
-                  </Link>
-                </article>
-              );
-            })
-          )}
-        </div>
-      </section>
+      <HomeNewsEventsSection
+        initialNews={initialNews}
+        initialEvents={initialEvents}
+        content={content.news}
+        isUk={isUk}
+      />
 
       {/* Section: Parent voices / testimonials — heading + `ParentVoicesCarousel` (`content.parentVoices`). Anchor: #parent-voices. */}
       <section

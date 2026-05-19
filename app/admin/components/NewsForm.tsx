@@ -11,6 +11,7 @@ import { createNews, updateNews } from '@/app/admin/news/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 import { parseInputDate, toInputDateValue } from '@/utils/date-format';
 import { DatePicker } from '@/app/admin/profile/components/DatePicker';
+import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 
 type NewsFormProps = {
   mode: 'create' | 'edit';
@@ -34,10 +35,11 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
     setIsSubmitting(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    if (photoFile) formData.set('photo', photoFile);
-
     try {
+      const formData = new FormData(e.currentTarget);
+      if (photoFile) {
+        formData.set('photo', await prepareAdminPhotoForUpload(photoFile));
+      }
       let result;
       if (mode === 'create') {
         result = await createNews(formData);
