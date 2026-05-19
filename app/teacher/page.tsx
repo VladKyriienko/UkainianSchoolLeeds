@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/utils/auth-helpers/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function TeacherHomePage() {

@@ -1,7 +1,7 @@
 import { CompletionBanner } from './CompletionBanner';
 import { getCompletionBannerData } from './actions';
-import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
-import { DEFAULT_COMPLETION_FIELDS } from '@/utils/auth-helpers/completion';
+import type { CompletionFieldConfig } from '@/lib/auth/completion';
+import { DEFAULT_COMPLETION_FIELDS } from '@/lib/auth/completion';
 
 type CompletionBannerWrapperProps = {
   userId?: string;

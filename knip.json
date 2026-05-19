@@ -1,0 +1,66 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "next": {
+    "entry": ["next.config.mjs", "middleware.ts"]
+  },
+  "project": ["**/*.{ts,tsx}"],
+  "ignore": [
+    "supabase/migrations/**",
+    "supabase/schemas/**",
+    "tests/**",
+    "fixtures/**",
+    "playwright.config.ts",
+    "drizzle.config.ts",
+    "lib/supabase/types.ts"
+  ],
+  "ignoreBinaries": ["stripe", "supabase"],
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true
+  },
+  "ignoreDependencies": [
+    "autoprefixer",
+    "postcss",
+    "tailwindcss",
+    "@tailwindcss/postcss",
+    "tailwindcss-animate",
+    "caniuse-lite",
+    "baseline-browser-mapping",
+    "bun",
+    "minimatch",
+    "drizzle-kit",
+    "drizzle-orm",
+    "@neondatabase/serverless",
+    "pg",
+    "postgres",
+    "dotenv",
+    "tsx",
+    "typescript",
+    "@types/node",
+    "@types/react",
+    "@types/react-dom",
+    "eslint",
+    "@eslint/js",
+    "@typescript-eslint/eslint-plugin",
+    "@typescript-eslint/parser",
+    "eslint-config-prettier",
+    "eslint-config-next",
+    "eslint-plugin-react",
+    "eslint-plugin-tailwindcss",
+    "typescript-eslint",
+    "globals",
+    "prettier",
+    "prettier-plugin-tailwindcss"
+  ],
+  "rules": {
+    "files": "error",
+    "dependencies": "warn",
+    "devDependencies": "warn",
+    "unlisted": "error",
+    "binaries": "warn",
+    "exports": "off",
+    "types": "off",
+    "enumMembers": "off",
+    "duplicates": "warn"
+  }
+}

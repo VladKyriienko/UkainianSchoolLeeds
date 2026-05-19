@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { DocumentForm } from '@/app/admin/components/DocumentForm';
+import { DocumentForm } from '@/components/features/admin/DocumentForm';
 import { getDocumentById } from '@/app/admin/documents/actions';
 
 export default async function EditDocumentPage({

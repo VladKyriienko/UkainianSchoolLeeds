@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ClassGalleryForm } from '@/app/admin/components/ClassGalleryForm';
+import { ClassGalleryForm } from '@/components/features/class-gallery/ClassGalleryForm';
 import { listClasses } from '@/app/admin/classes/actions';
 
 export default async function CreateClassGalleryPage() {

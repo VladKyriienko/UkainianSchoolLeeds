@@ -1,4 +1,4 @@
-import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
+import type { CompletionFieldConfig } from '@/lib/auth/completion';
 
 export type CompletionData = {
   percentage: number;

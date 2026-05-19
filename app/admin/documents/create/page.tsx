@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { DocumentForm } from '@/app/admin/components/DocumentForm';
+import { DocumentForm } from '@/components/features/admin/DocumentForm';
 import { listDocuments } from '@/app/admin/documents/actions';
 
 const SINGLETON_DOCUMENT_TYPES = ['COOKIES_POLICY', 'PRIVACY_POLICY'] as const;

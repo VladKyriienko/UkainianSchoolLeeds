@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { GalleryForm } from '@/app/admin/components/GalleryForm';
+import { GalleryForm } from '@/components/features/admin/GalleryForm';
 import { getSchoolGalleryItemById } from '@/app/admin/gallery/actions';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export default async function GalleryEditPage({
   params

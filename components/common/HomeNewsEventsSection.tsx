@@ -34,10 +34,6 @@ export function HomeNewsEventsSection({
   const hasNews = initialNews.length > 0;
   const hasUpcomingEvents = initialEvents.length > 0;
 
-  if (!hasNews && !hasUpcomingEvents) {
-    return null;
-  }
-
   const compactRow =
     initialEvents.length < HOME_FEED_MAX || initialNews.length < HOME_FEED_MAX;
 
@@ -65,6 +61,10 @@ export function HomeNewsEventsSection({
     const ordered = [...eventItems, ...newsItems];
     return compactRow ? ordered.slice(0, HOME_FEED_MAX) : ordered;
   }, [initialNews, initialEvents, hasUpcomingEvents, compactRow]);
+
+  if (!hasNews && !hasUpcomingEvents) {
+    return null;
+  }
 
   const gridClassName = cn(
     'mt-6 grid gap-6',
@@ -193,7 +193,7 @@ export function HomeNewsEventsSection({
                         <div className="text-xl font-bold leading-none text-foreground">
                           {dayLabel}
                         </div>
-                        <div className="mt-1 text-[11px] font-semibold uppercase text-muted-foreground">
+                        <div className="mt-1 text-2xs font-semibold uppercase text-muted-foreground">
                           {monthLabel}
                         </div>
                       </div>

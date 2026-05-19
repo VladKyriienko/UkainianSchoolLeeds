@@ -43,28 +43,44 @@ export function PageWrapper({
 
   const translatedTitle = typeof title === 'string' ? title : title[language];
   const translatedDescription = getTranslatedText(description, language);
+  const headerButtons = goBackButton || actions;
 
   return (
     <div className={cn('w-full', className)}>
-      {goBackButton ? <div className="mb-4">{goBackButton}</div> : null}
-      <header className="mb-8 space-y-2">
-        <div className="flex w-full items-center gap-3 sm:gap-4">
-          <h1 className="min-w-0 flex-1 font-display text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
-            {translatedTitle}
-          </h1>
-          {actions ? <div className="ml-auto shrink-0">{actions}</div> : null}
-        </div>
-        {translatedDescription ? (
-          typeof translatedDescription === 'string' ? (
-            <h2 className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">
-              {translatedDescription}
-            </h2>
-          ) : (
-            <div className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">
-              {translatedDescription}
+      <header className="mb-8 space-y-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="flex items-start gap-3">
+              <h1 className="min-w-0 flex-1 font-display text-3xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
+                {translatedTitle}
+              </h1>
+              {goBackButton ? (
+                <div className="shrink-0 md:hidden">{goBackButton}</div>
+              ) : null}
             </div>
-          )
-        ) : null}
+
+            {translatedDescription ? (
+              typeof translatedDescription === 'string' ? (
+                <h2 className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">
+                  {translatedDescription}
+                </h2>
+              ) : (
+                <div className="font-sans text-body font-normal leading-[1.75] text-muted-foreground">
+                  {translatedDescription}
+                </div>
+              )
+            ) : null}
+          </div>
+
+          {headerButtons ? (
+            <div className="flex flex-wrap items-center justify-end gap-2 md:shrink-0">
+              {goBackButton ? (
+                <div className="hidden md:block">{goBackButton}</div>
+              ) : null}
+              {actions}
+            </div>
+          ) : null}
+        </div>
       </header>
 
       {children}

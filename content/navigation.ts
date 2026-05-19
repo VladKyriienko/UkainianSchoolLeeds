@@ -1,6 +1,7 @@
-'use client';
+import type { Language } from '@/types';
+import type { NavItem } from '@/types';
 
-import type { Language } from '@/providers/language-provider';
+export type { NavItem };
 
 // Brand name per language (two lines for header display)
 export const BRAND_NAME: Record<Language, string> = {
@@ -12,6 +13,36 @@ export const BRAND_NAME_LINES: Record<Language, { line1: string; line2: string }
   en: { line1: 'Ukrainian Saturday School', line2: 'of Leeds' },
   uk: { line1: 'Українська суботня школа', line2: 'Лідсу' }
 };
+
+/** Public site nav structure (labels resolved via NAV_LABELS). */
+export const NavItems: NavItem[] = [
+  { label: 'Home', href: '/', key: 'home' },
+  {
+    label: 'About',
+    href: '/about',
+    key: 'about',
+    children: [
+      { label: 'Welcome', href: '/about/welcome' },
+      { label: 'Whos Who', href: '/about/whos-who' },
+      { label: 'Vacancies', href: '/about/vacancies' },
+      { label: 'School Development Plan', href: '/about/development-plan' }
+    ]
+  },
+  {
+    label: 'Parents',
+    href: '/parents',
+    key: 'parents',
+    children: [
+      { label: 'Latest News', href: '/parents/news' },
+      { label: 'Photo gallery', href: '/parents/gallery' },
+      { label: 'Calendar', href: '/parents/calendar' },
+      { label: 'Class Pages', href: '/parents/class-pages' }
+    ]
+  },
+  { label: 'Key Info', href: '/key-info', key: 'keyInfo' },
+  { label: 'Donate', href: '/donate', key: 'donate' },
+  { label: 'Contact', href: '/contact', key: 'contact' }
+];
 
 // Navigation labels per route and language
 export const NAV_LABELS: Record<Language, Record<string, string>> = {

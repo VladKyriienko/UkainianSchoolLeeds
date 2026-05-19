@@ -1,10 +1,10 @@
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getEventById } from '@/app/admin/events/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { EventForm } from '@/app/admin/components/EventForm';
+import { EventForm } from '@/components/features/admin/EventForm';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { getAdminUser } from '@/utils/auth-helpers/server';
+import { getAdminUser } from '@/lib/auth/server';
 
 type EditEventPageProps = {
   params: Promise<{ id: string }>;

@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getNewsById } from '@/app/admin/news/actions';
-import { NewsDetailsActions } from '@/app/admin/components/NewsDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteNews } from '@/app/admin/news/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
 import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
@@ -47,7 +48,16 @@ export default async function NewsViewPage({
       title={item.title}
       description={formatDate(item.date)}
       goBackButton={<BackButton />}
-      actions={<NewsDetailsActions newsId={item.id} newsTitle={item.title} />}
+      actions={
+        <AdminEntityDetailsActions
+          editHref={`/admin/news/${item.id}/edit`}
+          listPath="/admin/news"
+          confirmMessage={`Are you sure you want to delete "${item.title}"? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete news"
+          entityId={item.id}
+          deleteAction={deleteNews}
+        />
+      }
     >
       <Card className="min-w-0 overflow-hidden">
         <CardHeader>

@@ -8,7 +8,7 @@ import { listDonations } from '@/app/admin/donations/actions';
 import { listDocuments } from '@/app/admin/documents/actions';
 import { listNews } from '@/app/admin/news/actions';
 import { listClasses } from '@/app/admin/classes/actions';
-import { listGalleryItems } from '@/app/admin/class-gallery/actions';
+import { listGalleryItems } from '@/lib/class-gallery/actions';
 import { listSchoolGalleryItems } from '@/app/admin/gallery/actions';
 import { listReviews } from '@/app/admin/reviews/actions';
 

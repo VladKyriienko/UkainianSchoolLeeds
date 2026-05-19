@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ScheduleForm } from '@/app/admin/components/ScheduleForm';
+import { ScheduleForm } from '@/components/features/admin/ScheduleForm';
 
 export default async function CreateSchedulePage() {
   return (

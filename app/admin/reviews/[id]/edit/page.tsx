@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ReviewForm } from '@/app/admin/components/ReviewForm';
+import { ReviewForm } from '@/components/features/admin/ReviewForm';
 import { getReviewById } from '@/app/admin/reviews/actions';
 
 export default async function EditReviewPage({

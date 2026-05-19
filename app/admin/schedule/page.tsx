@@ -4,8 +4,8 @@ import { AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { listSchedule } from './actions';
-import { ScheduleSearchForm } from '@/app/admin/components/ScheduleSearchForm';
-import ScheduleManagementTable from '@/app/admin/components/ScheduleManagementTable';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
+import ScheduleManagementTable from '@/components/features/admin/ScheduleManagementTable';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
 
@@ -59,7 +59,12 @@ export default async function AdminSchedulePage({
         </Button>
       }
     >
-      <ScheduleSearchForm initialDateFrom={dateFrom} initialDateTo={dateTo} />
+      <AdminListSearchForm
+        searchInputId="schedule-dates"
+        showSearch={false}
+        initialDateFrom={dateFrom}
+        initialDateTo={dateTo}
+      />
 
       {error ? (
         <Alert variant="destructive" className="mb-6">

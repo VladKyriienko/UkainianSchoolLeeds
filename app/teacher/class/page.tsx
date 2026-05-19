@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { getTeacherAssignedClassForGallery } from '@/app/admin/class-gallery/actions';
+import { getTeacherAssignedClassForGallery } from '@/lib/class-gallery/actions';
 import { isHtmlContent } from '@/utils/rich-text';
 
 export default async function TeacherClassPage() {

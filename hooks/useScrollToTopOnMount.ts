@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { scrollPageToTop } from '@/components/common/ScrollToTopOnNavigate';
 
-/** Scroll window to top when a public content page mounts (e.g. after in-app navigation). */
+/** Scroll to top when the route changes (e.g. opening a detail view). */
 export function useScrollToTopOnMount() {
+  const pathname = usePathname();
+
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0 });
-  }, []);
+    scrollPageToTop();
+    requestAnimationFrame(scrollPageToTop);
+  }, [pathname]);
 }

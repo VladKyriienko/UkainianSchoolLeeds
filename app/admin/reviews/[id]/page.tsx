@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getReviewById } from '@/app/admin/reviews/actions';
-import { ReviewDetailsActions } from '@/app/admin/components/ReviewDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteReview } from '@/app/admin/reviews/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { format } from 'date-fns';
@@ -32,7 +33,14 @@ export default async function ReviewViewPage({
       description={formatDateTimeLabel(item.data)}
       goBackButton={<BackButton />}
       actions={
-        <ReviewDetailsActions reviewId={item.id} attribution={item.perens} />
+        <AdminEntityDetailsActions
+          editHref={`/admin/reviews/${item.id}/edit`}
+          listPath="/admin/reviews"
+          confirmMessage={`Delete this review from "${item.perens}"? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete review"
+          entityId={item.id}
+          deleteAction={deleteReview}
+        />
       }
     >
       <Card>

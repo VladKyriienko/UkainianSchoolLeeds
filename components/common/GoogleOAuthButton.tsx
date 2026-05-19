@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { GoogleIcon } from '@/components/icons/Google';
-import { signInWithOAuth } from '@/utils/auth-helpers/client';
+import { signInWithOAuth } from '@/lib/auth/client';
 import { useState } from 'react';
 
 type GoogleOAuthButtonProps = {

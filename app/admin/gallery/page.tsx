@@ -2,7 +2,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import GalleryManagementTable from '@/app/admin/components/GalleryManagementTable';
+import GalleryManagementTable from '@/components/features/admin/GalleryManagementTable';
 import { listSchoolGalleryItems } from '@/app/admin/gallery/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';

@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import EventManagementTable from '@/app/admin/components/EventManagementTable';
+import EventManagementTable from '@/components/features/admin/EventManagementTable';
 import { listEvents } from '@/app/admin/events/actions';
 import type { AdminEvent } from '@/app/admin/events/actions';
-import { EventSearchForm } from '@/app/admin/components/EventSearchForm';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
 import { PageWrapper } from '@/components/common/PageWrapper';
@@ -60,11 +60,13 @@ export default async function AdminEventsPage({
         </Button>
       }
     >
-      <EventSearchForm
+      <AdminListSearchForm
+        searchInputId="events-search"
+        searchLabel="Search Events"
+        searchPlaceholder="Search by title, description, or location..."
         initialSearch={search}
-        initialLimit={limit}
-        {...(dateFrom && { initialDateFrom: dateFrom })}
-        {...(dateTo && { initialDateTo: dateTo })}
+        initialDateFrom={dateFrom}
+        initialDateTo={dateTo}
       />
 
       {error ? (

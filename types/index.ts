@@ -1,5 +1,5 @@
 import type { ValidLucideIconName } from '@/utils/lucide-icons';
-import type { Tables } from '@/utils/supabase/types';
+import type { Tables } from '@/lib/supabase/types';
 
 // Route & auth
 export type UserRole = 'admin' | 'teacher' | 'user' | null;
@@ -29,9 +29,9 @@ export type PublicNews = Tables<'news'> & {
   photoUrl: string | null;
 };
 
-import type { PublicEvent } from '@/app/(not-aunthenticated)/parents/calendar/actions';
+import type { PublicEvent } from '@/types/calendar';
 
-export type { PublicEvent };
+export type { PublicEvent } from '@/types/calendar';
 
 /** Home “school atmosphere” strip — rows from `gallery` with public URLs. */
 export type SchoolAtmosphereGalleryImage = {
@@ -65,4 +65,4 @@ export type {
   CompletionBannerData
 } from '@/components/common/CompletionBanner/types';
 
-export type { Database, Tables, Enums } from '@/utils/supabase/types';
+export type { Database, Tables, Enums } from '@/lib/supabase/types';

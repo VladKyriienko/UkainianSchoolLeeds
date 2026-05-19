@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { GalleryForm } from '@/app/admin/components/GalleryForm';
+import { GalleryForm } from '@/components/features/admin/GalleryForm';
 
 export default function AdminGalleryCreatePage() {
   return (

@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getTeacherById } from '@/app/admin/teachers/actions';
-import { TeacherDetailsActions } from '@/app/admin/components/TeacherDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteTeacher } from '@/app/admin/teachers/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { isHtmlContent } from '@/utils/rich-text';
@@ -37,7 +38,16 @@ export default async function TeacherDetailsPage({
       title={teacher.name}
       description={teacher.title || '—'}
       goBackButton={<BackButton />}
-      actions={<TeacherDetailsActions teacherId={teacher.id} teacherName={teacher.name} />}
+      actions={
+        <AdminEntityDetailsActions
+          editHref={`/admin/teachers/${teacher.id}/edit`}
+          listPath="/admin/teachers"
+          confirmMessage={`Are you sure you want to delete ${teacher.name}? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete teacher"
+          entityId={teacher.id}
+          deleteAction={deleteTeacher}
+        />
+      }
     >
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1">

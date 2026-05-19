@@ -1,9 +1,9 @@
 'use server';
 
-import { createAdminClient } from '@/utils/supabase/admin';
-import { verifyAdminAccess } from '@/utils/auth-helpers/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
-import type { Tables } from '@/utils/supabase/types';
+import type { Tables } from '@/lib/supabase/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';

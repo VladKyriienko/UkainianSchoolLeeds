@@ -2,11 +2,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import ClassGalleryManagementTable from '@/app/admin/components/ClassGalleryManagementTable';
+import ClassGalleryManagementTable from '@/components/features/class-gallery/ClassGalleryManagementTable';
 import {
   getTeacherAssignedClassForGallery,
   listGalleryItems
-} from '@/app/admin/class-gallery/actions';
+} from '@/lib/class-gallery/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
 import { PageWrapper } from '@/components/common/PageWrapper';

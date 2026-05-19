@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Test data for different user roles
 export const ADMIN_USER = {

@@ -1,5 +1,5 @@
 
-import { TeacherForm } from '@/app/admin/components/TeacherForm';
+import { TeacherForm } from '@/components/features/admin/TeacherForm';
 import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function CreateTeacherPage() {

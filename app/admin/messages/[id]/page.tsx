@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getMessageById } from '@/app/admin/messages/actions';
-import { MessagesDetailsActions } from '@/app/admin/components/MessagesDetailsActions';
-import { MessageReadStatus } from '@/app/admin/components/MessageReadStatus';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteMessage } from '@/app/admin/messages/actions';
+import { MessageReadStatus } from '@/components/features/admin/MessageReadStatus';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { formatDateTimeLabel } from '@/utils/date-format';
@@ -31,7 +32,13 @@ export default async function MessageViewPage({
       description={formatDateTimeLabel(item.created_at)}
       goBackButton={<BackButton />}
       actions={
-        <MessagesDetailsActions messageId={item.id} subject={item.subject} />
+        <AdminEntityDetailsActions
+          listPath="/admin/messages"
+          confirmMessage={`Delete message "${item.subject}"? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete message"
+          entityId={item.id}
+          deleteAction={deleteMessage}
+        />
       }
     >
       <Card className="min-w-0 overflow-hidden">

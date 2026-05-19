@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSchoolGalleryItemById } from '@/app/admin/gallery/actions';
-import { GalleryDetailsActions } from '@/app/admin/components/GalleryDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteSchoolGalleryItem } from '@/app/admin/gallery/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { format } from 'date-fns';
 
 export default async function GalleryViewPage({
@@ -34,7 +35,15 @@ export default async function GalleryViewPage({
       title="Gallery photo"
       description={`Order: ${item.order}`}
       goBackButton={<BackButton />}
-      actions={<GalleryDetailsActions itemId={item.id} />}
+      actions={
+        <AdminEntityDetailsActions
+          editHref={`/admin/gallery/${item.id}/edit`}
+          listPath="/admin/gallery"
+          confirmMessage="Delete this photo from the gallery?"
+          entityId={item.id}
+          deleteAction={deleteSchoolGalleryItem}
+        />
+      }
     >
       <Card>
         <CardHeader>

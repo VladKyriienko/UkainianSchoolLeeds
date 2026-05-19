@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDocumentById } from '@/app/admin/documents/actions';
-import { DocumentDetailsActions } from '@/app/admin/components/DocumentDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteDocument } from '@/app/admin/documents/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/app/admin/documents/constants';
@@ -34,9 +35,13 @@ export default async function DocumentViewPage({
       description={typeLabel}
       goBackButton={<BackButton />}
       actions={
-        <DocumentDetailsActions
-          documentId={doc.id}
-          documentTitle={doc.title}
+        <AdminEntityDetailsActions
+          editHref={`/admin/documents/${doc.id}/edit`}
+          listPath="/admin/documents"
+          confirmMessage={`Are you sure you want to delete "${doc.title}"? This cannot be undone.`}
+          deleteErrorMessage="Failed to delete document"
+          entityId={doc.id}
+          deleteAction={deleteDocument}
         />
       }
     >

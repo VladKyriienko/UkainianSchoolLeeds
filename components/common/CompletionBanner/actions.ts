@@ -2,9 +2,9 @@ import {
   calculateProfileCompletion,
   calculateProfileCompletionFromUserRow,
   DEFAULT_COMPLETION_FIELDS
-} from '@/utils/auth-helpers/completion';
-import { getPostSignupSettings } from '@/utils/auth-helpers/settings';
-import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
+} from '@/lib/auth/completion';
+import { getPostSignupSettings } from '@/lib/auth/settings';
+import type { CompletionFieldConfig } from '@/lib/auth/completion';
 import type { CompletionBannerData } from './types';
 
 /**

@@ -5,7 +5,7 @@ import { getURL } from '@/utils/helpers';
 import { cookies } from 'next/headers';
 import Providers from '@/providers/providers';
 import 'styles/main.css';
-import { getCurrentUser } from '@/utils/auth-helpers/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { cn } from '@/utils/cn';
 
 const inter = Inter({

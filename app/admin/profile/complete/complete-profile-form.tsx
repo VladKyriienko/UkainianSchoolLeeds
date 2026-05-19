@@ -1,6 +1,6 @@
 'use client';
 
-import { DatePicker } from '@/app/admin/profile/components/DatePicker';
+import { DatePicker } from '@/components/common/admin/DatePicker';
 import { Button } from '@/components/ui/button';
 import {
   Card,

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/utils/supabase/admin';
-import { TeacherForm } from '@/app/admin/components/TeacherForm';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { TeacherForm } from '@/components/features/admin/TeacherForm';
 import { getTeacherById } from '@/app/admin/teachers/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 

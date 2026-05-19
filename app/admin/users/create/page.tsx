@@ -1,10 +1,10 @@
 import { getAllOrganisations } from '@/app/admin/users/actions';
 import { listClasses } from '@/app/admin/classes/actions';
-import { getOrganisationSettings } from '@/utils/auth-helpers/settings';
-import CreateUserForm from '@/app/admin/components/CreateUserForm';
+import { getOrganisationSettings } from '@/lib/auth/settings';
+import CreateUserForm from '@/components/features/admin/CreateUserForm';
 import { BackButton } from '@/components/common/BackButton';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { Tables } from '@/utils/supabase/types';
+import { Tables } from '@/lib/supabase/types';
 
 export default async function CreateUserPage() {
 

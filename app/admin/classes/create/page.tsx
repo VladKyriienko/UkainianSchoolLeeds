@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ClassForm } from '@/app/admin/components/ClassForm';
+import { ClassForm } from '@/components/features/admin/ClassForm';
 
 export default async function CreateClassPage() {
   return (

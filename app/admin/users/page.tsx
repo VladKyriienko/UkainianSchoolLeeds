@@ -2,8 +2,8 @@ import {
   getAllUsers,
   AdminUser
 } from '@/app/admin/users/actions';
-import UserManagementTable from '@/app/admin/components/UserManagementTable';
-import { UserSearchForm } from '@/app/admin/components/UserSearchForm';
+import UserManagementTable from '@/components/features/admin/UserManagementTable';
+import { UserSearchForm } from '@/components/features/admin/UserSearchForm';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
 import Link from 'next/link';

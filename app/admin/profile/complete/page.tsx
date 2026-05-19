@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
-import { checkUserCompletionStatus } from '@/utils/auth-helpers/completion';
-import { getPostSignupSettings } from '@/utils/auth-helpers/settings';
-import { createClient } from '@/utils/supabase/server';
+import { checkUserCompletionStatus } from '@/lib/auth/completion';
+import { getPostSignupSettings } from '@/lib/auth/settings';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { CompleteProfileForm } from './complete-profile-form';
 import { FullPageLoader } from '@/components/common/FullPageLoader';

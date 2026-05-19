@@ -2,8 +2,9 @@
 
 import { AuthProvider } from '@/providers/auth-provider';
 import { LanguageProvider } from './language-provider';
+import { ScrollToTopOnNavigate } from '@/components/common/ScrollToTopOnNavigate';
 import { User } from '@supabase/supabase-js';
-import { UserWithRoles } from '@/utils/supabase/server';
+import { UserWithRoles } from '@/lib/supabase/server';
 
 export default function Providers({
   children,
@@ -17,6 +18,7 @@ export default function Providers({
   return (
     <LanguageProvider>
       <AuthProvider userResponse={user} userWithRoles={userData}>
+        <ScrollToTopOnNavigate />
         {children}
       </AuthProvider>
     </LanguageProvider>

@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@/utils/supabase/hooks';
+import { createClient } from '@/lib/supabase/hooks';
 import {
   createContext,
   useState,
@@ -9,9 +9,9 @@ import {
   useMemo,
   useCallback
 } from 'react';
-import { UserWithRoles } from '@/utils/supabase/server';
+import { UserWithRoles } from '@/lib/supabase/server';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Database } from '@/utils/supabase/types';
+import { Database } from '@/lib/supabase/types';
 import { type User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 

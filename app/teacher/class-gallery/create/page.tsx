@@ -1,6 +1,6 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ClassGalleryForm } from '@/app/admin/components/ClassGalleryForm';
-import { getTeacherAssignedClassForGallery } from '@/app/admin/class-gallery/actions';
+import { ClassGalleryForm } from '@/components/features/class-gallery/ClassGalleryForm';
+import { getTeacherAssignedClassForGallery } from '@/lib/class-gallery/actions';
 
 export default async function TeacherCreateClassGalleryPage() {
   const assignedClass = await getTeacherAssignedClassForGallery();

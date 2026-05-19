@@ -38,7 +38,6 @@ export type HomeContent = {
     titleBefore: string;
     titleHighlight: string;
     titleAfter: string;
-    items: { quote: string; attribution: string }[];
   };
   faq: {
     titleBefore: string;
@@ -170,34 +169,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     parentVoices: {
       titleBefore: 'What ',
       titleHighlight: 'parents',
-      titleAfter: ' say',
-      items: [
-        {
-          quote:
-            'Our daughter looks forward to Saturdays. She speaks Ukrainian more confidently and has made friends who share the same roots.',
-          attribution: "Maria, Sofia's mum"
-        },
-        {
-          quote:
-            'The teachers are warm and professional. We feel welcome as a family and always know what is happening at school.',
-          attribution: 'Olena, mum of two'
-        },
-        {
-          quote:
-            'Traditions, songs, and community events mean a lot to us. The school helps our children stay close to Ukraine while growing up in Leeds.',
-          attribution: "Andriy, Marko's dad"
-        },
-        {
-          quote:
-            'I appreciate the clear communication and the care for every child. It is more than lessons — it is a second home for our grandchildren.',
-          attribution: "Iryna, Hanka's grandmother"
-        },
-        {
-          quote:
-            'We were new to the city and found support here immediately. The school connects families and keeps our language alive.',
-          attribution: "Petro, Yurko's dad"
-        }
-      ]
+      titleAfter: ' say'
     },
     faq: {
       titleBefore: 'Frequently asked ',
@@ -408,34 +380,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     parentVoices: {
       titleBefore: 'Що ',
       titleHighlight: 'кажуть',
-      titleAfter: ' батьки',
-      items: [
-        {
-          quote:
-            'Наша дочка з нетерпінням чекає на суботу. Вона впевненіше говорить українською й знайшла друзів зі спільними коренями.',
-          attribution: 'Марія, мама Софійки'
-        },
-        {
-          quote:
-            'Викладачі теплі й професійні. Ми відчуваємо себе бажаними родиною і завжди в курсі шкільних подій.',
-          attribution: 'Олена, мама двох дітей'
-        },
-        {
-          quote:
-            'Традиції, пісні та спільні заходи для нас важливі. Школа допомагає дітям бути ближче до України, зростаючи в Лідсі.',
-          attribution: 'Андрій, тато Марка'
-        },
-        {
-          quote:
-            'Ціную зрозумілу комунікацію й турботу про кожну дитину. Це більше ніж уроки — це другий дім для онуків.',
-          attribution: 'Ірина, бабуся Ганки'
-        },
-        {
-          quote:
-            'Ми нещодавно переїхали в місто й одразу знайшли підтримку тут. Школа з’єднує родини й береже нашу мову.',
-          attribution: 'Петро, тато Юрка'
-        }
-      ]
+      titleAfter: ' батьки'
     },
     faq: {
       titleBefore: 'Часті ',

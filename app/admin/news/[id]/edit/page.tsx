@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { NewsForm } from '@/app/admin/components/NewsForm';
+import { NewsForm } from '@/components/features/admin/NewsForm';
 import { getNewsById } from '@/app/admin/news/actions';
 
 export default async function EditNewsPage({
