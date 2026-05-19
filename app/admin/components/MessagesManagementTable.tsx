@@ -8,15 +8,16 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { MessageSquare } from 'lucide-react';
 import type { AdminMessage } from '@/app/admin/messages/actions';
-import { markMessageAsRead } from '@/app/admin/messages/actions';
-import { useTransition } from 'react';
+import { deleteMessage } from '@/app/admin/messages/actions';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { formatDateTimeLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { StatusBadge } from '@/components/common/admin/StatusBadge';
+import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 
 type MessagesManagementTableProps = {
   messages: AdminMessage[];
@@ -27,11 +28,34 @@ const MESSAGE_PREVIEW_LENGTH = 60;
 export default function MessagesManagementTable({
   messages
 }: MessagesManagementTableProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const handleMarkAsRead = (id: string) => {
+  const handleDelete = (id: string, subject: string) => {
+    if (
+      !confirm(
+        `Delete message "${subject}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setLoadingId(id);
     startTransition(async () => {
-      await markMessageAsRead(id);
+      try {
+        const result = await deleteMessage(id);
+        if (!result.success) {
+          alert(result.error ?? 'Failed to delete message');
+        } else {
+          router.refresh();
+        }
+      } catch (err) {
+        console.error('Failed to delete message:', err);
+        alert('Failed to delete message');
+      } finally {
+        setLoadingId(null);
+      }
     });
   };
 
@@ -56,26 +80,29 @@ export default function MessagesManagementTable({
             <TableHead className="w-[140px]">Subject</TableHead>
             <TableHead>Message</TableHead>
             <TableHead className="w-[90px]">Status</TableHead>
-            <TableHead className="w-[100px] text-right">Actions</TableHead>
+            <TableHead className="w-[72px] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {messages.map((msg) => (
-            <TableRow key={msg.id} className={msg.read ? '' : 'bg-muted/30'}>
-              <TableCell className="text-muted-foreground text-sm">
+            <TableRow
+              key={msg.id}
+              className={msg.read ? '' : 'bg-muted/30'}
+            >
+              <TableCell className="text-sm text-muted-foreground">
                 {formatDateTimeLabel(msg.created_at)}
               </TableCell>
               <TableCell className="font-medium">{msg.name}</TableCell>
-              <TableCell className="text-muted-foreground text-sm">
+              <TableCell className="text-sm text-muted-foreground">
                 <a
                   href={`mailto:${msg.email}`}
-                  className="hover:underline truncate block max-w-[180px]"
+                  className="block max-w-[180px] truncate hover:underline"
                 >
                   {msg.email}
                 </a>
               </TableCell>
               <TableCell className="text-sm">{msg.subject}</TableCell>
-              <TableCell className="text-muted-foreground text-sm max-w-[280px]">
+              <TableCell className="max-w-[280px] text-sm text-muted-foreground">
                 <span title={msg.message}>
                   {msg.message.length > MESSAGE_PREVIEW_LENGTH
                     ? `${msg.message.slice(0, MESSAGE_PREVIEW_LENGTH)}…`
@@ -89,16 +116,11 @@ export default function MessagesManagementTable({
                 />
               </TableCell>
               <TableCell className="text-right">
-                {!msg.read && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={isPending}
-                    onClick={() => handleMarkAsRead(msg.id)}
-                  >
-                    Mark read
-                  </Button>
-                )}
+                <RowActionMenu
+                  isLoading={isPending && loadingId === msg.id}
+                  onView={() => router.push(`/admin/messages/${msg.id}`)}
+                  onDelete={() => handleDelete(msg.id, msg.subject)}
+                />
               </TableCell>
             </TableRow>
           ))}

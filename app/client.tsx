@@ -15,7 +15,7 @@ import { CARD_SURFACE_CLASSNAME, CARD_SURFACE_STATIC_CLASSNAME } from '@/compone
 import { useLanguage } from '@/providers/language-provider';
 import { HOME_CONTENT } from '@/content/home';
 import { ArrowRight, Backpack, HeartHandshake, Quote, Snowflake, Users } from 'lucide-react';
-import type { Language, PublicHomeClientProps } from '@/types';
+import type { PublicHomeClientProps } from '@/types';
 import { createMessageAction } from '@/app/(not-aunthenticated)/contact/actions';
 import { isHtmlContent } from '@/utils/rich-text';
 import { cn } from '@/utils/cn';
@@ -397,7 +397,7 @@ function HeroFloatingChipTitle({
 
 type HomeCtaContent = (typeof HOME_CONTENT)['en']['cta'];
 
-function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: Language }) {
+function HomeLeadCtaSection({ cta }: { cta: HomeCtaContent }) {
   const [form, setForm] = useState({
     parentName: '',
     phone: '',
@@ -426,16 +426,12 @@ function HomeLeadCtaSection({ cta, language }: { cta: HomeCtaContent; language: 
     }
     setStatus('submitting');
     try {
-      const ageLabel = language === 'uk' ? 'Вік дитини' : "Child's age";
-      const sourceLine =
-        language === 'uk' ? 'Джерело: головна сторінка сайту.' : 'Source: website home page.';
-      const message = [`${ageLabel}: ${form.childAge.trim()}`, '', sourceLine].join('\n');
       await createMessageAction({
         name: form.parentName.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
         subject: cta.messageSubject,
-        message
+        message: form.childAge.trim()
       });
       setForm({ parentName: '', phone: '', email: '', childAge: '' });
       setStatus('success');
@@ -1078,7 +1074,7 @@ export function PublicHomeClient({
       </section>
 
       {/* Section: Bottom lead CTA — headline, icon, lead form (`content.cta`); stays within container width; posts to `messages` like contact page. */}
-      <HomeLeadCtaSection cta={content.cta} language={language} />
+      <HomeLeadCtaSection cta={content.cta} />
     </div>
   );
 }

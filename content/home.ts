@@ -249,7 +249,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         email: 'Email',
         childAge: "Child's age"
       },
-      messageSubject: 'Home page — child registration',
+      messageSubject: 'Child registration',
       submitting: 'Sending…',
       successMessage: 'Thank you! We will contact you soon.',
       errorMessage:
@@ -487,7 +487,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         email: 'Email',
         childAge: 'Вік дитини'
       },
-      messageSubject: 'Головна - заявка на запис дитини',
+      messageSubject: 'Реєстрація дитини',
       submitting: 'Надсилаємо…',
       successMessage: 'Дякуємо! Ми зв’яжемося з вами найближчим часом.',
       errorMessage:
