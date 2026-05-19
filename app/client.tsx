@@ -1002,7 +1002,8 @@ export function PublicHomeClient({
         isUk={isUk}
       />
 
-      {/* Section: Parent voices / testimonials — heading + `ParentVoicesCarousel` (`content.parentVoices`). Anchor: #parent-voices. */}
+      {/* Section: Parent voices — hidden when there are no reviews. Anchor: #parent-voices. */}
+      {parentVoices.length > 0 ? (
       <section
         id="parent-voices"
         aria-labelledby="parent-voices-heading"
@@ -1031,16 +1032,9 @@ export function PublicHomeClient({
             />
           </div>
         </div>
-        {parentVoiceCarouselItems.length === 0 ? (
-          <p className="mx-auto max-w-md text-center text-sm text-muted-foreground">
-            {isUk
-              ? 'Тут зʼявляться відгуки батьків після додавання їх в адмін-панелі.'
-              : 'Parent testimonials will appear here once they are added in the admin.'}
-          </p>
-        ) : (
-          <ParentVoicesCarousel items={parentVoiceCarouselItems} />
-        )}
+        <ParentVoicesCarousel items={parentVoiceCarouselItems} />
       </section>
+      ) : null}
 
       {/* Section: FAQ — split title + two-column accordion (`content.faq`). Anchor: #faq. */}
       <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-24 overflow-visible">
