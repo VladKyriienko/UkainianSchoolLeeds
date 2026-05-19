@@ -102,6 +102,53 @@ export function NavUser() {
     }
   ];
 
+  const userInfo = (
+    <>
+      <Avatar className="h-8 w-8 rounded-lg">
+        <AvatarImage
+          className="object-cover"
+          src={userData?.avatar_url || undefined}
+          alt={userData?.full_name || user.email || 'User'}
+        />
+        <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
+      </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <span className="truncate font-semibold">{displayName}</span>
+        <span className="truncate text-xs">{user.email}</span>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" className="pointer-events-none opacity-100">
+            {userInfo}
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild>
+            <Link href={profileHref} onClick={handleMobileNavigation}>
+              <Icon iconName="User" className="h-4 w-4" />
+              <span>Profile</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <form onSubmit={handleSignOut} className="w-full">
+            <SidebarMenuButton asChild>
+              <button type="submit" className="flex w-full items-center gap-2">
+                <Icon iconName="LogOut" className="h-4 w-4" />
+                <span>Sign Out</span>
+              </button>
+            </SidebarMenuButton>
+          </form>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -111,26 +158,13 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  className="object-cover"
-                  src={userData?.avatar_url || undefined}
-                  alt={userData?.full_name || user.email || 'User'}
-                />
-                <AvatarFallback className="rounded-lg">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{displayName}</span>
-                <span className="truncate text-xs">{user.email}</span>
-              </div>
+              {userInfo}
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? 'bottom' : 'right'}
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            side="right"
             align="end"
             sideOffset={4}
           >

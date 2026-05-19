@@ -1,7 +1,7 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import MessagesManagementTable from '@/app/admin/components/MessagesManagementTable';
-import { MessagesSearchForm } from '@/app/admin/components/MessagesSearchForm';
+import MessagesManagementTable from '@/components/features/admin/MessagesManagementTable';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { listMessages } from '@/app/admin/messages/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
@@ -49,7 +49,10 @@ export default async function AdminMessagesPage({
 
   return (
     <PageWrapper title="Messages" description="View contact form messages">
-      <MessagesSearchForm
+      <AdminListSearchForm
+        searchInputId="messages-search"
+        searchLabel="Search messages"
+        searchPlaceholder="Email, name, subject or message..."
         initialSearch={search}
         initialDateFrom={dateFrom}
         initialDateTo={dateTo}

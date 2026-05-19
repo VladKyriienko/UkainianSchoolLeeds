@@ -1,7 +1,7 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import DonationManagementTable from '@/app/admin/components/DonationManagementTable';
-import { DonationsSearchForm } from '@/app/admin/components/DonationsSearchForm';
+import DonationManagementTable from '@/components/features/admin/DonationManagementTable';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { listDonations } from '@/app/admin/donations/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
@@ -52,11 +52,14 @@ export default async function AdminDonationsPage({
       title="Donations"
       description="View donation history"
     >
-      <DonationsSearchForm
+      <AdminListSearchForm
+        searchInputId="donations-search"
+        searchLabel="Search by email"
+        searchPlaceholder="Donor email..."
         initialSearch={search}
         initialDateFrom={dateFrom}
         initialDateTo={dateTo}
-        initialLimit={limit}
+        fixedLimit={limit}
       />
       {error ? (
         <Alert variant="destructive" className="mb-6">

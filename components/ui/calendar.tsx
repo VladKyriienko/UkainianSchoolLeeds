@@ -41,7 +41,7 @@ function Calendar({
       }}
       classNames={{
         root: cn(
-          'w-fit min-w-[calc(7*var(--cell-size))]',
+          'w-fit min-w-[calc(7*var(--cell-size))',
           defaultClassNames.root
         ),
         months: cn(
@@ -55,20 +55,20 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50',
+          'h-(--cell-size) w-(--cell-size) select-none p-0 aria-disabled:opacity-50',
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50',
+          'h-(--cell-size) w-(--cell-size) select-none p-0 aria-disabled:opacity-50',
           defaultClassNames.button_next
         ),
         month_caption: cn(
-          'flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]',
+          'flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)',
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          'flex h-[--cell-size] w-full items-center justify-center gap-1.5 text-sm font-medium',
+          'flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium',
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
@@ -94,11 +94,11 @@ function Calendar({
         ),
         weeks: defaultClassNames.weeks,
         week: cn(
-          'mt-0 flex w-full h-[var(--cell-size)] min-h-[var(--cell-size)]',
+          'mt-0 flex w-full h-(--cell-size) min-h-(--cell-size)',
           defaultClassNames.week
         ),
         week_number_header: cn(
-          'w-[--cell-size] select-none',
+          'w-(--cell-size) select-none',
           defaultClassNames.week_number_header
         ),
         week_number: cn(
@@ -106,7 +106,7 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          'group/day relative flex items-center justify-center select-none p-0 text-center h-[var(--cell-size)] w-[var(--cell-size)] min-h-[var(--cell-size)] min-w-[var(--cell-size)] max-h-[var(--cell-size)] max-w-[var(--cell-size)] [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md',
+          'group/day relative flex items-center justify-center select-none p-0 text-center h-(--cell-size) w-(--cell-size) min-h-(--cell-size) min-w-(--cell-size) max-h-(--cell-size) max-w-(--cell-size) [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md',
           defaultClassNames.day
         ),
         day_button: cn(

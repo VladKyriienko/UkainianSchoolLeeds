@@ -3,8 +3,8 @@ import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import NewsManagementTable from '@/app/admin/components/NewsManagementTable';
-import { NewsSearchForm } from '@/app/admin/components/NewsSearchForm';
+import NewsManagementTable from '@/components/features/admin/NewsManagementTable';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { listNews } from '@/app/admin/news/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
@@ -63,7 +63,10 @@ export default async function AdminNewsPage({
         </Button>
       }
     >
-      <NewsSearchForm
+      <AdminListSearchForm
+        searchInputId="news-search"
+        searchLabel="Search by title"
+        searchPlaceholder="Title..."
         initialSearch={search}
         initialDateFrom={dateFrom}
         initialDateTo={dateTo}

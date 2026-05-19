@@ -3,8 +3,8 @@ import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import ClassesManagementTable from '@/app/admin/components/ClassesManagementTable';
-import { ClassesSearchForm } from '@/app/admin/components/ClassesSearchForm';
+import ClassesManagementTable from '@/components/features/admin/ClassesManagementTable';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { listClasses } from '@/app/admin/classes/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
@@ -57,7 +57,14 @@ export default async function AdminClassesPage({
         </Button>
       }
     >
-      <ClassesSearchForm initialSearch={search} />
+      <AdminListSearchForm
+        searchInputId="classes-search"
+        searchLabel="Search classes"
+        searchPlaceholder="Title..."
+        initialSearch={search}
+        showDateRange={false}
+        className="flex flex-col gap-4 sm:max-w-md"
+      />
       {error ? (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />

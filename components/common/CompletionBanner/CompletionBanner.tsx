@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, AlertCircle, User, X } from 'lucide-react';
-import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
+import type { CompletionFieldConfig } from '@/lib/auth/completion';
 import type { CompletionData } from './types';
 
 type CompletionBannerProps = {
@@ -71,7 +71,7 @@ export function CompletionBanner({
     switch (variant) {
       case 'top-banner':
         return {
-          container: 'border-b bg-gradient-to-r from-primary/5 to-primary/10',
+          container: 'border-b bg-linear-to-r from-primary/5 to-primary/10',
           card: 'border-0 shadow-none bg-transparent',
           content: 'py-3 px-4'
         };

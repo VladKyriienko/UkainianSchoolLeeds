@@ -1,6 +1,6 @@
 export type HomeLanguage = 'en' | 'uk';
 
-type HomeContent = {
+export type HomeContent = {
   hero: {
     titleLines: string[];
     titleAccent: string;
@@ -28,14 +28,16 @@ type HomeContent = {
   news: {
     eyebrow: string;
     title: string;
-    viewAll: string;
+    viewAllNews: string;
+    viewAllEvents: string;
     emptyMessage: string;
+    eventLabel: string;
+    newsLabel: string;
   };
   parentVoices: {
     titleBefore: string;
     titleHighlight: string;
     titleAfter: string;
-    items: { quote: string; attribution: string }[];
   };
   faq: {
     titleBefore: string;
@@ -84,12 +86,11 @@ type HomeContent = {
       href?: string;
     }[];
   };
-  /** Photo strip: heading + CTA + gallery */
+  /** Photo strip: heading + CTA (photos from `gallery` table). */
   schoolAtmosphere: {
     heading: string;
     cta: string;
     ctaHref: string;
-    images: { src: string; alt: string }[];
   };
   /** Row under hero CTAs: icon + two-line label (language via HOME_CONTENT). */
   heroTrust: {
@@ -159,40 +160,16 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     news: {
       eyebrow: 'News and events',
       title: 'Stay up to date with school life',
-      viewAll: 'All news',
-      emptyMessage: 'No news yet. Check back later.'
+      viewAllNews: 'All news',
+      viewAllEvents: 'Calendar',
+      emptyMessage: 'No news or events yet. Check back later.',
+      eventLabel: 'Event',
+      newsLabel: 'News'
     },
     parentVoices: {
       titleBefore: 'What ',
       titleHighlight: 'parents',
-      titleAfter: ' say',
-      items: [
-        {
-          quote:
-            'Our daughter looks forward to Saturdays. She speaks Ukrainian more confidently and has made friends who share the same roots.',
-          attribution: "Maria, Sofia's mum"
-        },
-        {
-          quote:
-            'The teachers are warm and professional. We feel welcome as a family and always know what is happening at school.',
-          attribution: 'Olena, mum of two'
-        },
-        {
-          quote:
-            'Traditions, songs, and community events mean a lot to us. The school helps our children stay close to Ukraine while growing up in Leeds.',
-          attribution: "Andriy, Marko's dad"
-        },
-        {
-          quote:
-            'I appreciate the clear communication and the care for every child. It is more than lessons — it is a second home for our grandchildren.',
-          attribution: "Iryna, Hanka's grandmother"
-        },
-        {
-          quote:
-            'We were new to the city and found support here immediately. The school connects families and keeps our language alive.',
-          attribution: "Petro, Yurko's dad"
-        }
-      ]
+      titleAfter: ' say'
     },
     faq: {
       titleBefore: 'Frequently asked ',
@@ -244,7 +221,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         email: 'Email',
         childAge: "Child's age"
       },
-      messageSubject: 'Home page — child registration',
+      messageSubject: 'Child registration',
       submitting: 'Sending…',
       successMessage: 'Thank you! We will contact you soon.',
       errorMessage:
@@ -299,25 +276,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     schoolAtmosphere: {
       heading: "Our school's atmosphere",
       cta: 'See more photos',
-      ctaHref: '/parents/news',
-      images: [
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Children drawing and learning together at a desk'
-        },
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Children outdoors with the Ukrainian flag'
-        },
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Children celebrating Ukrainian culture at school'
-        },
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Pupils taking part in a classroom activity'
-        }
-      ]
+      ctaHref: '/parents/gallery'
     },
     programs: {
       headingBefore: 'Educational ',
@@ -412,40 +371,16 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     news: {
       eyebrow: 'Новини та події',
       title: 'Будь в курсі шкільного життя',
-      viewAll: 'Всі новини',
-      emptyMessage: 'Новини поки немає. Завітайте пізніше.'
+      viewAllNews: 'Всі новини',
+      viewAllEvents: 'Календар',
+      emptyMessage: 'Новин і подій поки немає. Завітайте пізніше.',
+      eventLabel: 'Подія',
+      newsLabel: 'Новина'
     },
     parentVoices: {
       titleBefore: 'Що ',
       titleHighlight: 'кажуть',
-      titleAfter: ' батьки',
-      items: [
-        {
-          quote:
-            'Наша дочка з нетерпінням чекає на суботу. Вона впевненіше говорить українською й знайшла друзів зі спільними коренями.',
-          attribution: 'Марія, мама Софійки'
-        },
-        {
-          quote:
-            'Викладачі теплі й професійні. Ми відчуваємо себе бажаними родиною і завжди в курсі шкільних подій.',
-          attribution: 'Олена, мама двох дітей'
-        },
-        {
-          quote:
-            'Традиції, пісні та спільні заходи для нас важливі. Школа допомагає дітям бути ближче до України, зростаючи в Лідсі.',
-          attribution: 'Андрій, тато Марка'
-        },
-        {
-          quote:
-            'Ціную зрозумілу комунікацію й турботу про кожну дитину. Це більше ніж уроки — це другий дім для онуків.',
-          attribution: 'Ірина, бабуся Ганки'
-        },
-        {
-          quote:
-            'Ми нещодавно переїхали в місто й одразу знайшли підтримку тут. Школа з’єднує родини й береже нашу мову.',
-          attribution: 'Петро, тато Юрка'
-        }
-      ]
+      titleAfter: ' батьки'
     },
     faq: {
       titleBefore: 'Часті ',
@@ -497,7 +432,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
         email: 'Email',
         childAge: 'Вік дитини'
       },
-      messageSubject: 'Головна - заявка на запис дитини',
+      messageSubject: 'Реєстрація дитини',
       submitting: 'Надсилаємо…',
       successMessage: 'Дякуємо! Ми зв’яжемося з вами найближчим часом.',
       errorMessage:
@@ -552,25 +487,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     schoolAtmosphere: {
       heading: 'Атмосфера нашої школи',
       cta: 'Дивитися більше фото',
-      ctaHref: '/parents/news',
-      images: [
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Діти малюють та навчаються за партою'
-        },
-        {
-          src: '/home-hero-school.png',
-          alt: 'Діти на вулиці з прапором України'
-        },
-        {
-          src: '/home/hero-card-1.png',
-          alt: 'Святкування української культури у школі'
-        },
-        {
-          src: '/home/hero-card-2.png',
-          alt: 'Учні під час заняття в класі'
-        }
-      ]
+      ctaHref: '/parents/gallery'
     },
     programs: {
       headingBefore: 'Програми ',

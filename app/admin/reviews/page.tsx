@@ -2,8 +2,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import ReviewsManagementTable from '@/app/admin/components/ReviewsManagementTable';
-import { ReviewsSearchForm } from '@/app/admin/components/ReviewsSearchForm';
+import ReviewsManagementTable from '@/components/features/admin/ReviewsManagementTable';
+import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { listReviews } from '@/app/admin/reviews/actions';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';
@@ -62,8 +62,12 @@ export default async function AdminReviewsPage({
         </Button>
       }
     >
-      <ReviewsSearchForm
-        initialParents={parents}
+      <AdminListSearchForm
+        searchInputId="reviews-parents"
+        searchParamKey="parents"
+        searchLabel="Filter by parents (attribution)"
+        searchPlaceholder="e.g. Maria, Sofia's mum"
+        initialSearch={parents}
         initialDateFrom={dateFrom}
         initialDateTo={dateTo}
       />

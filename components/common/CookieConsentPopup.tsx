@@ -85,7 +85,7 @@ export function CookieConsentPopup() {
       <div
         role="dialog"
         aria-labelledby="cookie-consent-title"
-        className="mx-auto w-full max-w-[1400px] rounded-t-2xl border border-border bg-card text-card-foreground shadow-[0_-12px_40px_rgba(0,0,0,0.18)] ring-1 ring-black/5 dark:ring-white/10"
+        className="mx-auto w-full max-w-screen-2xl rounded-t-2xl border border-border bg-card text-card-foreground shadow-[0_-12px_40px_rgba(0,0,0,0.18)] ring-1 ring-black/5 dark:ring-white/10"
       >
         <div className="h-1 w-full rounded-t-[inherit] bg-linear-to-r" aria-hidden />
         <div className="flex w-full flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6 md:py-5">

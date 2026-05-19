@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createDocumentSlug } from '@/utils/document-slug';
 
 export async function GET() {

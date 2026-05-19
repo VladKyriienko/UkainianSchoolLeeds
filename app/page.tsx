@@ -1,12 +1,17 @@
-import { getCurrentUser } from '@/utils/auth-helpers/server';
-import { hasAdminRole, hasTeacherRole } from '@/utils/auth-helpers/roles';
+import { getCurrentUser } from '@/lib/auth/server';
+import { hasAdminRole, hasTeacherRole } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { PublicHomeClient } from './client';
 import { PublicLayout } from '@/components/common/RootLayout/PublicLayout';
-import { getNews } from '@/app/(not-aunthenticated)/parents/news/actions';
-import { getPublicParentVoices, getSchoolAtmosphereGalleryImages } from './actions';
+import { getNews } from '@/app/(public)/parents/news/actions';
+import { getUpcomingPublicEvents } from '@/app/(public)/parents/calendar/actions';
+import {
+  getPublicParentVoices,
+  getSchoolAtmosphereGalleryImages
+} from '@/lib/data/home';
 
 const HOME_NEWS_LIMIT = 3;
+const HOME_EVENTS_LIMIT = 3;
 
 export default async function HomePage() {
   const { user, profileData } = await getCurrentUser();
@@ -18,17 +23,20 @@ export default async function HomePage() {
     redirect('/teacher');
   }
 
-  const [allNews, atmosphereGalleryImages, parentVoices] = await Promise.all([
-    getNews(),
-    getSchoolAtmosphereGalleryImages(),
-    getPublicParentVoices()
-  ]);
+  const [allNews, upcomingEvents, atmosphereGalleryImages, parentVoices] =
+    await Promise.all([
+      getNews(),
+      getUpcomingPublicEvents(HOME_EVENTS_LIMIT),
+      getSchoolAtmosphereGalleryImages(),
+      getPublicParentVoices()
+    ]);
   const latestNews = allNews.slice(0, HOME_NEWS_LIMIT);
 
   return (
     <PublicLayout showHeader={true} showDarkModeToggle={false} showFooter={true}>
       <PublicHomeClient
         initialNews={latestNews}
+        initialEvents={upcomingEvents}
         atmosphereGalleryImages={atmosphereGalleryImages}
         parentVoices={parentVoices}
       />

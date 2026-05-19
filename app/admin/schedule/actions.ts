@@ -2,8 +2,8 @@
 
 import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
-import { createAdminClient } from '@/utils/supabase/admin';
-import { verifyAdminAccess } from '@/utils/auth-helpers/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { verifyAdminAccess } from '@/lib/auth/server';
 import { sanitizeFilename } from '@/utils/file-name';
 
 const supabaseAdmin = createAdminClient();

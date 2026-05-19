@@ -82,7 +82,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm max-w-none dark:prose-invert min-h-[220px] px-4 py-3 focus:outline-none'
+          'prose prose-sm max-w-none dark:prose-invert min-h-editor px-4 py-3 focus:outline-none'
       }
     },
     onUpdate: ({ editor: currentEditor }) => {
@@ -268,7 +268,7 @@ export function RichTextEditor({
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 rounded-sm border border-transparent px-2 text-[11px] transition-colors hover:bg-muted"
+            className="h-7 rounded-sm border border-transparent px-2 text-2xs transition-colors hover:bg-muted"
             onMouseDown={keepEditorSelection}
             onClick={() => {
               editor
@@ -320,7 +320,7 @@ export function RichTextEditor({
           id={id}
           editor={editor}
           className={cn(
-            'min-h-[220px]',
+            'min-h-editor',
             '[&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:leading-tight [&_.ProseMirror_h2]:my-4',
             '[&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:leading-snug [&_.ProseMirror_h3]:my-3',
             '[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-3',

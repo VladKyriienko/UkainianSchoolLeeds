@@ -6,7 +6,7 @@ import { BackButton } from '@/components/common/BackButton';
 
 export default function AdminNotFound() {
   return (
-    <div className="flex items-center justify-center min-h-[60vh] p-4">
+    <div className="flex items-center justify-center min-h-[60svh] p-4">
       <Card className="w-full max-w-md border-0 shadow-none">
         <CardContent className="flex flex-col items-center text-center space-y-6 p-8">
           <div className="space-y-2">

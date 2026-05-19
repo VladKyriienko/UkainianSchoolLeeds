@@ -15,6 +15,20 @@ import { crudPolicy } from 'drizzle-orm/neon';
 import { authenticatedRole, anonRole } from 'drizzle-orm/supabase';
 import { sql } from 'drizzle-orm';
 
+const createdAtColumn = () =>
+  timestamp('created_at', { withTimezone: true }).defaultNow().notNull();
+
+const updatedAtColumn = () =>
+  timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date());
+
+const timestamps = {
+  createdAt: createdAtColumn(),
+  updatedAt: updatedAtColumn()
+};
+
 // Users table (define first to avoid reference errors)
 export const users = pgTable(
   'users',
@@ -27,7 +41,8 @@ export const users = pgTable(
     avatarUrl: text('avatar_url'),
     birthdate: timestamp('birthdate', { withTimezone: true }),
     marketingConsent: boolean('marketing_consent').default(false),
-    isActive: boolean('is_active').notNull().default(true)
+    isActive: boolean('is_active').notNull().default(true),
+    ...timestamps
   },
   (t) => [
     crudPolicy({
@@ -69,7 +84,8 @@ export const roles = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id),
-    role: rolesEnum('role').notNull().default('user')
+    role: rolesEnum('role').notNull().default('user'),
+    ...timestamps
   },
   (t) => [
     crudPolicy({
@@ -91,12 +107,7 @@ export const organisations = pgTable(
     name: text('name').notNull(),
     nameUk: text('name_uk'),
     slug: text('slug').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   (t) => [
     crudPolicy({
@@ -126,7 +137,8 @@ export const organisationMemberships = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id),
-    role: text('role').notNull()
+    role: text('role').notNull(),
+    ...timestamps
   },
   (t) => [
     crudPolicy({
@@ -150,12 +162,7 @@ export const userUploads = pgTable(
       .notNull()
       .references(() => users.id),
     fileUrl: text('file_url').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   (t) => [
     crudPolicy({
@@ -187,9 +194,7 @@ export const teachers = pgTable(
     description: text('description'),
     descriptionUk: text('description_uk'),
     category: teacherCategoryEnum('category').notNull().default('TEACHER'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -240,9 +245,7 @@ export const news = pgTable(
     date: timestamp('date', { withTimezone: true }).defaultNow().notNull(),
     order: integer('order').notNull().default(0),
     photo: text('photo'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -295,9 +298,8 @@ export const events = pgTable(
     endTime: time('end_time'),
     location: text('location'),
     locationUk: text('location_uk'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    photo: text('photo'),
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -333,6 +335,51 @@ export const events = pgTable(
   }
 );
 
+export const gallery = pgTable(
+  'gallery',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    photo: text('photo').notNull(),
+    order: integer('order').notNull().default(0),
+    ...timestamps
+  },
+  () => {
+    const isAdmin = sql`exists (
+      select 1
+      from roles
+      where roles.user_id = auth.uid()
+        and roles.role = 'admin'
+    )`;
+
+    return [
+      pgPolicy('gallery_public_select', {
+        for: 'select',
+        to: [anonRole, authenticatedRole],
+        using: sql`true`
+      }),
+      pgPolicy('gallery_admin_insert', {
+        for: 'insert',
+        to: authenticatedRole,
+        withCheck: isAdmin
+      }),
+      pgPolicy('gallery_admin_update', {
+        for: 'update',
+        to: authenticatedRole,
+        using: isAdmin,
+        withCheck: isAdmin
+      }),
+      pgPolicy('gallery_admin_delete', {
+        for: 'delete',
+        to: authenticatedRole,
+        using: isAdmin
+      })
+    ];
+  }
+);
+
 export const schedule = pgTable(
   'schedule',
   {
@@ -342,9 +389,7 @@ export const schedule = pgTable(
       .default(sql`gen_random_uuid()`),
     date: timestamp('date', { withTimezone: true }).defaultNow().notNull(),
     file: text('file').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -392,9 +437,7 @@ export const documents = pgTable(
     content: text('content').notNull(),
     contentUk: text('content_uk'),
     type: typeDocumentEnum('type').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -442,9 +485,7 @@ export const classes = pgTable(
     description: text('description'),
     descriptionUk: text('description_uk'),
     order: integer('order').notNull().default(0),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -493,9 +534,7 @@ export const teacherClass = pgTable(
     classId: uuid('class_id')
       .notNull()
       .references(() => classes.id),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -549,9 +588,7 @@ export const classPhotoGalery = pgTable(
       .references(() => classes.id),
     photo: text('photo').notNull(),
     order: integer('order').notNull().default(0),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -601,9 +638,7 @@ export const donations = pgTable(
     currency: text('currency').notNull().default('gbp'),
     status: text('status').notNull().default('pending'),
     donorEmail: text('donor_email'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -635,7 +670,8 @@ export const review = pgTable(
     perensUk: text('perens_uk'),
     content: text('content').notNull(),
     contentUk: text('content_uk'),
-    data: timestamp('data', { withTimezone: true }).defaultNow().notNull()
+    data: timestamp('data', { withTimezone: true }).defaultNow().notNull(),
+    ...timestamps
   },
   () => {
     const isAdmin = sql`exists (
@@ -685,9 +721,7 @@ export const messages = pgTable(
     subject: text('subject').notNull(),
     message: text('message').notNull(),
     read: boolean('read').notNull().default(false),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull()
+    ...timestamps
   },
   () => {
     // No RLS policies: table is accessible only via service_role (server-side with createAdminClient).

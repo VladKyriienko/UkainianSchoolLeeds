@@ -7,13 +7,17 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
-import { NavItems, type NavItem } from '@/constants/navigation';
 import { cn } from '@/utils/cn';
 import { ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
-import { BRAND_NAME_LINES, NAV_LABELS } from '@/content/navigation';
+import {
+  BRAND_NAME_LINES,
+  NAV_LABELS,
+  NavItems,
+  type NavItem
+} from '@/content/navigation';
 
 export type PublicNavBarProps = {
   showDarkModeToggle?: boolean;
@@ -304,10 +308,10 @@ export function PublicNavBar({
                 portalContainer={sheetPortalContainer}
                 aria-describedby={undefined}
                 className={cn(
-                  'w-[300px] sm:w-[400px] overflow-y-auto px-4 bg-ukraine-header-bg text-ukraine-header-fg border-0 shadow-none',
-                  'top-18! h-[calc(100vh-4.5rem)]'
+                  'w-75 sm:w-100 overflow-y-auto px-4 bg-ukraine-header-bg text-ukraine-header-fg border-0 shadow-none',
+                  'top-18! h-[calc(100dvh-4.5rem)]'
                 )}
-                overlayClassName="!top-[4.5rem] h-[calc(100vh-4.5rem)]"
+                overlayClassName="top-18! h-[calc(100dvh-4.5rem)]"
                 overlayStyle={{
                   top: '4.5rem',
                   height: 'calc(100vh - 4.5rem)',

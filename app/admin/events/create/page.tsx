@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { EventForm } from '@/app/admin/components/EventForm';
+import { EventForm } from '@/components/features/admin/EventForm';
 
 export default async function CreateEventPage() {
   return (

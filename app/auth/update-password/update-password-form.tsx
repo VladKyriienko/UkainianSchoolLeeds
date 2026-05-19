@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { updatePassword } from '@/utils/auth-helpers/server';
-import { handleRequest } from '@/utils/auth-helpers/client';
+import { updatePassword } from '@/lib/auth/server';
+import { handleRequest } from '@/lib/auth/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import {
@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/utils/supabase/hooks';
+import { createClient } from '@/lib/supabase/hooks';
 
 export default function UpdatePasswordForm() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { NewsForm } from '@/app/admin/components/NewsForm';
+import { NewsForm } from '@/components/features/admin/NewsForm';
 
 export default async function CreateNewsPage() {
   return (

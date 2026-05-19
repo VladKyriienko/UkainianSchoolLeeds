@@ -1,6 +1,6 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { ProfileForm } from '@/app/admin/profile/profile-form';
+import { ProfileForm } from '@/components/features/profile/ProfileForm';
 import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function TeacherProfilePage() {

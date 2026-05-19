@@ -1,9 +1,9 @@
 import { PropsWithChildren } from 'react';
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/utils/auth-helpers/server';
-import { hasAdminRole, hasTeacherRole } from '@/utils/auth-helpers/roles';
+import { getCurrentUser } from '@/lib/auth/server';
+import { hasAdminRole, hasTeacherRole } from '@/lib/auth/roles';
 import { getCompletionBannerData } from '@/components/common/CompletionBanner';
-import { AuthenticatedLayout } from '@/app/admin/AuthenticatedLayout';
+import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import type { RouteConfig } from '@/utils/route-protection';
 
 const teacherNavigation: RouteConfig[] = [

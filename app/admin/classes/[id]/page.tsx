@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getClassById } from '@/app/admin/classes/actions';
-import { ClassDetailsActions } from '@/app/admin/components/ClassDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteClass } from '@/app/admin/classes/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
 import { format } from 'date-fns';
@@ -30,7 +31,16 @@ export default async function ClassViewPage({
       title={item.title}
       description={`Order: ${item.order}`}
       goBackButton={<BackButton />}
-      actions={<ClassDetailsActions classId={item.id} classTitle={item.title} />}
+      actions={
+        <AdminEntityDetailsActions
+          editHref={`/admin/classes/${item.id}/edit`}
+          listPath="/admin/classes"
+          confirmMessage={`Are you sure you want to delete "${item.title}"? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete class"
+          entityId={item.id}
+          deleteAction={deleteClass}
+        />
+      }
     >
       <Card>
         <CardHeader>

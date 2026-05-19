@@ -1,8 +1,8 @@
 'use server';
 
-import { createAdminClient } from '@/utils/supabase/admin';
-import { verifyAdminAccess } from '@/utils/auth-helpers/server';
-import type { Tables } from '@/utils/supabase/types';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { verifyAdminAccess } from '@/lib/auth/server';
+import type { Tables } from '@/lib/supabase/types';
 
 const supabaseAdmin = createAdminClient();
 

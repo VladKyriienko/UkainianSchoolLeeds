@@ -1,0 +1,387 @@
+'use server';
+
+import { cache } from 'react';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient, UserWithRoles } from '@/lib/supabase/server';
+import { hasAdminRole } from '@/lib/auth/roles';
+import { redirect } from 'next/navigation';
+import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+import type { User } from '@supabase/supabase-js';
+
+function isValidEmail(email: string) {
+  const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return regex.test(email);
+}
+
+/**
+ * Cached function to get current user with profile data.
+ * This ensures only one database query is made per request,
+ * even if called multiple times (e.g., in layout and page).
+ */
+export const getCurrentUser = cache(
+  async (): Promise<{
+    user: User | null;
+    profileData: UserWithRoles | null;
+  }> => {
+    const supabase = createClient();
+
+    // Get authenticated user
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { user: null, profileData: null };
+    }
+
+    // Get user profile data from users table
+    const { data: profileData } = await supabase
+      .from('users')
+      .select('*, roles(*)')
+      .eq('id', user.id)
+      .single();
+
+    return { user, profileData };
+  }
+);
+
+export async function redirectToPath(path: string) {
+  return redirect(path);
+}
+
+/**
+ * Returns whether the current session user is active (for use after OAuth/setSession).
+ * No DB access from browser: call this server action from the client.
+ */
+export async function getCurrentUserActiveStatus(): Promise<{
+  active: boolean;
+} | null> {
+  const supabase = createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase
+    .from('users')
+    .select('is_active')
+    .eq('id', user.id)
+    .single();
+  if (!data || typeof data.is_active !== 'boolean') return null;
+  return { active: data.is_active };
+}
+
+export async function SignOut(formData?: FormData) {
+  const pathName = String(formData?.get('pathName') || '/').trim();
+
+  const supabase = createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    return getErrorRedirect(
+      pathName,
+      'Hmm... Something went wrong.',
+      'You could not be signed out.'
+    );
+  }
+
+  return '/auth/login';
+}
+
+export async function SignIn(email: string, password: string) {
+  const supabase = createClient();
+  const { data: authData, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  // Check if user is active
+  if (authData.user) {
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('is_active')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (userError) {
+      console.error('Error checking user status:', userError);
+      // If we can't check the status, allow login but log the error
+    } else if (userData && userData.is_active === false) {
+      // Sign out the user immediately
+      await supabase.auth.signOut();
+      throw new Error(
+        'Your account has been deactivated. Please contact an administrator.'
+      );
+    }
+  }
+
+  if (authData.user) {
+    const { data: roleRows } = await supabase
+      .from('roles')
+      .select('role')
+      .eq('user_id', authData.user.id);
+
+    const roles = roleRows?.map((item) => item.role) ?? [];
+    if (roles.includes('admin')) {
+      return '/admin';
+    }
+    if (roles.includes('teacher')) {
+      return '/teacher';
+    }
+  }
+
+  return '/';
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = String(formData.get('password')).trim();
+  const passwordConfirm = String(formData.get('passwordConfirm')).trim();
+
+  // Check that the password and confirmation match
+  if (password !== passwordConfirm) {
+    return getErrorRedirect(
+      '/auth/update-password',
+      'Your password could not be updated.',
+      'Passwords do not match.'
+    );
+  }
+
+  const supabase = createClient();
+  const { error, data } = await supabase.auth.updateUser({
+    password
+  });
+
+  if (error) {
+    return getErrorRedirect(
+      '/auth/update-password',
+      'Your password could not be updated.',
+      error.message
+    );
+  } else if (data.user) {
+    return getStatusRedirect(
+      '/auth/login',
+      'Success!',
+      'Your password has been updated.'
+    );
+  } else {
+    return getErrorRedirect(
+      '/auth/update-password',
+      'Hmm... Something went wrong.',
+      'Your password could not be updated.'
+    );
+  }
+}
+
+export async function updateEmail(formData: FormData) {
+  // Get form data
+  const newEmail = String(formData.get('newEmail')).trim();
+
+  // Check that the email is valid
+  if (!isValidEmail(newEmail)) {
+    return getErrorRedirect(
+      '/',
+      'Your email could not be updated.',
+      'Invalid email address.'
+    );
+  }
+
+  const supabase = createClient();
+
+  const callbackUrl = getURL(
+    getStatusRedirect('/', 'Success!', `Your email has been updated.`)
+  );
+
+  const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    {
+      emailRedirectTo: callbackUrl
+    }
+  );
+
+  if (error) {
+    return getErrorRedirect(
+      '/account',
+      'Your email could not be updated.',
+      error.message
+    );
+  } else {
+    return getStatusRedirect(
+      '/account',
+      'Confirmation emails sent.',
+      `You will need to confirm the update by clicking the links sent to both the old and new email addresses.`
+    );
+  }
+}
+
+export async function updateName(formData: FormData) {
+  // Get form data
+  const fullName = String(formData.get('fullName')).trim();
+
+  const supabase = createClient();
+  const { error, data } = await supabase.auth.updateUser({
+    data: { full_name: fullName }
+  });
+
+  if (error) {
+    return getErrorRedirect(
+      '/account',
+      'Your name could not be updated.',
+      error.message
+    );
+  } else if (data.user) {
+    return getStatusRedirect(
+      '/account',
+      'Success!',
+      'Your name has been updated.'
+    );
+  } else {
+    return getErrorRedirect(
+      '/account',
+      'Hmm... Something went wrong.',
+      'Your name could not be updated.'
+    );
+  }
+}
+
+/**
+ * Verifies that the current user has admin role.
+ * Throws an error if user is not authenticated or not an admin.
+ * Returns the user ID if successful.
+ *
+ * This function uses getCurrentUser cache to avoid duplicate database queries.
+ */
+export async function verifyAdminAccess(): Promise<string> {
+  const { user, profileData } = await getCurrentUser();
+
+  if (!user) {
+    redirect('/auth/login');
+    throw new Error('Unauthorized: User not authenticated');
+  }
+
+  if (!profileData) {
+    redirect('/');
+    throw new Error('User profile not found');
+  }
+
+  if (!hasAdminRole(profileData)) {
+    redirect('/');
+    throw new Error('Unauthorized: Admin access required');
+  }
+
+  return user.id;
+}
+
+/**
+ * Gets the current user and verifies admin access.
+ * Returns user and profile data if admin, otherwise redirects.
+ * Uses getCurrentUser cache to avoid duplicate queries.
+ */
+export async function getAdminUser(): Promise<{
+  userId: string;
+  user: User;
+  profileData: UserWithRoles;
+}> {
+  const { user, profileData } = await getCurrentUser();
+
+  if (!user) {
+    redirect('/auth/login');
+    throw new Error('Unauthorized: User not authenticated');
+  }
+
+  if (!profileData) {
+    redirect('/');
+    throw new Error('User profile not found');
+  }
+
+  if (!hasAdminRole(profileData)) {
+    redirect('/');
+    throw new Error('Unauthorized: Admin access required');
+  }
+
+  return {
+    userId: user.id,
+    user,
+    profileData
+  };
+}
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = String(formData.get('email')).trim();
+
+  if (!isValidEmail(email)) {
+    return getErrorRedirect(
+      '/auth/forgot-password',
+      'Invalid email address.',
+      'Please enter a valid email address.'
+    );
+  }
+
+  const supabase = createClient();
+  const supabaseAdmin = createAdminClient();
+
+  try {
+    // First check if auth user exists - we need to use listUsers and filter by email
+    const { data: authUsers, error: authError } =
+      await supabaseAdmin.auth.admin.listUsers();
+
+    if (authError) {
+      console.error('Error listing users:', authError);
+      // Continue with reset attempt if we can't check status
+    }
+
+    let authUser = null;
+    if (authUsers && authUsers.users) {
+      authUser = authUsers.users.find((user) => user.email === email);
+    }
+
+    if (authUser) {
+      // Check if the user is active in our users table using admin client for permissions
+      const { data: userData, error: userDataError } = await supabaseAdmin
+        .from('users')
+        .select('is_active')
+        .eq('id', authUser.id)
+        .single();
+
+      if (userDataError) {
+        console.error('Error checking user active status:', userDataError);
+        // Continue with reset attempt if we can't check status
+      } else if (userData && userData.is_active === false) {
+        return getErrorRedirect(
+          '/auth/forgot-password',
+          'Your account has been deactivated.',
+          'Please contact an administrator for assistance.'
+        );
+      }
+    }
+
+    // Send password reset email
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getURL('/auth/callback?redirectTo=/auth/update-password')
+    });
+
+    if (error) {
+      return getErrorRedirect(
+        '/auth/forgot-password',
+        'Unable to send password reset email.',
+        error.message
+      );
+    }
+
+    return getStatusRedirect(
+      '/auth/forgot-password',
+      'Check your email.',
+      'Password reset instructions sent.'
+    );
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'An error occurred';
+    return getErrorRedirect(
+      '/auth/forgot-password',
+      'Unable to send password reset email.',
+      errorMessage
+    );
+  }
+}

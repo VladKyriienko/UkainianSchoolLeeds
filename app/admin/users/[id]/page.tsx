@@ -23,8 +23,9 @@ import {
   Settings,
   Activity
 } from 'lucide-react';
-import UserActionButtons from '@/app/admin/components/UserActionButtons';
-import { UserDetailsActions } from '@/app/admin/components/UserDetailsActions';
+import UserActionButtons from '@/components/features/admin/UserActionButtons';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteUser } from '@/app/admin/users/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -132,7 +133,7 @@ export default async function UserDetailsPage({
               src={currentUser.avatar_url || ''}
               alt={currentUser.full_name || 'User'}
             />
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm">
+            <AvatarFallback className="bg-linear-to-br from-blue-500 to-purple-600 text-sm">
               {currentUser.full_name?.charAt(0) ||
                 currentUser.email?.charAt(0) ||
                 '?'}
@@ -146,9 +147,13 @@ export default async function UserDetailsPage({
       }
       goBackButton={<BackButton />}
       actions={
-        <UserDetailsActions
-          userId={currentUser.id}
-          userEmail={currentUser.email}
+        <AdminEntityDetailsActions
+          editHref={`/admin/users/${currentUser.id}/edit`}
+          listPath="/admin/users"
+          confirmMessage={`Are you sure you want to delete user ${currentUser.email}? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete user"
+          entityId={currentUser.id}
+          deleteAction={deleteUser}
         />
       }
     >

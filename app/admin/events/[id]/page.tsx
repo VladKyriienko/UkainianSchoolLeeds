@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getEventById } from '@/app/admin/events/actions';
-import { EventDetailsActions } from '@/app/admin/components/EventDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteEvent } from '@/app/admin/events/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
+import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
 
 export default async function EventDetailsPage({
   params
@@ -34,6 +37,12 @@ export default async function EventDetailsPage({
     }
   };
 
+  const supabaseAdmin = createAdminClient();
+  const photoUrl = event.photo
+    ? supabaseAdmin.storage.from('events-photos').getPublicUrl(event.photo).data
+      .publicUrl
+    : null;
+
   const formatTime = (timeString: string | null) => {
     if (!timeString) return '—';
     const parts = timeString.split(':');
@@ -51,9 +60,18 @@ export default async function EventDetailsPage({
       title={event.title}
       description={formatDate(event.date)}
       goBackButton={<BackButton />}
-      actions={<EventDetailsActions eventId={event.id} eventTitle={event.title} />}
+      actions={
+        <AdminEntityDetailsActions
+          editHref={`/admin/events/${event.id}/edit`}
+          listPath="/admin/events"
+          confirmMessage={`Are you sure you want to delete "${event.title}"? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete event"
+          entityId={event.id}
+          deleteAction={deleteEvent}
+        />
+      }
     >
-      <Card>
+      <Card className="min-w-0 overflow-hidden">
         <CardHeader>
           <CardTitle>Event Details</CardTitle>
         </CardHeader>
@@ -62,6 +80,8 @@ export default async function EventDetailsPage({
             <div className="text-sm text-muted-foreground mb-1">Title</div>
             <div className="font-medium text-lg">{event.title}</div>
           </div>
+
+          {photoUrl && <AdminDetailPhoto src={photoUrl} alt={event.title} />}
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>

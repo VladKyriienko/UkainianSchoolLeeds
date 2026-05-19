@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/hooks';
-import { getCurrentUserActiveStatus } from '@/utils/auth-helpers/server';
+import { createClient } from '@/lib/supabase/hooks';
+import { getCurrentUserActiveStatus } from '@/lib/auth/server';
 
 export default function AuthCallbackClient() {
   const searchParams = useSearchParams();

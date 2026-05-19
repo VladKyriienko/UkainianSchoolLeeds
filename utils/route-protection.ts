@@ -74,6 +74,13 @@ export const navigationRoutes: RouteConfig[] = [
     requiresAuth: true
   },
   {
+    path: '/admin/gallery',
+    label: 'Gallery',
+    icon: 'Image',
+    requiredRole: 'admin',
+    requiresAuth: true
+  },
+  {
     path: '/admin/class-gallery',
     label: 'Class Gallery',
     icon: 'Images',

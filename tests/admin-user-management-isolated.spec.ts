@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ADMIN_USER } from './auth-utils';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Disable parallel execution for this entire file to avoid session conflicts
 test.describe.configure({ 

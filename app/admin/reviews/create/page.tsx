@@ -1,5 +1,5 @@
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ReviewForm } from '@/app/admin/components/ReviewForm';
+import { ReviewForm } from '@/components/features/admin/ReviewForm';
 
 export default async function CreateReviewPage() {
   return (

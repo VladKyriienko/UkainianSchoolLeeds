@@ -23,7 +23,7 @@ import LanguageToggle from '@/components/common/RootLayout/LanguageToggle';
 import { cn } from '@/utils/cn';
 import { useLanguage } from '@/providers/language-provider';
 import { BRAND_NAME_LINES } from '@/content/navigation';
-import type { CompletionFieldConfig } from '@/utils/auth-helpers/completion';
+import type { CompletionFieldConfig } from '@/lib/auth/completion';
 import type { CompletionData } from '@/components/common/CompletionBanner/types';
 import type { RouteConfig } from '@/utils/route-protection';
 
@@ -149,7 +149,7 @@ export function AppSidebar({
         <NavMain items={navItems} />
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border">
+      <SidebarFooter className="shrink-0 border-t border-sidebar-border bg-sidebar pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <NavUser />
       </SidebarFooter>
 

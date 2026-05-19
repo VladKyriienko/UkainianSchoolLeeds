@@ -4,11 +4,12 @@ import {
   type AdminGalleryItem,
   getGalleryItemById,
   listAccessibleClassesForGallery
-} from '@/app/admin/class-gallery/actions';
-import { ClassGalleryDetailsActions } from '@/app/admin/components/ClassGalleryDetailsActions';
+} from '@/lib/class-gallery/actions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteGalleryItem } from '@/lib/class-gallery/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { format } from 'date-fns';
 
 export default async function TeacherClassGalleryViewPage({
@@ -46,9 +47,12 @@ export default async function TeacherClassGalleryViewPage({
       description={classTitle}
       goBackButton={<BackButton />}
       actions={
-        <ClassGalleryDetailsActions
-          itemId={item.id}
-          basePath="/teacher/class-gallery"
+        <AdminEntityDetailsActions
+          editHref={`/teacher/class-gallery/${item.id}/edit`}
+          listPath="/teacher/class-gallery"
+          confirmMessage="Delete this photo from the gallery?"
+          entityId={item.id}
+          deleteAction={deleteGalleryItem}
         />
       }
     >

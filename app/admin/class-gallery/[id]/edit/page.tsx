@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ClassGalleryForm } from '@/app/admin/components/ClassGalleryForm';
-import { getGalleryItemById } from '@/app/admin/class-gallery/actions';
+import { ClassGalleryForm } from '@/components/features/class-gallery/ClassGalleryForm';
+import { getGalleryItemById } from '@/lib/class-gallery/actions';
 import { listClasses } from '@/app/admin/classes/actions';
 
 export default async function EditClassGalleryPage({

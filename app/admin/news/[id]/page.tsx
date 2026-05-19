@@ -1,12 +1,14 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getNewsById } from '@/app/admin/news/actions';
-import { NewsDetailsActions } from '@/app/admin/components/NewsDetailsActions';
+import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
+import { deleteNews } from '@/app/admin/news/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
+import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
 
 export default async function NewsViewPage({
   params
@@ -38,7 +40,7 @@ export default async function NewsViewPage({
   const supabaseAdmin = createAdminClient();
   const photoUrl = item.photo
     ? supabaseAdmin.storage.from('news-photos').getPublicUrl(item.photo).data
-      .publicUrl
+        .publicUrl
     : null;
 
   return (
@@ -46,9 +48,18 @@ export default async function NewsViewPage({
       title={item.title}
       description={formatDate(item.date)}
       goBackButton={<BackButton />}
-      actions={<NewsDetailsActions newsId={item.id} newsTitle={item.title} />}
+      actions={
+        <AdminEntityDetailsActions
+          editHref={`/admin/news/${item.id}/edit`}
+          listPath="/admin/news"
+          confirmMessage={`Are you sure you want to delete "${item.title}"? This action cannot be undone.`}
+          deleteErrorMessage="Failed to delete news"
+          entityId={item.id}
+          deleteAction={deleteNews}
+        />
+      }
     >
-      <Card>
+      <Card className="min-w-0 overflow-hidden">
         <CardHeader>
           <CardTitle>News Details</CardTitle>
         </CardHeader>
@@ -57,6 +68,8 @@ export default async function NewsViewPage({
             <div className="text-sm text-muted-foreground mb-1">Title</div>
             <div className="font-medium text-lg">{item.title}</div>
           </div>
+
+          {photoUrl && <AdminDetailPhoto src={photoUrl} alt={item.title} />}
 
           <div>
             <div className="text-sm text-muted-foreground mb-1">Description</div>
@@ -81,28 +94,14 @@ export default async function NewsViewPage({
             </div>
           </div>
 
-          {photoUrl && (
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Photo</div>
-              <div className="rounded-md border overflow-hidden max-w-md">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photoUrl}
-                  alt={item.title}
-                  className="w-full object-cover aspect-video"
-                />
-              </div>
-            </div>
-          )}
-
           {(item.title_uk || item.description_uk) && (
-            <div className="pt-4 border-t space-y-2">
+            <div className="space-y-4 border-t pt-4">
               {item.title_uk && (
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">
                     Title (Ukrainian)
                   </div>
-                  <div className="font-medium">{item.title_uk}</div>
+                  <div className="font-medium text-lg">{item.title_uk}</div>
                 </div>
               )}
               {item.description_uk && (

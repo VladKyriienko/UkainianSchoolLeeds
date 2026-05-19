@@ -1,6 +1,6 @@
-import { getCurrentUser } from '@/utils/auth-helpers/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { getAdminDashboardStats } from '@/app/admin/actions';
-import { AdminDashboardStats } from '@/app/admin/components/AdminDashboardStats';
+import { AdminDashboardStats } from '@/components/features/admin/AdminDashboardStats';
 import { PageWrapper } from '@/components/common/PageWrapper';
 
 export default async function AdminHomePage() {

@@ -26,7 +26,12 @@ export default {
         body: ['1.125rem', { lineHeight: '1.75' }],
         h1: ['4rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
         h2: ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-        h4: ['1.375rem', { lineHeight: '1.35', letterSpacing: '-0.01em' }]
+        h3: ['1.75rem', { lineHeight: '1.3', letterSpacing: '-0.01em' }],
+        h4: ['1.375rem', { lineHeight: '1.35', letterSpacing: '-0.01em' }],
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }]
+      },
+      minHeight: {
+        editor: '13.75rem'
       },
       keyframes: {
         'accordion-down': {

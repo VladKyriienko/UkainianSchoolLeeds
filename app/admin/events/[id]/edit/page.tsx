@@ -1,9 +1,10 @@
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getEventById } from '@/app/admin/events/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { EventForm } from '@/app/admin/components/EventForm';
+import { EventForm } from '@/components/features/admin/EventForm';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { getAdminUser } from '@/utils/auth-helpers/server';
+import { getAdminUser } from '@/lib/auth/server';
 
 type EditEventPageProps = {
   params: Promise<{ id: string }>;
@@ -41,12 +42,18 @@ export default async function EditEventPage({ params }: EditEventPageProps) {
     );
   }
 
+  const supabaseAdmin = createAdminClient();
+  const currentPhotoUrl = event.photo
+    ? supabaseAdmin.storage.from('events-photos').getPublicUrl(event.photo).data
+        .publicUrl
+    : null;
+
   return (
     <PageWrapper
       title="Edit Event"
       description="Update event details"
     >
-      <EventForm mode="edit" event={event} />
+      <EventForm mode="edit" event={event} currentPhotoUrl={currentPhotoUrl} />
     </PageWrapper>
   );
 }

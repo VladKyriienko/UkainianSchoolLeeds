@@ -1,9 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createAdminClient } from '@/utils/supabase/admin';
-import { verifyAdminAccess } from '@/utils/auth-helpers/server';
-import type { Tables } from '@/utils/supabase/types';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { verifyAdminAccess } from '@/lib/auth/server';
+import type { Tables } from '@/lib/supabase/types';
 
 const supabaseAdmin = createAdminClient();
 
@@ -59,6 +59,23 @@ export async function listMessages(options?: {
   };
 }
 
+export async function getMessageById(id: string): Promise<AdminMessage | null> {
+  await verifyAdminAccess();
+
+  const { data, error } = await supabaseAdmin
+    .from('messages')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw new Error(`Failed to fetch message: ${error.message}`);
+  }
+
+  return data as AdminMessage;
+}
+
 export async function markMessageAsRead(id: string): Promise<void> {
   await verifyAdminAccess();
 
@@ -72,4 +89,25 @@ export async function markMessageAsRead(id: string): Promise<void> {
   }
 
   revalidatePath('/admin/messages');
+  revalidatePath(`/admin/messages/${id}`);
+}
+
+export async function deleteMessage(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await verifyAdminAccess();
+
+    const { error } = await supabaseAdmin.from('messages').delete().eq('id', id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath('/admin/messages');
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error: msg };
+  }
 }

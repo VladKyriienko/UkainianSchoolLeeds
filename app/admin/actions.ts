@@ -8,7 +8,8 @@ import { listDonations } from '@/app/admin/donations/actions';
 import { listDocuments } from '@/app/admin/documents/actions';
 import { listNews } from '@/app/admin/news/actions';
 import { listClasses } from '@/app/admin/classes/actions';
-import { listGalleryItems } from '@/app/admin/class-gallery/actions';
+import { listGalleryItems } from '@/lib/class-gallery/actions';
+import { listSchoolGalleryItems } from '@/app/admin/gallery/actions';
 import { listReviews } from '@/app/admin/reviews/actions';
 
 export type AdminDashboardStats = {
@@ -22,6 +23,7 @@ export type AdminDashboardStats = {
   reviewsTotal: number;
   classesTotal: number;
   galleryTotal: number;
+  schoolGalleryTotal: number;
 };
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
@@ -35,7 +37,8 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     newsResult,
     reviewsResult,
     classesResult,
-    galleryResult
+    galleryResult,
+    schoolGalleryResult
   ] = await Promise.all([
     getUsersCount(),
     listTeachers({ page: 1, limit: 1 }),
@@ -46,7 +49,8 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     listNews({ page: 1, limit: 1 }),
     listReviews({ page: 1, limit: 1 }),
     listClasses({ page: 1, limit: 1 }),
-    listGalleryItems({ page: 1, limit: 1 })
+    listGalleryItems({ page: 1, limit: 1 }),
+    listSchoolGalleryItems({ page: 1, limit: 1 })
   ]);
 
   return {
@@ -59,6 +63,7 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     newsTotal: newsResult.total,
     reviewsTotal: reviewsResult.total,
     classesTotal: classesResult.total,
-    galleryTotal: galleryResult.total
+    galleryTotal: galleryResult.total,
+    schoolGalleryTotal: schoolGalleryResult.total
   };
 }

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { PageWrapper } from '@/components/common/PageWrapper';
-import { ClassForm } from '@/app/admin/components/ClassForm';
+import { ClassForm } from '@/components/features/admin/ClassForm';
 import { getClassById } from '@/app/admin/classes/actions';
 
 export default async function EditClassPage({

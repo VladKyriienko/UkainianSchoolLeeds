@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ADMIN_USER, REGULAR_USER } from './auth-utils';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Helper function to create a unique test user for password reset tests
 async function createPasswordResetTestUser() {

@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/utils/cn';
-import { requestPasswordReset } from '@/utils/auth-helpers/server';
+import { requestPasswordReset } from '@/lib/auth/server';
 import { Button } from '@/components/ui/button';
 import {
   Card,
