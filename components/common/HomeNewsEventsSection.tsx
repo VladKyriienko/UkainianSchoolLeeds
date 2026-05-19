@@ -31,7 +31,13 @@ export function HomeNewsEventsSection({
   content,
   isUk
 }: HomeNewsEventsSectionProps) {
+  const hasNews = initialNews.length > 0;
   const hasUpcomingEvents = initialEvents.length > 0;
+
+  if (!hasNews && !hasUpcomingEvents) {
+    return null;
+  }
+
   const compactRow =
     initialEvents.length < HOME_FEED_MAX || initialNews.length < HOME_FEED_MAX;
 

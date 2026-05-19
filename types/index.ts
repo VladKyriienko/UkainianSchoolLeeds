@@ -51,7 +51,7 @@ export type PublicParentVoiceReview = Pick<
 export type PublicHomeClientProps = {
   initialNews: PublicNews[];
   initialEvents: PublicEvent[];
-  /** From `gallery`; when empty, `HOME_CONTENT.schoolAtmosphere.images` is used. */
+  /** From `gallery`; home atmosphere section is hidden when empty. */
   atmosphereGalleryImages: SchoolAtmosphereGalleryImage[];
   /** From `review`; when empty, the parent-voices carousel is hidden. */
   parentVoices: PublicParentVoiceReview[];

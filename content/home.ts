@@ -87,12 +87,11 @@ export type HomeContent = {
       href?: string;
     }[];
   };
-  /** Photo strip: heading + CTA + gallery */
+  /** Photo strip: heading + CTA (photos from `gallery` table). */
   schoolAtmosphere: {
     heading: string;
     cta: string;
     ctaHref: string;
-    images: { src: string; alt: string }[];
   };
   /** Row under hero CTAs: icon + two-line label (language via HOME_CONTENT). */
   heroTrust: {
@@ -305,25 +304,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     schoolAtmosphere: {
       heading: "Our school's atmosphere",
       cta: 'See more photos',
-      ctaHref: '/parents/gallery',
-      images: [
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Children drawing and learning together at a desk'
-        },
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Children outdoors with the Ukrainian flag'
-        },
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Children celebrating Ukrainian culture at school'
-        },
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Pupils taking part in a classroom activity'
-        }
-      ]
+      ctaHref: '/parents/gallery'
     },
     programs: {
       headingBefore: 'Educational ',
@@ -561,25 +542,7 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     schoolAtmosphere: {
       heading: 'Атмосфера нашої школи',
       cta: 'Дивитися більше фото',
-      ctaHref: '/parents/gallery',
-      images: [
-        {
-          src: '/hero-home-classroom.png',
-          alt: 'Діти малюють та навчаються за партою'
-        },
-        {
-          src: '/home-hero-school.png',
-          alt: 'Діти на вулиці з прапором України'
-        },
-        {
-          src: '/home/hero-card-1.png',
-          alt: 'Святкування української культури у школі'
-        },
-        {
-          src: '/home/hero-card-2.png',
-          alt: 'Учні під час заняття в класі'
-        }
-      ]
+      ctaHref: '/parents/gallery'
     },
     programs: {
       headingBefore: 'Програми ',

@@ -571,18 +571,13 @@ export function PublicHomeClient({
     }));
   }, [parentVoices, isUk]);
 
-  const atmosphereStripImages =
-    atmosphereGalleryImages.length > 0
-      ? atmosphereGalleryImages.map((p) => ({
-        key: p.id,
-        src: p.src,
-        alt: isUk && p.altUk ? p.altUk : p.altEn
-      }))
-      : content.schoolAtmosphere.images.map((p, index) => ({
-        key: `static-${p.src}-${index}`,
-        src: p.src,
-        alt: p.alt
-      }));
+  const showSchoolAtmosphere = atmosphereGalleryImages.length > 0;
+
+  const atmosphereStripImages = atmosphereGalleryImages.map((p) => ({
+    key: p.id,
+    src: p.src,
+    alt: isUk && p.altUk ? p.altUk : p.altEn
+  }));
 
   const [atmosphereLightboxOpen, setAtmosphereLightboxOpen] = useState(false);
   const [atmosphereLightboxIndex, setAtmosphereLightboxIndex] = useState(0);
@@ -930,7 +925,8 @@ export function PublicHomeClient({
         </div>
       </section>
 
-      {/* Section: School atmosphere — gallery heading, CTA link, responsive image strip (`content.schoolAtmosphere`). Anchor: #school-atmosphere. */}
+      {/* Section: School atmosphere — hidden when gallery has no photos. Anchor: #school-atmosphere. */}
+      {showSchoolAtmosphere ? (
       <section
         id="school-atmosphere"
         aria-labelledby="school-atmosphere-heading"
@@ -997,6 +993,7 @@ export function PublicHomeClient({
           title={content.schoolAtmosphere.heading}
         />
       </section>
+      ) : null}
 
       <HomeNewsEventsSection
         initialNews={initialNews}
