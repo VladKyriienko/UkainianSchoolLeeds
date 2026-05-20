@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, Tables } from '@/lib/supabase/types';
 import type {
@@ -39,7 +39,7 @@ export async function getPublicGalleryImages(
   limit?: number
 ): Promise<SchoolAtmosphereGalleryImage[]> {
   try {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     let query = supabase
       .from('gallery')
       .select('id, photo')
@@ -101,7 +101,7 @@ export async function getPublicParentVoices(
   limit = PARENT_VOICES_PUBLIC_LIMIT
 ): Promise<PublicParentVoiceReview[]> {
   try {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from('review')
       .select('id, content, content_uk, perens, perens_uk')

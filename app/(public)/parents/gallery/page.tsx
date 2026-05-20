@@ -3,6 +3,9 @@ import { GALLERY_CONTENT } from '@/content/gallery';
 import { getPublicGalleryImages } from '@/lib/data/home';
 import GalleryContent from '@/app/(public)/parents/gallery/client';
 
+/** Public gallery — anon Supabase reads; revalidate periodically on Vercel. */
+export const revalidate = 60;
+
 export default async function GalleryPage() {
   const photos = await getPublicGalleryImages();
 
