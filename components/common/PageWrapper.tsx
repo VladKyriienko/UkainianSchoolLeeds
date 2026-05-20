@@ -2,17 +2,9 @@
 
 import { cn } from '@/utils/cn';
 import { useLanguage } from '@/providers/language-provider';
+import type { PageWrapperProps } from '@/types';
 
-type TranslatableText = string | { en: string; uk: string };
-
-export type PageWrapperProps = {
-  title: TranslatableText;
-  description?: TranslatableText | React.ReactNode;
-  goBackButton?: React.ReactNode;
-  actions?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-};
+type TranslatableText = PageWrapperProps['title'];
 
 function getTranslatedText(text: TranslatableText | React.ReactNode | undefined, language: 'en' | 'uk'): React.ReactNode {
   if (!text) return null;

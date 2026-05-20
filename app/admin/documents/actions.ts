@@ -3,16 +3,11 @@
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
-import type { Tables } from '@/lib/supabase/types';
-import {
-  DOCUMENT_TYPES,
-  type DocumentType
-} from '@/app/admin/documents/constants';
+import type { AdminDocument, DocumentType } from '@/types';
+import { DOCUMENT_TYPES } from '@/app/admin/documents/constants';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminDocument = Tables<'documents'>;
 
 export async function listDocuments(options?: {
   page?: number;

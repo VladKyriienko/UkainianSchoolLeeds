@@ -6,8 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, AlertCircle, User, X } from 'lucide-react';
-import type { CompletionFieldConfig } from '@/lib/auth/completion';
-import type { CompletionData } from './types';
+import type { CompletionData, CompletionFieldConfig } from '@/types';
 
 type CompletionBannerProps = {
   completionData: CompletionData;

@@ -4,58 +4,17 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import { getURL } from '@/utils/helpers';
+import type {
+  AdminOrganisation,
+  AdminUser,
+  CreateUserData,
+  OrganisationMembership,
+  UpdateUserData
+} from '@/types';
 import type { Tables } from '@/lib/supabase/types';
 
 // Admin client with service role access
 const supabaseAdmin = createAdminClient();
-
-export type OrganisationMembership = {
-  id: string;
-  user_id: string;
-  organisation_id: string;
-  role: string;
-  organisation?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  user?: {
-    id: string;
-    full_name: string | null;
-    avatar_url: string | null;
-  };
-};
-
-export type AdminUser = {
-  id: string;
-  email: string;
-  full_name?: string;
-  avatar_url?: string;
-  email_confirmed_at?: string;
-  created_at?: string;
-  last_sign_in_at?: string;
-  role?: string;
-  is_active?: boolean;
-  teacher_class_id?: string | null;
-  organisations?: OrganisationMembership[];
-};
-
-export type CreateUserData = {
-  email: string;
-  full_name?: string;
-  role?: 'admin' | 'teacher' | 'user';
-  class_id?: string;
-  organisation_id?: string;
-  organisation_role?: string;
-};
-
-export type UpdateUserData = {
-  email?: string;
-  full_name?: string;
-  role?: string;
-  class_id?: string;
-  password?: string;
-};
 
 type AuthUpdateData = {
   email?: string;
@@ -63,10 +22,6 @@ type AuthUpdateData = {
     full_name?: string;
   };
 };
-
-export type AdminOrganisation = {
-  organisation_memberships?: OrganisationMembership[];
-} & Tables<'organisations'>;
 
 async function setTeacherClassAssignment(
   userId: string,

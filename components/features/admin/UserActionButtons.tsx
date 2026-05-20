@@ -9,7 +9,7 @@ import {
   reactivateUser
 } from '@/app/admin/users/actions';
 import { useRouter } from 'next/navigation';
-import type { AdminUser } from '@/app/admin/users/actions';
+import type { AdminUser } from '@/types';
 import { Edit, Mail, Trash2, UserX, UserCheck } from 'lucide-react';
 
 type UserActionButtonsProps = {

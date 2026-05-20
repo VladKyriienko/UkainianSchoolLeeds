@@ -9,7 +9,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { MessageSquare } from 'lucide-react';
-import type { AdminMessage } from '@/app/admin/messages/actions';
+import type { AdminMessage } from '@/types';
 import { deleteMessage } from '@/app/admin/messages/actions';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';

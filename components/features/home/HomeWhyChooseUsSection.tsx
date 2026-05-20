@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { CARD_SURFACE_CLASSNAME } from '@/components/ui/card';
 import { TextHighlightUnderline } from './TextHighlightUnderline';
-import type { HomeContent } from './types';
+import type { HomeContent } from '@/types';
 
 export function HomeWhyChooseUsSection({
   whyChooseUs

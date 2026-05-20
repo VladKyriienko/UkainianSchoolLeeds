@@ -1,10 +1,8 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import type { Tables } from '@/lib/supabase/types';
+import type { PublicClass } from '@/types';
 import { createDocumentSlug } from '@/utils/document-slug';
-
-export type PublicClass = Tables<'classes'>;
 
 export async function getClasses(): Promise<PublicClass[]> {
   const supabase = createAdminClient();

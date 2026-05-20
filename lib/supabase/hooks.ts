@@ -3,14 +3,22 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { SupabaseClient } from '@supabase/supabase-js';
+import type {
+  MutationResult,
+  QueryResult,
+  UseInfiniteSupabaseOptions,
+  UseInfiniteSupabaseReturn,
+  UseMutationReturn,
+  UseSupabaseStoreReturn
+} from '@/types';
 import { Database } from './types';
-import { type QueryResult } from './server';
 
-// Mutation result type
-export type MutationResult<T = Record<string, unknown>> = {
-  data: T | T[] | null;
-  error: unknown;
-  count?: number;
+export type {
+  MutationResult,
+  UseInfiniteSupabaseOptions,
+  UseInfiniteSupabaseReturn,
+  UseMutationReturn,
+  UseSupabaseStoreReturn
 };
 
 // Create browser client
@@ -34,28 +42,6 @@ export const createClient = () => {
       }
     }
   );
-};
-
-// Hook return type for queries
-export type UseSupabaseStoreReturn<T = Record<string, unknown>> = {
-  data: T[];
-  filters: Record<string, unknown>;
-  loading: boolean;
-  error: string | null;
-  updateFilters: (newFilters: Record<string, unknown>) => void;
-  refetch: () => Promise<void>;
-  setRpcParams: (
-    rpcName: string | null,
-    params?: Record<string, unknown>
-  ) => void;
-};
-
-// Hook return type for mutations
-export type UseMutationReturn<T = Record<string, unknown>> = {
-  mutate: (...args: unknown[]) => Promise<MutationResult<T>>;
-  loading: boolean;
-  error: string | null;
-  data: T | T[] | null;
 };
 
 // Client-side store class for mutations
@@ -651,29 +637,6 @@ export function useUpsert<T = Record<string, unknown>>(
 
   return { mutate, loading, error, data };
 }
-
-// Hook return type for infinite queries
-export type UseInfiniteSupabaseReturn<T = Record<string, unknown>> = {
-  data: T[];
-  filters: Record<string, unknown>;
-  loading: boolean;
-  loadingMore: boolean;
-  error: string | null;
-  hasMore: boolean;
-  updateFilters: (newFilters: Record<string, unknown>) => void;
-  refetch: () => Promise<void>;
-  setRpcParams: (
-    rpcName: string | null,
-    params?: Record<string, unknown>
-  ) => void;
-  loadMore: () => Promise<void>;
-};
-
-// Infinite scroll hook options
-export type UseInfiniteSupabaseOptions = {
-  pageSize?: number;
-  initialPage?: number;
-};
 
 // Hook for infinite scroll pagination
 export function useInfiniteSupabase<T = Record<string, unknown>>(

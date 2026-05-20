@@ -3,14 +3,12 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminTeacher } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminTeacher = Tables<'teachers'>;
 
 async function uploadTeacherPhotoIfPresent(
   photoFile: File | null

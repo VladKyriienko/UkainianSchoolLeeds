@@ -1,6 +1,6 @@
-import type { UserRole, RouteConfig } from '@/types';
+import type { RouteConfig, UserRole } from '@/types';
 
-export type { UserRole, RouteConfig };
+export type { RouteConfig, UserRole };
 
 export const navigationRoutes: RouteConfig[] = [
   {

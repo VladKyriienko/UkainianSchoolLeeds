@@ -1,14 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
-
-export type CreateMessageInput = {
-  name: string;
-  email: string;
-  phone?: string | null;
-  subject: string;
-  message: string;
-};
+import type { CreateMessageInput } from '@/types';
 
 function isValidEmail(email: string) {
   const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

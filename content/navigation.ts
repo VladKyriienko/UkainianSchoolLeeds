@@ -1,7 +1,4 @@
-import type { Language } from '@/types';
-import type { NavItem } from '@/types';
-
-export type { NavItem };
+import type { Language, NavItem } from '@/types';
 
 // Brand name per language (two lines for header display)
 export const BRAND_NAME: Record<Language, string> = {

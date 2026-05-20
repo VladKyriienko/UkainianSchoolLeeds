@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useLanguage } from '@/providers/language-provider';
 import { WHOS_WHO_CONTENT } from '@/content/whos-who';
-import type { PublicTeacher } from './actions';
+import type { PublicTeacher } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

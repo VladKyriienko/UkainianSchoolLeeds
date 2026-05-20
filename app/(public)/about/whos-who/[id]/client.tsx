@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/providers/language-provider';
 import { WHOS_WHO_CONTENT } from '@/content/whos-who';
-import type { PublicTeacher } from '../actions';
+import type { PublicTeacher } from '@/types';
 import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {

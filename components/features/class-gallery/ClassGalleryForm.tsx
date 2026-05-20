@@ -13,9 +13,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import type { AdminGalleryItem } from '@/lib/class-gallery/actions';
+import type { AdminGalleryItem } from '@/types';
 import { createGalleryItem, updateGalleryItem } from '@/lib/class-gallery/actions';
-import type { AdminClass } from '@/app/admin/classes/actions';
+import type { AdminClass } from '@/types';
 import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 
 type ClassGalleryFormProps = {

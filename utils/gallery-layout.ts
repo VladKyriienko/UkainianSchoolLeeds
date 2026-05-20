@@ -1,22 +1,11 @@
+import type {
+  GalleryLayoutPhoto,
+  PackGalleryRowsOptions,
+  PhotoOrientation
+} from '@/types';
+
 /** Row width budget: landscape = 2 (half), portrait = 1 (quarter). */
 export const GALLERY_ROW_CAPACITY = 4;
-
-export type PhotoOrientation = 'landscape' | 'portrait';
-
-export type GalleryLayoutPhoto = {
-  id: string;
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  orientation: PhotoOrientation;
-  units: 1 | 2 | 4;
-};
-
-export type PackGalleryRowsOptions = {
-  /** One photo per row at full container width (< sm). */
-  mobileStack?: boolean;
-};
 
 export function getPhotoOrientation(
   width: number,

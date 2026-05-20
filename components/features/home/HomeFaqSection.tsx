@@ -9,7 +9,7 @@ import {
 import { CARD_SURFACE_STATIC_CLASSNAME } from '@/components/ui/card';
 import { cn } from '@/utils/cn';
 import { TextHighlightUnderline } from './TextHighlightUnderline';
-import type { HomeContent } from './types';
+import type { HomeContent } from '@/types';
 
 export function HomeFaqSection({ faq }: { faq: HomeContent['faq'] }) {
   return (

@@ -2,15 +2,7 @@
 
 import { unstable_noStore as noStore } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
-
-export type PublicPrivacyPolicyDocument = {
-  id: string;
-  title: string;
-  title_uk: string | null;
-  content: string;
-  content_uk: string | null;
-  created_at: string;
-};
+import type { PublicPrivacyPolicyDocument } from '@/types';
 
 export async function getLatestPrivacyPolicyDocument(): Promise<PublicPrivacyPolicyDocument | null> {
   noStore();

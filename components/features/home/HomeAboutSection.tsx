@@ -6,7 +6,7 @@ import { ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextHighlightUnderline } from './TextHighlightUnderline';
 import { ABOUT_HIGHLIGHT_ICONS, ABOUT_PATTERN_SRC } from './home-constants';
-import type { HomeContent } from './types';
+import type { HomeContent } from '@/types';
 
 export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
   return (

@@ -11,7 +11,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { FileText } from 'lucide-react';
-import type { AdminDocument } from '@/app/admin/documents/actions';
+import type { AdminDocument } from '@/types';
 import { deleteDocument } from '@/app/admin/documents/actions';
 import { DOCUMENT_TYPE_LABELS } from '@/app/admin/documents/constants';
 import { isHtmlContent } from '@/utils/rich-text';

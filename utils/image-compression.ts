@@ -2,17 +2,7 @@
  * Client-side image compression and validation for uploads (avatars, admin photos).
  */
 
-export type CompressionOptions = {
-  maxWidth?: number;
-  maxHeight?: number;
-  quality?: number;
-  maxSizeKB?: number;
-  /**
-   * When set (e.g. `image/jpeg`), forces `canvas.toBlob` to use this MIME type.
-   * Use for large PNGs: PNG encoding often ignores quality and stays huge, breaking Server Action body limits.
-   */
-  outputMimeType?: string;
-};
+import type { CompressionOptions } from '@/types';
 
 /**
  * Compress an image file while maintaining quality

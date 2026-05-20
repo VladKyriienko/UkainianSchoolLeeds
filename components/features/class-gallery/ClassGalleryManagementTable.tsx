@@ -12,7 +12,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Images } from 'lucide-react';
-import type { AdminGalleryItem } from '@/lib/class-gallery/actions';
+import type { AdminGalleryItem } from '@/types';
 import { deleteGalleryItem } from '@/lib/class-gallery/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';

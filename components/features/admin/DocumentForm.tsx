@@ -12,13 +12,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import type { AdminDocument } from '@/app/admin/documents/actions';
+import type { AdminDocument } from '@/types';
 import { createDocument, updateDocument } from '@/app/admin/documents/actions';
-import {
-  DOCUMENT_TYPES,
-  DOCUMENT_TYPE_LABELS,
-  type DocumentType
-} from '@/app/admin/documents/constants';
+import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '@/app/admin/documents/constants';
+import type { DocumentType } from '@/types';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 
 type DocumentFormProps = {

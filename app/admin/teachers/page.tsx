@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import TeacherManagementTable from '@/components/features/admin/TeacherManagementTable';
 import { listTeachers } from '@/app/admin/teachers/actions';
-import type { AdminTeacher } from '@/app/admin/teachers/actions';
+import type { AdminTeacher } from '@/types';
 import { TeacherSearchForm } from '@/components/features/admin/TeacherSearchForm';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';

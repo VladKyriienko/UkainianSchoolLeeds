@@ -11,7 +11,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { BookOpen } from 'lucide-react';
-import type { AdminClass } from '@/app/admin/classes/actions';
+import type { AdminClass } from '@/types';
 import { deleteClass } from '@/app/admin/classes/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { isHtmlContent } from '@/utils/rich-text';

@@ -11,7 +11,8 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { CalendarClock } from 'lucide-react';
-import { deleteSchedule, type AdminSchedule } from '@/app/admin/schedule/actions';
+import { deleteSchedule } from '@/app/admin/schedule/actions';
+import type { AdminSchedule } from '@/types';
 import { formatDateLabel, formatDateTimeLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';

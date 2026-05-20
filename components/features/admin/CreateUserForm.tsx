@@ -1,7 +1,7 @@
 'use client';
 
 import UserForm from './UserForm';
-import type { AdminClass } from '@/app/admin/classes/actions';
+import type { AdminClass } from '@/types';
 
 type Organisation = {
   id: string;

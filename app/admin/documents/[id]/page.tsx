@@ -5,7 +5,8 @@ import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntity
 import { deleteDocument } from '@/app/admin/documents/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { BackButton } from '@/components/common/BackButton';
-import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/app/admin/documents/constants';
+import { DOCUMENT_TYPE_LABELS } from '@/app/admin/documents/constants';
+import type { DocumentType } from '@/types';
 import { format } from 'date-fns';
 import { isHtmlContent } from '@/utils/rich-text';
 

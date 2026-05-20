@@ -4,10 +4,7 @@ import Link from 'next/link';
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
 import { FOOTER_CONTENT } from '@/content/footer';
-
-export type PublicFooterProps = {
-  className?: string;
-};
+import type { PublicFooterProps } from '@/types';
 
 const SOCIAL_ICON_BY_LABEL: Record<string, React.ComponentType<{ className?: string }>> = {
   Facebook,

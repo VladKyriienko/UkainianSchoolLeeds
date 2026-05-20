@@ -7,7 +7,7 @@ import { enUS, uk } from 'date-fns/locale';
 import { ArrowRight, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE_CLASSNAME } from '@/components/ui/card';
-import type { HomeContent } from '@/content/home';
+import type { HomeContent } from '@/types';
 import type { PublicEvent, PublicNews } from '@/types';
 import { isHtmlContent } from '@/utils/rich-text';
 import { cn } from '@/utils/cn';

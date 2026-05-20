@@ -1,30 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { getPostSignupSettings } from './settings';
-import type { Database } from '@/lib/supabase/types';
+import type {
+  CompletionFieldConfig,
+  ProfileCompletionResult,
+  UsersCompletionFieldConfig
+} from '@/types';
 
-// Type-safe table and field configuration
-type TableName = keyof Database['public']['Tables'];
-type UsersFields = keyof Database['public']['Tables']['users']['Row'];
-
-// Define completion field configuration type with proper DB constraints
-export type CompletionFieldConfig = {
-  id: string;
-  label: string;
-  table?: TableName; // Optional table name, defaults to 'users'
-  field: string; // Field name - will be validated at runtime
-  required?: boolean;
-  validator?: (value: unknown) => boolean; // Custom validation function
-};
-
-// Type-safe field configuration for users table
-export type UsersCompletionFieldConfig = {
-  id: string;
-  label: string;
-  table?: 'users';
-  field: UsersFields;
-  required?: boolean;
-  validator?: (value: unknown) => boolean;
-};
+export type { CompletionFieldConfig, ProfileCompletionResult, UsersCompletionFieldConfig };
 
 /**
  * Default completion fields configuration
@@ -44,13 +26,6 @@ export const DEFAULT_COMPLETION_FIELDS: UsersCompletionFieldConfig[] = [
     field: 'birthdate'
   },
 ];
-
-export type ProfileCompletionResult = {
-  percentage: number;
-  completedFields: string[];
-  missingFields: string[];
-  totalFields: number;
-};
 
 /**
  * Compute completion from already-fetched table data (no DB call).

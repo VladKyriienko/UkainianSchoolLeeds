@@ -11,7 +11,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Filter } from 'lucide-react';
-import type { AdminClass } from '@/app/admin/classes/actions';
+import type { AdminClass } from '@/types';
 
 type ClassGallerySearchFormProps = {
   classes: AdminClass[];

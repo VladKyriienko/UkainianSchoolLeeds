@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/providers/language-provider';
 import { isHtmlContent } from '@/utils/rich-text';
-import type { PublicKeyInfoDocument } from './actions';
+import type { PublicKeyInfoDocument } from '@/types';
 
 type DocumentContentProps = {
   document: PublicKeyInfoDocument | null;

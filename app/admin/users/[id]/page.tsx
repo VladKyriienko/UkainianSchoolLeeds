@@ -1,7 +1,5 @@
-import {
-  getAllUsers,
-  AdminUser
-} from '@/app/admin/users/actions';
+import { getAllUsers } from '@/app/admin/users/actions';
+import type { AdminUser } from '@/types';
 import { BackButton } from '@/components/common/BackButton';
 import {
   Card,

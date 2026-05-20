@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
-import type { AdminReview } from '@/app/admin/reviews/actions';
+import type { AdminReview } from '@/types';
 import { createReview, updateReview } from '@/app/admin/reviews/actions';
 import { parseInputDate, toInputDateValue } from '@/utils/date-format';
 import { DatePicker } from '@/components/common/admin/DatePicker';

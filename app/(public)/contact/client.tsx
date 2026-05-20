@@ -9,8 +9,11 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { EmailInput } from '@/components/common/EmailInput';
+import { PhoneInput } from '@/components/common/PhoneInput';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { validateEmail, validatePhone } from '@/utils/contact-validation';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, Phone, MapPin, Clock, AlertCircle, Navigation } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
@@ -30,10 +33,14 @@ export default function ContactContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [phoneError, setPhoneError] = useState<string | undefined>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'email') setEmailError(undefined);
+    if (name === 'phone') setPhoneError(undefined);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,12 +48,23 @@ export default function ContactContent() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
     setErrorMessage(null);
+    setEmailError(undefined);
+    setPhoneError(undefined);
+
+    const emailResult = validateEmail(formData.email);
+    const phoneResult = validatePhone(formData.phone, { required: false });
+    if (!emailResult.isValid) setEmailError(emailResult.error);
+    if (!phoneResult.isValid) setPhoneError(phoneResult.error);
+    if (!emailResult.isValid || !phoneResult.isValid) {
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       await createMessageAction({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
+        name: formData.name.trim(),
+        email: emailResult.value,
+        phone: phoneResult.value,
         subject: formData.subject,
         message: formData.message
       });
@@ -70,7 +88,7 @@ export default function ContactContent() {
           <CardTitle>{content.formTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="space-y-2">
               <Label htmlFor="name">{content.fields.nameLabel}</Label>
               <Input
@@ -86,26 +104,31 @@ export default function ContactContent() {
 
             <div className="space-y-2">
               <Label htmlFor="email">{content.fields.emailLabel}</Label>
-              <Input
+              <EmailInput
                 id="email"
                 name="email"
-                type="email"
                 required
                 value={formData.email}
                 onChange={handleChange}
+                error={emailError}
+                validateOnBlur
                 placeholder={content.fields.emailPlaceholder}
+                disabled={isSubmitting}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="phone">{content.fields.phoneLabel}</Label>
-              <Input
+              <PhoneInput
                 id="phone"
                 name="phone"
-                type="tel"
+                required={false}
                 value={formData.phone}
                 onChange={handleChange}
+                error={phoneError}
+                validateOnBlur
                 placeholder={content.fields.phonePlaceholder}
+                disabled={isSubmitting}
               />
             </div>
 
