@@ -21,14 +21,6 @@ export const HERO_PNG_ICONS = {
 
 export const ABOUT_HIGHLIGHT_ICONS = [Backpack, HeartHandshake, Users] as const;
 
-export const ABOUT_SNOWFLAKES = [
-  { top: '4%', right: '4%', size: 56, rotate: -14 },
-  { top: '2%', right: '28%', size: 48, rotate: 12 },
-  { top: '16%', right: '8%', size: 52, rotate: -8 },
-  { top: '22%', right: '36%', size: 44, rotate: 20 },
-  { top: '12%', right: '52%', size: 46, rotate: -18 },
-  { top: '28%', right: '20%', size: 50, rotate: 6 },
-  { top: '8%', right: '42%', size: 42, rotate: -22 }
-] as const;
+export const ABOUT_PATTERN_SRC = '/about-vyshyvanka-pattern.png';
 
 export const PARENT_VOICES_LOOP_SETS = 3;

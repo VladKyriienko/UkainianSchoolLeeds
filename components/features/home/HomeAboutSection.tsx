@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Snowflake, Users } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextHighlightUnderline } from './TextHighlightUnderline';
-import { ABOUT_HIGHLIGHT_ICONS, ABOUT_SNOWFLAKES } from './home-constants';
+import { ABOUT_HIGHLIGHT_ICONS, ABOUT_PATTERN_SRC } from './home-constants';
 import type { HomeContent } from './types';
 
 export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
@@ -14,7 +14,7 @@ export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
       aria-labelledby="about-school-heading"
       className="relative left-1/2 w-dvw max-w-none -translate-x-1/2 scroll-mt-24"
     >
-      <div className="w-full overflow-hidden rounded-none bg-card lg:grid lg:min-h-[min(28rem,65vh)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)]">
+      <div className="w-full overflow-visible rounded-none bg-card lg:grid lg:min-h-[min(28rem,65vh)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)]">
         <div className="relative aspect-5/4 min-h-editor lg:aspect-auto lg:min-h-[min(28rem,65vh)]">
           <Image
             src={about.imageSrc}
@@ -38,29 +38,23 @@ export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
           />
         </div>
 
-        <div className="relative flex flex-col justify-center bg-card px-6 pt-10 lg:px-10 lg:py-12 xl:px-12">
+        <div className="relative flex flex-col justify-center overflow-visible bg-card px-6 pt-10 lg:px-10 lg:py-12 xl:px-12">
           <div
             aria-hidden
-            className="pointer-events-none absolute top-0 right-0 h-[min(38%,13rem)] min-h-44 w-[min(92%,26rem)] overflow-hidden max-lg:max-h-48"
+            className="pointer-events-none absolute inset-y-0 lg:-top-20 lg:-bottom-20 right-0 w-[min(100%,32rem)]"
           >
-            {ABOUT_SNOWFLAKES.map((flake, index) => (
-              <Snowflake
-                key={index}
-                className="absolute text-primary/25"
-                strokeWidth={1.45}
-                aria-hidden
-                style={{
-                  top: flake.top,
-                  right: flake.right,
-                  width: flake.size,
-                  height: flake.size,
-                  transform: `rotate(${flake.rotate}deg)`
-                }}
-              />
-            ))}
+            <Image
+              src={ABOUT_PATTERN_SRC}
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 100vw, 32rem"
+              className="object-cover object-center opacity-[0.12] mix-blend-multiply dark:opacity-[0.45] dark:mix-blend-screen"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-linear-to-r from-card from-0% via-card/88 via-5% to-card/25 to-100%" />
           </div>
 
-          <p className="relative text-sm font-semibold tracking-wide text-primary">
+          <p className="relative z-10 text-sm font-semibold tracking-wide text-primary">
             <span className="relative inline-block">
               {about.eyebrow}
               <TextHighlightUnderline />
@@ -68,15 +62,15 @@ export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
           </p>
           <h2
             id="about-school-heading"
-            className="relative mt-5 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-foreground md:text-4xl"
+            className="relative z-10 mt-5 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-foreground md:text-4xl"
           >
             {about.title}
           </h2>
-          <p className="relative mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="relative z-10 mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
             {about.description}
           </p>
 
-          <ul className="relative mt-8 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-3 lg:grid-cols-3 lg:gap-2 [&>li:last-child]:sm:col-span-2 [&>li:last-child]:sm:flex [&>li:last-child]:sm:justify-center lg:[&>li:last-child]:col-span-1 lg:[&>li:last-child]:justify-start">
+          <ul className="relative z-10 mt-8 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-3 lg:grid-cols-3 lg:gap-2 [&>li:last-child]:sm:col-span-2 [&>li:last-child]:sm:flex [&>li:last-child]:sm:justify-center lg:[&>li:last-child]:col-span-1 lg:[&>li:last-child]:justify-start">
             {about.highlights.map((label, index) => {
               const Icon = ABOUT_HIGHLIGHT_ICONS[index] ?? Users;
               return (
@@ -97,7 +91,7 @@ export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
 
           <Button
             size="lg"
-            className="relative mt-9 h-12 w-fit rounded-full px-8"
+            className="relative z-10 mt-9 h-12 w-fit rounded-full px-8"
             asChild
           >
             <Link href="/about/welcome" className="gap-2">
