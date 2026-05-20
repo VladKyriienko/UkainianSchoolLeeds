@@ -11,7 +11,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Newspaper } from 'lucide-react';
-import type { AdminNews } from '@/app/admin/news/actions';
+import type { AdminNews } from '@/types';
 import { deleteNews } from '@/app/admin/news/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { isHtmlContent } from '@/utils/rich-text';

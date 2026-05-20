@@ -2,23 +2,11 @@
 
 import { unstable_noStore as noStore } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createDocumentSlug } from '@/utils/document-slug';
-
-export type PublicKeyInfoDocument = {
-  id: string;
-  title: string;
-  title_uk: string | null;
-  content: string;
-  content_uk: string | null;
-  created_at: string;
-};
-
-export type PublicKeyInfoDocumentSummary = Pick<
+import type {
   PublicKeyInfoDocument,
-  'id' | 'title' | 'title_uk' | 'created_at'
-> & {
-  slug: string;
-};
+  PublicKeyInfoDocumentSummary
+} from '@/types';
+import { createDocumentSlug } from '@/utils/document-slug';
 
 export async function listKeyInfoDocuments(): Promise<PublicKeyInfoDocumentSummary[]> {
   noStore();

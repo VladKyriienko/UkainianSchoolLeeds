@@ -1,8 +1,5 @@
-import {
-  getAllUsers,
-  getAllOrganisations,
-  AdminUser
-} from '@/app/admin/users/actions';
+import { getAllOrganisations, getAllUsers } from '@/app/admin/users/actions';
+import type { AdminUser } from '@/types';
 import { listClasses } from '@/app/admin/classes/actions';
 import { getOrganisationSettings } from '@/lib/auth/settings';
 import UserForm from '@/components/features/admin/UserForm';

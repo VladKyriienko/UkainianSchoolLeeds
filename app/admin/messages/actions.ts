@@ -3,11 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminMessage } from '@/types';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminMessage = Tables<'messages'>;
 
 export async function listMessages(options?: {
   page?: number;

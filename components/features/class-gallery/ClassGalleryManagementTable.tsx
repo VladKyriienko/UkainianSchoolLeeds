@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -11,7 +12,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Images } from 'lucide-react';
-import type { AdminGalleryItem } from '@/lib/class-gallery/actions';
+import type { AdminGalleryItem } from '@/types';
 import { deleteGalleryItem } from '@/lib/class-gallery/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
@@ -89,10 +90,13 @@ export default function ClassGalleryManagementTable({
           {items.map((item) => (
             <TableRow key={item.id}>
               <TableCell>
-                <div className="size-14 rounded border overflow-hidden bg-muted shrink-0">
-                  <img
+                <div className="relative size-14 shrink-0 overflow-hidden rounded border bg-muted">
+                  <Image
                     src={getPhotoUrl(item.photo)}
                     alt=""
+                    width={56}
+                    height={56}
+                    sizes="56px"
                     className="size-full object-cover"
                   />
                 </div>

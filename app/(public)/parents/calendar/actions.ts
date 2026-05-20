@@ -11,14 +11,6 @@ import type {
   PublicEvent
 } from '@/types/calendar';
 
-export type {
-  CalendarEvent,
-  CalendarEventDetail,
-  CalendarSchedule,
-  EventsFilter,
-  PublicEvent
-} from '@/types/calendar';
-
 function withEventPhotoUrl(
   supabase: ReturnType<typeof createAdminClient>,
   row: CalendarEvent & { photo?: string | null }

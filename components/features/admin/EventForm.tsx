@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
-import type { AdminEvent } from '@/app/admin/events/actions';
+import type { AdminEvent } from '@/types';
 import { createEvent, updateEvent } from '@/app/admin/events/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 import {

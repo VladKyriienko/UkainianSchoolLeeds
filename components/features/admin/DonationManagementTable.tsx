@@ -9,7 +9,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { PoundSterling } from 'lucide-react';
-import type { AdminDonation } from '@/app/admin/donations/actions';
+import type { AdminDonation } from '@/types';
 import { formatDateTimeLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';

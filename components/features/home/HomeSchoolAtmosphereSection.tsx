@@ -7,13 +7,7 @@ import { Button } from '@/components/ui/button';
 import { CARD_SURFACE_CLASSNAME } from '@/components/ui/card';
 import { PhotoLightbox } from '@/components/common/PhotoLightbox';
 import { cn } from '@/utils/cn';
-import type { HomeContent } from './types';
-
-export type AtmosphereStripImage = {
-  key: string;
-  src: string;
-  alt: string;
-};
+import type { AtmosphereStripImage, HomeContent } from '@/types';
 
 export function HomeSchoolAtmosphereSection({
   images,

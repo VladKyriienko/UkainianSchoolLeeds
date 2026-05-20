@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { CardDescription } from '@/components/ui/card';
-import type { AdminDashboardStats as AdminDashboardStatsData } from '@/app/admin/actions';
+import type { AdminDashboardStats as AdminDashboardStatsData } from '@/types';
 import {
   Users,
   GraduationCap,

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
-import type { AdminSchoolGalleryItem } from '@/app/admin/gallery/actions';
+import type { AdminSchoolGalleryItem } from '@/types';
 import {
   createSchoolGalleryItem,
   updateSchoolGalleryItem

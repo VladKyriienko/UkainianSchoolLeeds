@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Search, Filter } from 'lucide-react';
 import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '@/app/admin/documents/constants';
-import type { DocumentType } from '@/app/admin/documents/constants';
+import type { DocumentType } from '@/types';
 
 type DocumentsSearchFormProps = {
   initialSearch?: string;

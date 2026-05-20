@@ -3,7 +3,7 @@ import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
 import { hasAdminRole, hasTeacherRole } from '@/lib/auth/roles';
 import type { UserWithRoles } from '@/lib/supabase/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { supabase, supabaseResponse } =
     createMiddlewareSupabaseClient(request);
   const pathname = request.nextUrl.pathname;

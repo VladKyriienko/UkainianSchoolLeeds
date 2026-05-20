@@ -3,13 +3,11 @@
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminSchoolGalleryItem } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminSchoolGalleryItem = Tables<'gallery'>;
 
 const GALLERY_BUCKET = 'gallery-photos';
 

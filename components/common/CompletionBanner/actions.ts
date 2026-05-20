@@ -4,8 +4,7 @@ import {
   DEFAULT_COMPLETION_FIELDS
 } from '@/lib/auth/completion';
 import { getPostSignupSettings } from '@/lib/auth/settings';
-import type { CompletionFieldConfig } from '@/lib/auth/completion';
-import type { CompletionBannerData } from './types';
+import type { CompletionBannerData, CompletionFieldConfig } from '@/types';
 
 /**
  * Get completion banner data for a user.

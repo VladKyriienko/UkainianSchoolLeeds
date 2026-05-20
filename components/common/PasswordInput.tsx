@@ -5,13 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
-
-export type PasswordInputProps = Omit<
-  React.ComponentProps<typeof Input>,
-  'type'
-> & {
-  className?: string;
-};
+import type { PasswordInputProps } from '@/types';
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, ...props }, ref) => {

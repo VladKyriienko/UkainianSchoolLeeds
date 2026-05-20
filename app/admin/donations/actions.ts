@@ -2,11 +2,9 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminDonation } from '@/types';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminDonation = Tables<'donations'>;
 
 export async function listDonations(options?: {
   page?: number;

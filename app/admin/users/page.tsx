@@ -1,7 +1,5 @@
-import {
-  getAllUsers,
-  AdminUser
-} from '@/app/admin/users/actions';
+import { getAllUsers } from '@/app/admin/users/actions';
+import type { AdminUser } from '@/types';
 import UserManagementTable from '@/components/features/admin/UserManagementTable';
 import { UserSearchForm } from '@/components/features/admin/UserSearchForm';
 import { PaginationComponent } from '@/components/common/Pagination';

@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
-import { FOOTER_CONTENT } from '@/content/footer';
-
-export type PublicFooterProps = {
-  className?: string;
-};
+import {
+  FOOTER_CONTACT,
+  FOOTER_CONTENT,
+  FOOTER_SOCIAL_LINKS
+} from '@/content/footer';
+import type { PublicFooterProps } from '@/types';
 
 const SOCIAL_ICON_BY_LABEL: Record<string, React.ComponentType<{ className?: string }>> = {
   Facebook,
@@ -35,23 +36,23 @@ export function PublicFooter({ className }: PublicFooterProps) {
           <div>
             <p className="mb-4 text-base font-semibold text-ukraine-header-fg">{content.contactTitle}</p>
             <div className="space-y-2">
-              {content.contactAddress.map((line, index) => (
+              {FOOTER_CONTACT.contactAddress.map((line, index) => (
                 <p key={index}>{line}</p>
               ))}
               <p>
                 <a
-                  href={`mailto:${content.contactEmail}`}
+                  href={`mailto:${FOOTER_CONTACT.contactEmail}`}
                   className="transition-colors hover:text-ukraine-yellow hover:underline"
                 >
-                  {content.contactEmail}
+                  {FOOTER_CONTACT.contactEmail}
                 </a>
               </p>
               <p>
                 <a
-                  href={`tel:${content.contactPhone.replace(/\s/g, '')}`}
+                  href={`tel:${FOOTER_CONTACT.contactPhone.replace(/\s/g, '')}`}
                   className="transition-colors hover:text-ukraine-yellow hover:underline"
                 >
-                  {content.contactPhone}
+                  {FOOTER_CONTACT.contactPhone}
                 </a>
               </p>
             </div>
@@ -61,7 +62,7 @@ export function PublicFooter({ className }: PublicFooterProps) {
           <div>
             <p className="mb-4 text-base font-semibold text-ukraine-header-fg">{content.socialTitle}</p>
             <nav className="flex items-center justify-center gap-4">
-              {content.socialLinks.map((link) => {
+              {FOOTER_SOCIAL_LINKS.map((link) => {
                 const Icon = SOCIAL_ICON_BY_LABEL[link.label];
 
                 return (

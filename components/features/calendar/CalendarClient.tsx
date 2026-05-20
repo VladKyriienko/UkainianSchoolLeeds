@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import type { CalendarEvent, CalendarSchedule } from '@/types/calendar';
+import type { CalendarClientProps } from '@/types';
 import { MonthView } from './MonthView';
 import { ListView } from './ListView';
 import { DayView } from './DayView';
@@ -20,11 +20,6 @@ function parseViewMode(value: string | null): ViewMode {
   if (value === 'list' || value === 'month' || value === 'day') return value;
   return 'list';
 }
-
-export type CalendarClientProps = {
-  initialEvents: CalendarEvent[];
-  initialSchedules: CalendarSchedule[];
-};
 
 export function CalendarClient({ initialEvents, initialSchedules }: CalendarClientProps) {
   const { language } = useLanguage();

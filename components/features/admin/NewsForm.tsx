@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
-import type { AdminNews } from '@/app/admin/news/actions';
+import type { AdminNews } from '@/types';
 import { createNews, updateNews } from '@/app/admin/news/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 import { parseInputDate, toInputDateValue } from '@/utils/date-format';

@@ -10,7 +10,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Calendar } from 'lucide-react';
-import type { AdminEvent } from '@/app/admin/events/actions';
+import type { AdminEvent } from '@/types';
 import { deleteEvent } from '@/app/admin/events/actions';
 import { useState } from 'react';
 import { formatDateLabel } from '@/utils/date-format';

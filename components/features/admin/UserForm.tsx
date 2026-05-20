@@ -2,13 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  createUser,
-  updateUser,
-  AdminUser,
-  CreateUserData
-} from '@/app/admin/users/actions';
-import type { AdminClass } from '@/app/admin/classes/actions';
+import { createUser, updateUser } from '@/app/admin/users/actions';
+import type { AdminClass, AdminUser, CreateUserData } from '@/types';
 import { getOrganisationSettings } from '@/lib/auth/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

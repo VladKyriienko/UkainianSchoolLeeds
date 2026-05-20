@@ -6,6 +6,9 @@ import { getCompletionBannerData } from '@/components/common/CompletionBanner';
 import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import type { RouteConfig } from '@/utils/route-protection';
 
+/** Teacher routes require session cookies — skip static prerender at build time. */
+export const dynamic = 'force-dynamic';
+
 const teacherNavigation: RouteConfig[] = [
   {
     path: '/teacher',

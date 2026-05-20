@@ -5,7 +5,7 @@ import { Images } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
 import { GALLERY_CONTENT } from '@/content/gallery';
 import { PhotoLightbox } from '@/components/common/PhotoLightbox';
-import type { SchoolAtmosphereGalleryImage } from '@/types';
+import type { GalleryLayoutPhoto, SchoolAtmosphereGalleryImage } from '@/types';
 import { cn } from '@/utils/cn';
 import { useScrollToTopOnMount } from '@/hooks/useScrollToTopOnMount';
 import {
@@ -13,8 +13,7 @@ import {
   getPhotoOrientation,
   getPhotoWidthUnits,
   loadImageDimensions,
-  packGalleryPhotosIntoRows,
-  type GalleryLayoutPhoto
+  packGalleryPhotosIntoRows
 } from '@/utils/gallery-layout';
 
 type GalleryContentProps = {

@@ -230,12 +230,3 @@ export function validateSetPassword(data: {
   }
 }
 
-/**
- * Type exports for use in components
- */
-export type SignUpFormData = z.infer<typeof signUpSchema>;
-export type LoginFormData = z.infer<typeof loginSchema>;
-export type SetPasswordFormData = z.infer<typeof setPasswordSchema>;
-export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
-export type UpdatePasswordFormData = z.infer<typeof updatePasswordSchema>;
-export type ChangeEmailFormData = z.infer<typeof changeEmailSchema>;

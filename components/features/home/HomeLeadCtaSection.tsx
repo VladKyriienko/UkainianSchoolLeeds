@@ -3,9 +3,12 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmailInput } from '@/components/common/EmailInput';
+import { PhoneInput } from '@/components/common/PhoneInput';
 import { Input } from '@/components/ui/input';
 import { createMessageAction } from '@/app/(public)/contact/actions';
-import type { HomeContent } from './types';
+import { validateEmail, validatePhone } from '@/utils/contact-validation';
+import type { HomeContent } from '@/types';
 
 type HomeCtaContent = HomeContent['cta'];
 
@@ -18,15 +21,22 @@ export function HomeLeadCtaSection({ cta }: { cta: HomeCtaContent }) {
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [errorText, setErrorText] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [phoneError, setPhoneError] = useState<string | undefined>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'email') setEmailError(undefined);
+    if (name === 'phone') setPhoneError(undefined);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorText(null);
+    setEmailError(undefined);
+    setPhoneError(undefined);
+
     if (
       !form.parentName.trim() ||
       !form.phone.trim() ||
@@ -36,12 +46,19 @@ export function HomeLeadCtaSection({ cta }: { cta: HomeCtaContent }) {
       setErrorText(cta.fillAllFields);
       return;
     }
+
+    const emailResult = validateEmail(form.email);
+    const phoneResult = validatePhone(form.phone);
+    if (!emailResult.isValid) setEmailError(emailResult.error);
+    if (!phoneResult.isValid) setPhoneError(phoneResult.error);
+    if (!emailResult.isValid || !phoneResult.isValid) return;
+
     setStatus('submitting');
     try {
       await createMessageAction({
         name: form.parentName.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
+        email: emailResult.value,
+        phone: phoneResult.value,
         subject: cta.messageSubject,
         message: form.childAge.trim()
       });
@@ -101,24 +118,24 @@ export function HomeLeadCtaSection({ cta }: { cta: HomeCtaContent }) {
                         className="h-11 rounded-lg border-border/80 bg-background"
                         aria-label={cta.placeholders.parentName}
                       />
-                      <Input
+                      <PhoneInput
                         name="phone"
-                        type="tel"
                         value={form.phone}
                         onChange={handleChange}
+                        error={phoneError}
+                        validateOnBlur
                         placeholder={cta.placeholders.phone}
-                        autoComplete="tel"
                         disabled={status === 'submitting'}
                         className="h-11 rounded-lg border-border/80 bg-background"
                         aria-label={cta.placeholders.phone}
                       />
-                      <Input
+                      <EmailInput
                         name="email"
-                        type="email"
                         value={form.email}
                         onChange={handleChange}
+                        error={emailError}
+                        validateOnBlur
                         placeholder={cta.placeholders.email}
-                        autoComplete="email"
                         disabled={status === 'submitting'}
                         className="h-11 rounded-lg border-border/80 bg-background"
                         aria-label={cta.placeholders.email}

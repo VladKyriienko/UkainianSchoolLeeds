@@ -1,103 +1,3 @@
-export type HomeLanguage = 'en' | 'uk';
-
-export type HomeContent = {
-  hero: {
-    titleLines: string[];
-    titleAccent: string;
-    subtitle: string;
-    primaryCta: string;
-    secondaryCta: string;
-    mission: string;
-  };
-  features: {
-    title: string;
-    description: string;
-    /** Hero image overlay chips: heading on two lines (EN/UK). */
-    heroTitleLines?: readonly [string, string];
-  }[];
-  about: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    cta: string;
-    imageAlt: string;
-    /** Hero image for the “more than a school” block */
-    imageSrc: string;
-    highlights: string[];
-  };
-  news: {
-    eyebrow: string;
-    title: string;
-    viewAllNews: string;
-    viewAllEvents: string;
-    emptyMessage: string;
-    eventLabel: string;
-    newsLabel: string;
-  };
-  parentVoices: {
-    titleBefore: string;
-    titleHighlight: string;
-    titleAfter: string;
-  };
-  faq: {
-    titleBefore: string;
-    titleHighlight: string;
-    titleAfter: string;
-    items: { question: string; answer: string }[];
-  };
-  cta: {
-    titleBefore: string;
-    /** Place name in the CTA headline (e.g. Leeds / Лідсі). */
-    titleHighlight: string;
-    /** Trailing punctuation (e.g. `!`) — heart icon is rendered immediately after. */
-    titleAfter: string;
-    description: string;
-    submit: string;
-    placeholders: {
-      parentName: string;
-      phone: string;
-      email: string;
-      childAge: string;
-    };
-    /** Inbox subject for this lead (home page form). */
-    messageSubject: string;
-    submitting: string;
-    successMessage: string;
-    errorMessage: string;
-    fillAllFields: string;
-  };
-  whyChooseUs: {
-    heading: string;
-    cards: {
-      image: string;
-      title: string;
-      description: string;
-    }[];
-  };
-  programs: {
-    headingBefore: string;
-    headingHighlight: string;
-    learnMore: string;
-    cards: {
-      image: string;
-      title: string;
-      subtitle: string;
-      description: string;
-      href?: string;
-    }[];
-  };
-  /** Photo strip: heading + CTA (photos from `gallery` table). */
-  schoolAtmosphere: {
-    heading: string;
-    cta: string;
-    ctaHref: string;
-  };
-  /** Row under hero CTAs: icon + two-line label (language via HOME_CONTENT). */
-  heroTrust: {
-    items: { line1: string; line2: string }[];
-  };
-};
-
 /** Program card art (shared EN/UK) — files in `public/home`. */
 const PROGRAM_CARD_IMAGES = [
   '/home/program-junior.png',
@@ -106,7 +6,7 @@ const PROGRAM_CARD_IMAGES = [
   '/home/program-creative.png'
 ] as const;
 
-export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
+export const HOME_CONTENT = {
   en: {
     hero: {
       titleLines: ['Ukrainian Saturday School'],
@@ -530,3 +430,5 @@ export const HOME_CONTENT: Record<HomeLanguage, HomeContent> = {
     }
   }
 };
+
+export type HomeContent = (typeof HOME_CONTENT)['en'];

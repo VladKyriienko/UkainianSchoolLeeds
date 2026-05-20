@@ -9,35 +9,8 @@ import {
   useSidebar
 } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import type { CompletionFieldConfig } from '@/lib/auth/completion';
-import type { CompletionData } from '@/components/common/CompletionBanner/types';
-import { RouteConfig } from '@/utils/route-protection';
+import type { AuthenticatedLayoutProps } from '@/types';
 import { cn } from '@/utils/cn';
-
-export type AuthenticatedLayoutProps = {
-  children: React.ReactNode;
-  navItems?: RouteConfig[] | undefined;
-  showLanguageToggle?: boolean;
-  completionBannerData?:
-  | {
-    completionData: CompletionData;
-    settings: {
-      showCompletionBanner: boolean;
-    };
-    postSignupSettings: {
-      requirePostSignupCompletion: boolean;
-      postSignupCompletionPath: string;
-    };
-    fieldConfig: CompletionFieldConfig[];
-  }
-  | null
-  | undefined;
-  showDarkModeToggle?: boolean;
-  defaultOpen?: boolean;
-  mobileBurgerPosition?: 'left' | 'right';
-  /** Disable Card lift/shadow on hover (e.g. admin panel). */
-  disableCardHover?: boolean;
-};
 
 function AuthenticatedLayoutContent({
   children,

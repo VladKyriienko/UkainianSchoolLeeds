@@ -11,7 +11,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Star } from 'lucide-react';
-import type { AdminReview } from '@/app/admin/reviews/actions';
+import type { AdminReview } from '@/types';
 import { deleteReview } from '@/app/admin/reviews/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { isHtmlContent } from '@/utils/rich-text';

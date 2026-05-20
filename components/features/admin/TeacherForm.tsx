@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { EmailInput } from '@/components/common/EmailInput';
+import { PhoneInput } from '@/components/common/PhoneInput';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { validateEmail, validatePhone } from '@/utils/contact-validation';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
 import {
   Select,
@@ -13,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import type { AdminTeacher } from '@/app/admin/teachers/actions';
+import type { AdminTeacher } from '@/types';
 import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 import {
   createTeacher,
@@ -31,6 +34,8 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [phoneError, setPhoneError] = useState<string | undefined>();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [description, setDescription] = useState(teacher?.description || '');
   const [descriptionUk, setDescriptionUk] = useState(teacher?.description_uk || '');
@@ -43,9 +48,25 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setEmailError(undefined);
+    setPhoneError(undefined);
+
+    const form = e.currentTarget;
+    const email = String(new FormData(form).get('email') ?? '');
+    const phone = String(new FormData(form).get('phone') ?? '');
+    const emailResult = validateEmail(email, { required: false });
+    const phoneResult = validatePhone(phone, { required: false });
+    if (!emailResult.isValid) setEmailError(emailResult.error);
+    if (!phoneResult.isValid) setPhoneError(phoneResult.error);
+    if (!emailResult.isValid || !phoneResult.isValid) {
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
+      if (emailResult.value) formData.set('email', emailResult.value);
+      if (phoneResult.value) formData.set('phone', phoneResult.value);
       formData.set('category', category);
       if (photoFile) {
         formData.set('photo', await prepareAdminPhotoForUpload(photoFile));
@@ -71,7 +92,7 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {error && (
         <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded">
           {error}
@@ -124,22 +145,28 @@ export function TeacherForm({ mode, teacher, currentPhotoUrl }: TeacherFormProps
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input
+          <EmailInput
             id="email"
             name="email"
-            type="email"
+            required={false}
             defaultValue={teacher?.email || ''}
+            error={emailError}
+            validateOnBlur
             placeholder="teacher@example.com"
+            disabled={isSubmitting}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
-          <Input
+          <PhoneInput
             id="phone"
             name="phone"
+            required={false}
             defaultValue={teacher?.phone || ''}
-            placeholder="+1 555 000 0000"
+            error={phoneError}
+            validateOnBlur
+            disabled={isSubmitting}
           />
         </div>
       </div>

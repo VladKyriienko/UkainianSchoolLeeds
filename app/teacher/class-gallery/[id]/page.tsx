@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  type AdminGalleryItem,
   getGalleryItemById,
   listAccessibleClassesForGallery
 } from '@/lib/class-gallery/actions';
+import type { AdminGalleryItem } from '@/types';
 import { AdminEntityDetailsActions } from '@/components/common/admin/AdminEntityDetailsActions';
 import { deleteGalleryItem } from '@/lib/class-gallery/actions';
 import { PageWrapper } from '@/components/common/PageWrapper';

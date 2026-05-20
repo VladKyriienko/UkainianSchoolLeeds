@@ -4,14 +4,11 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth/server';
 import { hasAdminRole, hasTeacherRole } from '@/lib/auth/roles';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminGalleryItem, GalleryClass } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminGalleryItem = Tables<'class_photo_galery'>;
-export type GalleryClass = Tables<'classes'>;
 
 type GalleryAccessContext = {
   userId: string;

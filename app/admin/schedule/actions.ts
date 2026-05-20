@@ -7,15 +7,9 @@ import { verifyAdminAccess } from '@/lib/auth/server';
 import { sanitizeFilename } from '@/utils/file-name';
 
 const supabaseAdmin = createAdminClient();
-const SCHEDULE_BUCKET = 'schedule-files';
+import type { AdminSchedule } from '@/types';
 
-export type AdminSchedule = {
-  id: string;
-  date: string;
-  file: string;
-  created_at: string;
-  publicUrl: string;
-};
+const SCHEDULE_BUCKET = 'schedule-files';
 
 function isSaturdayDateString(value: string): boolean {
   const d = new Date(`${value}T12:00:00.000Z`);

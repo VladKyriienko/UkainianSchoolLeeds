@@ -3,14 +3,12 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminEvent } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminEvent = Tables<'events'>;
 
 async function uploadEventPhotoIfPresent(
   photoFile: File | null

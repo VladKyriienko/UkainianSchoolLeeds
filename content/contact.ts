@@ -59,7 +59,8 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     errorFallback: 'Failed to submit message. Please try again.',
     infoTitle: 'Contact Information',
     addressTitle: 'Find us',
-    addressText: 'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
+    addressText:
+      'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
     mapQuery:
       'The Association of Ukrainians in Great Britain, 5 Back Newton Grove, Leeds LS7 4HW, United Kingdom',
     directionsTitle: 'How to get here',
@@ -97,7 +98,8 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     errorFallback: 'Не вдалося надіслати повідомлення. Спробуйте ще раз.',
     infoTitle: 'Контактна інформація',
     addressTitle: 'Знайдіть нас',
-    addressText: 'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
+    addressText:
+      'The Association of Ukrainians in Great Britain\n5 Back Newton Grove\nLeeds\nLS7 4HW',
     mapQuery:
       'The Association of Ukrainians in Great Britain, 5 Back Newton Grove, Leeds LS7 4HW, United Kingdom',
     directionsTitle: 'Як до нас дістатися',

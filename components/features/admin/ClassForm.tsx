@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { AdminClass } from '@/app/admin/classes/actions';
+import type { AdminClass } from '@/types';
 import { createClass, updateClass } from '@/app/admin/classes/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
 

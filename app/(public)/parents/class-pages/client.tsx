@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useLanguage } from '@/providers/language-provider';
 import { CLASS_PAGES_CONTENT } from '@/content/class-pages';
-import type { PublicClass } from './actions';
+import type { PublicClass } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronRight } from 'lucide-react';

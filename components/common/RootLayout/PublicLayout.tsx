@@ -5,14 +5,7 @@ import { PublicNavBar } from './PublicNavBar';
 import { PublicFooter } from './PublicFooter';
 import { cn } from '@/utils/cn';
 import { CookieConsentPopup } from '@/components/common/CookieConsentPopup';
-
-export type PublicLayoutProps = {
-  children: React.ReactNode;
-  showHeader?: boolean;
-  showDarkModeToggle?: boolean;
-  showFooter?: boolean;
-  showNavigation?: boolean;
-};
+import type { PublicLayoutProps } from '@/types';
 
 export function PublicLayout({
   children,

@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { CARD_SURFACE_CLASSNAME } from '@/components/ui/card';
 import { cn } from '@/utils/cn';
 import { TextHighlightUnderline } from './TextHighlightUnderline';
-import type { HomeContent } from './types';
+import type { HomeContent } from '@/types';
 
 export function HomeProgramsSection({ programs }: { programs: HomeContent['programs'] }) {
   return (

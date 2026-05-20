@@ -3,12 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
-import type { Tables } from '@/lib/supabase/types';
+import type { AdminClass } from '@/types';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
-
-export type AdminClass = Tables<'classes'>;
 
 export async function listClasses(options?: {
   page?: number;

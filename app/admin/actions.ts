@@ -11,20 +11,7 @@ import { listClasses } from '@/app/admin/classes/actions';
 import { listGalleryItems } from '@/lib/class-gallery/actions';
 import { listSchoolGalleryItems } from '@/app/admin/gallery/actions';
 import { listReviews } from '@/app/admin/reviews/actions';
-
-export type AdminDashboardStats = {
-  usersCount: number;
-  teachersTotal: number;
-  eventsTotal: number;
-  messagesTotal: number;
-  donationsTotal: number;
-  documentsTotal: number;
-  newsTotal: number;
-  reviewsTotal: number;
-  classesTotal: number;
-  galleryTotal: number;
-  schoolGalleryTotal: number;
-};
+import type { AdminDashboardStats } from '@/types';
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
   const [

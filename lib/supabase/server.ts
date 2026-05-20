@@ -1,7 +1,8 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
-import { Database, Tables } from './types';
+import type { QueryResult, UserWithRoles } from '@/types';
+import { Database } from './types';
 // Note: We avoid importing PostgrestBuilder here because runtime shapes vary by
 // client version and we treat the incoming query as `unknown`.
 
@@ -10,22 +11,7 @@ import { Database, Tables } from './types';
 // but it's not part of the public types. We'll access it via `any` at the call
 // site to avoid TypeScript errors and guard its use at runtime.
 
-// User with roles type for auth context
-export type UserWithRoles = {
-  roles: Tables<'roles'>[];
-} & Tables<'users'>;
-
-// Simple wrapper to store query metadata for hooks
-export type QueryResult<T = Record<string, unknown>> = {
-  queryKey: string;
-  data: T[];
-  tableName: string;
-  url: string;
-  searchParams: Record<string, string>;
-  // Optional RPC function support
-  rpcName?: string;
-  rpcParams?: Record<string, unknown>;
-};
+export type { QueryResult, UserWithRoles };
 
 // Create server client function
 export const createClient = (): SupabaseClient<Database> => {
@@ -100,6 +86,17 @@ export const createClient = (): SupabaseClient<Database> => {
     }
   ) as unknown as SupabaseClient<Database>;
 };
+
+/**
+ * Anon Supabase client without cookies — for public RLS reads on static/ISR pages.
+ * Do not use for authenticated or session-dependent queries.
+ */
+export function createPublicClient(): SupabaseClient<Database> {
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 // Utility function to execute a query and capture its metadata
 export async function executeWithMetadata<T extends Record<string, unknown>>(

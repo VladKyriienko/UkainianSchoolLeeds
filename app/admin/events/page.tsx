@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import EventManagementTable from '@/components/features/admin/EventManagementTable';
 import { listEvents } from '@/app/admin/events/actions';
-import type { AdminEvent } from '@/app/admin/events/actions';
+import type { AdminEvent } from '@/types';
 import { AdminListSearchForm } from '@/components/common/admin/AdminListSearchForm';
 import { PaginationComponent } from '@/components/common/Pagination';
 import { PaginationInfo } from '@/components/common/PaginationInfo';

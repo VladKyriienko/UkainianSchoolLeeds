@@ -11,13 +11,7 @@ import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
 import { useLanguage } from '@/providers/language-provider';
 import { BRAND_NAME_LINES } from '@/content/navigation';
-
-export type MobileHeaderProps = {
-  showDarkModeToggle?: boolean;
-  showLanguageToggle?: boolean;
-  burgerPosition?: 'left' | 'right';
-  className?: string;
-};
+import type { MobileHeaderProps } from '@/types';
 
 export function MobileHeader({
   showDarkModeToggle = true,

@@ -1,45 +1,46 @@
 export type FooterLanguage = 'en' | 'uk';
 
-type FooterContent = {
+/** Shared across EN/UK — URLs and contact details must not diverge per language. */
+export const FOOTER_SOCIAL_LINKS = [
+  {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/profile.php?id=100087647560269'
+  },
+  { label: 'Instagram', href: '#' },
+  { label: 'YouTube', href: '#' },
+  { label: 'X', href: '#' }
+] as const;
+
+export const FOOTER_CONTACT = {
+  contactEmail: 'admin@ukrainianschool.com',
+  contactPhone: '0113 2755883',
+  contactAddress: [
+    'The Association of Ukrainians in Great Britain',
+    '5 Back Newton Grove',
+    'Leeds',
+    'LS7 4HW'
+  ] as const
+};
+
+type FooterLocalizedContent = {
   usefulInfoTitle: string;
   usefulInfoDescription: string;
   contactTitle: string;
   contactSchoolName: string;
-  contactAddress: string[];
-  contactEmail: string;
-  contactPhone: string;
   socialTitle: string;
-  socialLinks: {
-    label: string;
-    href: string;
-  }[];
   copyright: string;
   cookiesPolicy: string;
   privacyPolicy: string;
 };
 
-export const FOOTER_CONTENT: Record<FooterLanguage, FooterContent> = {
+export const FOOTER_CONTENT: Record<FooterLanguage, FooterLocalizedContent> = {
   en: {
     usefulInfoTitle: 'Useful Information',
     usefulInfoDescription:
       'The Ukrainian Saturday School is the heart of the local community. We serve our community with dedication and passion for the study of the Ukrainian language, culture, and history.',
     contactTitle: 'Contact Us',
     contactSchoolName: 'Ukrainian School',
-    contactAddress: [
-      'The Association of Ukrainians in Great Britain',
-      '5 Back Newton Grove',
-      'Leeds',
-      'LS7 4HW'
-    ],
-    contactEmail: 'admin@ukrainianschool.com',
-    contactPhone: '0113 2755883',
     socialTitle: 'Social Media',
-    socialLinks: [
-      { label: 'Facebook', href: '#' },
-      { label: 'Instagram', href: '#' },
-      { label: 'YouTube', href: '#' },
-      { label: 'X', href: '#' }
-    ],
     copyright: 'All website content copyright © Ukrainian School 2026',
     cookiesPolicy: 'Cookies Policy',
     privacyPolicy: 'Privacy Policy'
@@ -50,21 +51,7 @@ export const FOOTER_CONTENT: Record<FooterLanguage, FooterContent> = {
       'Українська суботня школа є серцем місцевої громади. Ми служимо нашій громаді з відданістю та пристрастю до вивчення української мови, культури та історії.',
     contactTitle: 'Зв’яжіться з нами',
     contactSchoolName: 'Українська школа',
-    contactAddress: [
-      'The Association of Ukrainians in Great Britain',
-      '5 Back Newton Grove',
-      'Leeds',
-      'LS7 4HW'
-    ],
-    contactEmail: 'admin@ukrainianschool.com',
-    contactPhone: '0113 2755883',
     socialTitle: 'Соціальні мережі',
-    socialLinks: [
-      { label: 'Facebook', href: '#' },
-      { label: 'Instagram', href: '#' },
-      { label: 'YouTube', href: '#' },
-      { label: 'X', href: '#' }
-    ],
     copyright:
       'Весь контент веб-сайту захищено авторським правом © Українська школа 2026',
     cookiesPolicy: 'Політика файлів cookie',

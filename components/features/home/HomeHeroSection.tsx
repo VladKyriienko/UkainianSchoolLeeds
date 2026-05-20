@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextHighlightUnderline } from './TextHighlightUnderline';
 import { HERO_MAIN_IMAGE, HERO_PNG_ICONS, HERO_TRUST_ICON_PATHS } from './home-constants';
-import type { HomeContent } from './types';
+import type { HomeContent } from '@/types';
 
 type HeroSectionContent = Pick<HomeContent, 'hero' | 'heroTrust' | 'features'>;
 
@@ -14,7 +14,7 @@ function HeroFloatingChipTitle({
   heroTitleLines
 }: {
   title: string;
-  heroTitleLines?: readonly [string, string];
+  heroTitleLines?: readonly string[];
 }) {
   return (
     <h3 className="text-base font-semibold leading-snug text-foreground">

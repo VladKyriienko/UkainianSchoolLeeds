@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
 import { useLanguage } from '@/providers/language-provider';
-import type { PublicPrivacyPolicyDocument } from './actions';
+import type { PublicPrivacyPolicyDocument } from '@/types';
 import { isHtmlContent } from '@/utils/rich-text';
 
 type PrivacyPolicyContentProps = {

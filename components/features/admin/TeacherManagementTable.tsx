@@ -10,7 +10,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { GraduationCap } from 'lucide-react';
-import type { AdminTeacher } from '@/app/admin/teachers/actions';
+import type { AdminTeacher } from '@/types';
 import { deleteTeacher } from '@/app/admin/teachers/actions';
 import { useState } from 'react';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';

@@ -1,11 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type { Tables } from '@/lib/supabase/types';
-
-export type PublicTeacher = Tables<'teachers'> & {
-  photoUrl: string | null;
-};
+import type { PublicTeacher } from '@/types';
 
 export async function getTeachers(): Promise<PublicTeacher[]> {
   const supabase = await createClient();

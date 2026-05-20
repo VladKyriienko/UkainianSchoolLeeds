@@ -15,18 +15,9 @@ import { useLanguage } from '@/providers/language-provider';
 import {
   BRAND_NAME_LINES,
   NAV_LABELS,
-  NavItems,
-  type NavItem
+  NavItems
 } from '@/content/navigation';
-
-export type PublicNavBarProps = {
-  showDarkModeToggle?: boolean;
-  showNavigation?: boolean;
-  /** Container for mobile sheet portal so overlay renders below header (z-index) */
-  sheetPortalContainer?: HTMLDivElement | null;
-  /** Called when mobile menu open state changes (for custom overlay in layout) */
-  onMobileMenuOpenChange?: (open: boolean) => void;
-};
+import type { NavItem, PublicNavBarProps } from '@/types';
 
 type KeyInfoNavDocument = {
   id: string;
