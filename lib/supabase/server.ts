@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import type { QueryResult, UserWithRoles } from '@/types';
-import { Database, Tables } from './types';
+import { Database } from './types';
 // Note: We avoid importing PostgrestBuilder here because runtime shapes vary by
 // client version and we treat the incoming query as `unknown`.
 

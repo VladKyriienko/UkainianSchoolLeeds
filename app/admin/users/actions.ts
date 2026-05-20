@@ -8,10 +8,8 @@ import type {
   AdminOrganisation,
   AdminUser,
   CreateUserData,
-  OrganisationMembership,
   UpdateUserData
 } from '@/types';
-import type { Tables } from '@/lib/supabase/types';
 
 // Admin client with service role access
 const supabaseAdmin = createAdminClient();

@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import type { AuthenticatedLayoutProps } from '@/types';
-import { RouteConfig } from '@/utils/route-protection';
 import { cn } from '@/utils/cn';
 
 function AuthenticatedLayoutContent({

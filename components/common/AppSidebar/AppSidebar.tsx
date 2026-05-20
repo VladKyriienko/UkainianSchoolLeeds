@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User } from '@supabase/supabase-js';
 import {
   Sidebar,
   SidebarContent,

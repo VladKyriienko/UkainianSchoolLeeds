@@ -2,11 +2,7 @@ import type * as React from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { Sidebar } from '@/components/ui/sidebar';
 import type { Input } from '@/components/ui/input';
-import type {
-  CompletionBannerData,
-  CompletionFieldConfig,
-  CompletionData
-} from '@/types/auth';
+import type { CompletionBannerData } from '@/types/auth';
 import type { RouteConfig } from '@/types/navigation';
 import type { PhoneCountryCode } from '@/types/phone';
 

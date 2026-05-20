@@ -6,11 +6,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import type {
-  CalendarClientProps,
-  CalendarEvent,
-  CalendarSchedule
-} from '@/types';
+import type { CalendarClientProps } from '@/types';
 import { MonthView } from './MonthView';
 import { ListView } from './ListView';
 import { DayView } from './DayView';

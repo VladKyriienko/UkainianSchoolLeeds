@@ -1,5 +1,3 @@
-import type { HomeLanguage } from '@/types/content/home';
-
 /** Program card art (shared EN/UK) — files in `public/home`. */
 const PROGRAM_CARD_IMAGES = [
   '/home/program-junior.png',
