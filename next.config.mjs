@@ -27,7 +27,9 @@ const nextConfig = {
     }
   },
   images: {
-    remotePatterns: supabaseStorageImageRemotePatterns()
+    remotePatterns: supabaseStorageImageRemotePatterns(),
+    // Local Supabase (127.0.0.1:54321) in dev — Next.js 16 blocks private IPs by default (SSRF).
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development'
   }
 };
 
