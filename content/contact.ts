@@ -67,9 +67,9 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     directionsText:
       'Located in Leeds, easily accessible by public transport and car. Several bus routes stop nearby. Free parking available on site.',
     phoneTitle: 'Phone',
-    phoneValue: '01234567890',
+    phoneValue: '07926 248347',
     emailTitle: 'Email',
-    emailValue: 'info@ukrainiaschool.com',
+    emailValue: 'ukrainianschoolleeds@gmail.com',
     hoursTitle: 'Hours',
     hoursText: 'Saturday, 2:00 pm to 5:30 pm',
     emergencyTitle: 'Emergency Contact',
@@ -106,9 +106,9 @@ export const CONTACT_CONTENT: Record<ContactLanguage, ContactContent> = {
     directionsText:
       'Розташовано в Лідсі, зручно дістатися громадським транспортом або автомобілем. Поруч зупиняються кілька автобусних маршрутів. Безкоштовна парковка на території.',
     phoneTitle: 'Телефон',
-    phoneValue: '01234567890',
+    phoneValue: '07926 248347',
     emailTitle: 'Електронна пошта',
-    emailValue: 'info@ukrainiaschool.com',
+    emailValue: 'ukrainianschoolleeds@gmail.com',
     hoursTitle: 'Години роботи',
     hoursText: 'Субота, з 14:00 до 17:30',
     emergencyTitle: 'Екстрений зв’язок',

@@ -12,8 +12,8 @@ export const FOOTER_SOCIAL_LINKS = [
 ] as const;
 
 export const FOOTER_CONTACT = {
-  contactEmail: 'admin@ukrainianschool.com',
-  contactPhone: '0113 2755883',
+  contactEmail: 'ukrainianschoolleeds@gmail.com',
+  contactPhone: '07926 248347',
   contactAddress: [
     'The Association of Ukrainians in Great Britain',
     '5 Back Newton Grove',
