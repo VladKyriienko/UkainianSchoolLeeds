@@ -14,11 +14,6 @@ const PHONE_REQUIRED_MESSAGE = 'Phone number is required';
 
 export { phoneDigitsOnly };
 
-/** @deprecated Use PhoneInput country selector; kept for plain text fields. */
-export function sanitizePhoneInput(value: string): string {
-  return value.replace(/[^\d+\s\-()]/g, '');
-}
-
 export const emailSchema = z
   .string()
   .trim()

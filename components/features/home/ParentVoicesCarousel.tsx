@@ -5,9 +5,8 @@ import { Quote } from 'lucide-react';
 import { CARD_SURFACE_CLASSNAME } from '@/components/ui/card';
 import { isHtmlContent } from '@/utils/rich-text';
 import { clampScrollLeft, scrollSlideIntoView } from './carousel-utils';
+import type { ParentVoiceItem } from '@/types';
 import { PARENT_VOICES_LOOP_SETS } from './home-constants';
-
-export type ParentVoiceItem = { quote: string; attribution: string };
 
 /** Parent testimonials: horizontal scroll + snap; triple DOM loop for infinite wrap; flex-basis % (peek / 3-up). */
 export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {

@@ -96,13 +96,6 @@ export const navigationRoutes: RouteConfig[] = [
   }
 ];
 
-export const adminPathPrefixes = ['/admin'] as const;
-
-export function isAdminPath(pathname: string | null): boolean {
-  if (!pathname) return false;
-  return pathname === '/admin' || pathname.startsWith('/admin/');
-}
-
 export function getAccessibleRoutes(
   routes: RouteConfig[],
   user?: { id: string; email?: string } | null,

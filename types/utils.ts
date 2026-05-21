@@ -22,5 +22,4 @@ export type CompressionOptions = {
   outputMimeType?: string;
 };
 
-export type LucideIconName = import('@/utils/lucide-icons').LucideIconName;
 export type ValidLucideIconName = import('@/utils/lucide-icons').ValidLucideIconName;

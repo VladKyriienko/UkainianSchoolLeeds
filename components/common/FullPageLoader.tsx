@@ -58,27 +58,4 @@ export function FullPageLoader({
   );
 }
 
-// Alternative inline loader for page sections
-export function InlineLoader({
-  message = 'Loading...',
-  className,
-  size = 'md'
-}: Omit<FullPageLoaderProps, 'variant'>) {
-  return (
-    <div
-      className={cn(
-        'flex flex-col items-center justify-center space-y-4 py-12',
-        className
-      )}
-    >
-      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
-      {message && (
-        <p className="text-sm text-muted-foreground text-center max-w-sm">
-          {message}
-        </p>
-      )}
-    </div>
-  );
-}
-
 export type { FullPageLoaderProps };

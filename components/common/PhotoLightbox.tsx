@@ -11,11 +11,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
-
-export type PhotoLightboxImage = {
-  src: string;
-  alt?: string;
-};
+import type { PhotoLightboxImage } from '@/types';
 
 type PhotoLightboxProps = {
   images: PhotoLightboxImage[];

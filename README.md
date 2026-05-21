@@ -101,7 +101,7 @@ bun run db:migrate
 bun run db:generate-types
 ```
 
-This will generate the types in the `utils/supabase/types.ts` file. You only need to do this if you make changes to the properties of the tables.
+This will generate the types in the `lib/supabase/types.ts` file. You only need to do this if you make changes to the properties of the tables.
 
 This will execute the migration SQL against your database.
 
@@ -247,8 +247,8 @@ This starter kit includes an elegant Supabase integration that provides seamless
 // app/page.tsx
 'use server';
 
-import { createClient, executeWithMetadata } from '@/utils/supabase/server';
-import { Tables } from '@/utils/supabase/types';
+import { createClient, executeWithMetadata } from '@/lib/supabase/server';
+import { Tables } from '@/lib/supabase/types';
 
 // Define the expected shape of the data
 export type ProductWithPrices = Tables<'products'> & {
@@ -281,8 +281,8 @@ export default async function ProductsPage() {
 // components/ProductsList.tsx
 'use client';
 
-import { useSupabaseStore } from '@/utils/supabase/hooks';
-import type { QueryResult } from '@/utils/supabase/server';
+import { useSupabaseStore } from '@/lib/supabase/hooks';
+import type { QueryResult } from '@/lib/supabase/server';
 import { ProductWithPrices } from '@/app/page';
 
 interface Props {
@@ -330,7 +330,7 @@ export default function ProductsList({ productsQuery }: Props) {
 
 ### API Reference
 
-#### Server-Side (`utils/supabase/server.ts`)
+#### Server-Side (`lib/supabase/server.ts`)
 
 ##### `executeWithMetadata<T>(query, tableName): Promise<QueryResult<T>>`
 
@@ -367,7 +367,7 @@ const query = supabase
 const result = await executeWithMetadata(query);
 ```
 
-#### Client-Side (`utils/supabase/hooks.ts`)
+#### Client-Side (`lib/supabase/hooks.ts`)
 
 ##### `useSupabaseStore(queryResult): [data, filters, loading, error, updateFilters, refetch]`
 
@@ -619,7 +619,7 @@ For pages that fetch data, follow the server-to-client pattern:
 
 ```typescript
 // app/products/page.tsx (Server Component)
-import { executeWithMetadata } from '@/utils/supabase/server';
+import { executeWithMetadata } from '@/lib/supabase/server';
 import { ProductsList } from './products-list';
 
 export default async function ProductsPage() {
@@ -633,7 +633,7 @@ export default async function ProductsPage() {
 
 // app/products/products-list.tsx (Client Component)
 'use client';
-import { useSupabaseStore } from '@/utils/supabase/hooks';
+import { useSupabaseStore } from '@/lib/supabase/hooks';
 
 export function ProductsList({ productsQuery }) {
   const { data: products, filters, updateFilters } = useSupabaseStore(productsQuery);
@@ -673,7 +673,7 @@ For pages with forms that do require data fetching such as edit forms:
 
 ```typescript
 // app/products/edit/[id]/page.tsx (Server Component)
-import { executeWithMetadata } from '@/utils/supabase/server';
+import { executeWithMetadata } from '@/lib/supabase/server';
 import { ProductEditForm } from './client';
 
 export default async function EditProductPage({ params }) {
@@ -684,7 +684,7 @@ export default async function EditProductPage({ params }) {
 
 // app/products/edit/[id]/client.tsx (Client Component)
 'use client';
-import { useSupabaseStore } from '@/utils/supabase/hooks';
+import { useSupabaseStore } from '@/lib/supabase/hooks';
 
 export function ProductEditForm({ productQuery }) {
   const { data: products, filters, updateFilters } = useSupabaseStore(productQuery);
@@ -699,7 +699,7 @@ export function ProductEditForm({ productQuery }) {
 
 // app/products/edit/[id]/actions.ts (Server Actions)
 'use server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 export async function updateProduct(formData: FormData) {

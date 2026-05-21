@@ -242,26 +242,3 @@ export async function markUserCompletionComplete(
     return false;
   }
 }
-
-/**
- * Get the completion redirect path from settings
- */
-export function getCompletionRedirectPath(): string {
-  const settings = getPostSignupSettings();
-  return settings.postSignupCompletionPath;
-}
-
-/**
- * Check if a path should be excluded from completion checks
- */
-export function isExcludedPath(pathname: string): boolean {
-  const excludedPaths = ['/auth', '/signin', '/signup', '/api'];
-
-  const settings = getPostSignupSettings();
-  const completionPath = settings.postSignupCompletionPath;
-
-  // Add the completion path to excluded paths
-  excludedPaths.push(completionPath);
-
-  return excludedPaths.some((path) => pathname.startsWith(path));
-}
