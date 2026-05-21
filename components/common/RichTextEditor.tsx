@@ -82,7 +82,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm max-w-none dark:prose-invert min-h-editor px-4 py-3 focus:outline-none'
+          'prose prose-sm max-w-none dark:prose-invert min-h-64 px-4 py-3 focus:outline-none'
       }
     },
     onUpdate: ({ editor: currentEditor }) => {
@@ -128,8 +128,8 @@ export function RichTextEditor({
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
 
-      <div className="rounded-md border bg-background">
-        <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/40 px-2 py-1.5">
+      <div className="flex flex-col overflow-hidden rounded-md border bg-background">
+        <div className="flex shrink-0 flex-wrap items-center gap-0.5 border-b bg-muted/40 px-2 py-1.5">
           <Toggle
             type="button"
             variant="outline"
@@ -316,12 +316,12 @@ export function RichTextEditor({
           </Toggle>
         </div>
 
-        <EditorContent
-          id={id}
-          editor={editor}
-          className={cn(
-            'min-h-editor',
-            '[&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:leading-tight [&_.ProseMirror_h2]:my-4',
+        <div className="max-h-editor min-h-0 overflow-y-auto overscroll-contain">
+          <EditorContent
+            id={id}
+            editor={editor}
+            className={cn(
+              '[&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:leading-tight [&_.ProseMirror_h2]:my-4',
             '[&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:leading-snug [&_.ProseMirror_h3]:my-3',
             '[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-3',
             '[&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:my-3',
@@ -330,8 +330,9 @@ export function RichTextEditor({
             '[&_.ProseMirror>p.is-editor-empty:first-child::before]:h-0',
             '[&_.ProseMirror>p.is-editor-empty:first-child::before]:text-muted-foreground',
             '[&_.ProseMirror>p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]'
-          )}
-        />
+            )}
+          />
+        </div>
       </div>
 
       <textarea

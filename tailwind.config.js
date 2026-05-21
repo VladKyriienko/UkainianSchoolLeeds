@@ -31,7 +31,10 @@ export default {
         '2xs': ['0.6875rem', { lineHeight: '1rem' }]
       },
       minHeight: {
-        editor: '13.75rem'
+        editor: '27.5rem'
+      },
+      maxHeight: {
+        editor: '27.5rem'
       },
       keyframes: {
         'accordion-down': {
