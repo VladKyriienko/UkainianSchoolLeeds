@@ -65,6 +65,8 @@ export type MobileHeaderProps = {
   showDarkModeToggle?: boolean;
   showLanguageToggle?: boolean;
   burgerPosition?: 'left' | 'right';
+  /** Public-site styling (fixed ukraine header + menu below). */
+  variant?: 'default' | 'public';
   className?: string;
 };
 

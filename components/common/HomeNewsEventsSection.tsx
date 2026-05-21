@@ -50,13 +50,11 @@ export function HomeNewsEventsSection({
           )
       : [];
 
-    const newsItems: HomeFeedItem[] = initialNews
-      .map((item) => ({
-        kind: 'news' as const,
-        date: item.date,
-        item
-      }))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const newsItems: HomeFeedItem[] = initialNews.map((item) => ({
+      kind: 'news' as const,
+      date: item.date,
+      item
+    }));
 
     const ordered = [...eventItems, ...newsItems];
     return compactRow ? ordered.slice(0, HOME_FEED_MAX) : ordered;

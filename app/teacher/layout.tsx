@@ -55,14 +55,14 @@ export default async function TeacherLayout({ children }: PropsWithChildren) {
   );
 
   return (
-    <AuthenticatedLayout
-      navItems={teacherNavigation}
-      completionBannerData={completionBannerData}
-      showLanguageToggle={true}
-      mobileBurgerPosition="right"
-      showDarkModeToggle={false}
-      defaultOpen={true}
-    >
+      <AuthenticatedLayout
+        navItems={teacherNavigation}
+        completionBannerData={completionBannerData}
+        showLanguageToggle={true}
+        mobileBurgerPosition="right"
+        showDarkModeToggle={false}
+        defaultOpen={true}
+      >
       {children}
     </AuthenticatedLayout>
   );

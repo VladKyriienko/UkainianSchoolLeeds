@@ -4,8 +4,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
-  Table,
-  TableBody,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,10 +11,17 @@ import {
 } from '@/components/ui/table';
 import { Images } from 'lucide-react';
 import type { AdminSchoolGalleryItem } from '@/types';
-import { deleteSchoolGalleryItem } from '@/app/admin/gallery/actions';
+import {
+  deleteSchoolGalleryItem,
+  reorderSchoolGallery
+} from '@/app/admin/gallery/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
-import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
+import {
+  adminDateCellClass,
+  adminDateHeadClass
+} from '@/components/common/admin/dateColumnClasses';
+import { SortableTable } from '@/components/common/admin/SortableTable';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
 
@@ -60,6 +65,14 @@ export default function GalleryManagementTable({
     });
   };
 
+  const handleReorder = async (orderedIds: string[]) => {
+    const result = await reorderSchoolGallery(orderedIds);
+    if (result.success) {
+      router.refresh();
+    }
+    return result;
+  };
+
   if (items.length === 0) {
     return (
       <EntityEmptyState
@@ -70,50 +83,53 @@ export default function GalleryManagementTable({
     );
   }
 
+  const canDrag = items.length > 1;
+
   return (
-    <EntityTableShell>
-      <Table>
+    <SortableTable
+      items={items}
+      onReorder={handleReorder}
+      header={
         <TableHeader>
           <TableRow>
-            <TableHead className="w-25">Photo</TableHead>
+            {canDrag ? <TableHead className="w-12" /> : null}
             <TableHead className="w-20">Order</TableHead>
-            <TableHead className="w-30">Created</TableHead>
+            <TableHead className="w-25">Photo</TableHead>
+            <TableHead className={adminDateHeadClass}>Created</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {items.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>
-                <div className="relative size-14 shrink-0 overflow-hidden rounded border bg-muted">
-                  <Image
-                    src={getPhotoUrl(item.photo)}
-                    alt=""
-                    width={56}
-                    height={56}
-                    sizes="56px"
-                    className="size-full object-cover"
-                  />
-                </div>
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {item.order}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {formatDateLabel(item.created_at)}
-              </TableCell>
-              <TableCell>
-                <RowActionMenu
-                  isLoading={loadingId === item.id}
-                  onView={() => router.push(`/admin/gallery/${item.id}`)}
-                  onEdit={() => router.push(`/admin/gallery/${item.id}/edit`)}
-                  onDelete={() => handleDelete(item.id)}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </EntityTableShell>
+      }
+      renderRow={(item, { canDrag: rowCanDrag, displayIndex }) => (
+        <>
+          <TableCell className="text-sm text-muted-foreground">
+            {rowCanDrag ? displayIndex : item.order}
+          </TableCell>
+          <TableCell>
+            <div className="relative size-14 shrink-0 overflow-hidden rounded border bg-muted">
+              <Image
+                src={getPhotoUrl(item.photo)}
+                alt=""
+                width={56}
+                height={56}
+                sizes="56px"
+                className="size-full object-cover"
+              />
+            </div>
+          </TableCell>
+          <TableCell className={adminDateCellClass}>
+            {formatDateLabel(item.created_at)}
+          </TableCell>
+          <TableCell>
+            <RowActionMenu
+              isLoading={loadingId === item.id}
+              onView={() => router.push(`/admin/gallery/${item.id}`)}
+              onEdit={() => router.push(`/admin/gallery/${item.id}/edit`)}
+              onDelete={() => handleDelete(item.id)}
+            />
+          </TableCell>
+        </>
+      )}
+    />
   );
 }

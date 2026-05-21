@@ -10,6 +10,7 @@ import { cn } from '@/utils/cn';
 import { useScrollToTopOnMount } from '@/hooks/useScrollToTopOnMount';
 import {
   computeGalleryRowHeight,
+  getGalleryPhotoWidthFraction,
   getPhotoOrientation,
   getPhotoWidthUnits,
   loadImageDimensions,
@@ -175,10 +176,12 @@ export default function GalleryContent({ photos }: GalleryContentProps) {
                 gap
               );
 
+              const singleInRow = row.length === 1;
+
               return (
                 <ul
                   key={`row-${rowIndex}-${row.map((p) => p.id).join('-')}`}
-                  className="flex w-full min-w-0"
+                  className="flex w-full min-w-0 justify-start"
                   style={{ gap, height: rowHeight }}
                 >
                   {row.map((photo) => {
@@ -186,12 +189,21 @@ export default function GalleryContent({ photos }: GalleryContentProps) {
                     const openLabel = isUk
                       ? `${GALLERY_CONTENT.openPhotoUk} ${index + 1}`
                       : `${GALLERY_CONTENT.openPhotoEn} ${index + 1}`;
+                    const widthPercent =
+                      getGalleryPhotoWidthFraction(photo, row.length) * 100;
 
                     return (
                       <li
                         key={photo.id}
                         className="min-h-0 min-w-0"
-                        style={{ flex: `${photo.units} 1 0` }}
+                        style={
+                          singleInRow
+                            ? {
+                                flex: '0 0 auto',
+                                width: `${widthPercent}%`
+                              }
+                            : { flex: `${photo.units} 1 0` }
+                        }
                       >
                         <button
                           type="button"
@@ -200,7 +212,7 @@ export default function GalleryContent({ photos }: GalleryContentProps) {
                             setLightboxOpen(true);
                           }}
                           className={cn(
-                            'flex h-full w-full items-center justify-center rounded-none p-0',
+                            'flex h-full w-full items-center justify-start rounded-none p-0',
                             'cursor-pointer transition-opacity hover:opacity-90',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                           )}
@@ -212,7 +224,9 @@ export default function GalleryContent({ photos }: GalleryContentProps) {
                             alt={photo.alt}
                             className={cn(
                               'h-full w-full rounded-none',
-                              mobileStack ? 'object-contain' : 'object-cover'
+                              mobileStack
+                                ? 'object-contain object-left'
+                                : 'object-cover object-left'
                             )}
                             loading="lazy"
                             decoding="async"

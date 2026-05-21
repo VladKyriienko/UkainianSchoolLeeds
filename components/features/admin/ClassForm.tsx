@@ -5,21 +5,46 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminClass } from '@/types';
 import { createClass, updateClass } from '@/app/admin/classes/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 
 type ClassFormProps = {
   mode: 'create' | 'edit';
   classItem?: AdminClass | null;
+  currentPhotoUrl?: string | null;
 };
 
-export function ClassForm({ mode, classItem }: ClassFormProps) {
+export function ClassForm({ mode, classItem, currentPhotoUrl }: ClassFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [isCompressingPhoto, setIsCompressingPhoto] = useState(false);
   const [description, setDescription] = useState(classItem?.description ?? '');
   const [descriptionUk, setDescriptionUk] = useState(classItem?.description_uk ?? '');
+
+  const handlePhotoChange = async (file: File | null) => {
+    if (!file) {
+      setPhotoFile(null);
+      return;
+    }
+
+    setIsCompressingPhoto(true);
+    setError(null);
+    try {
+      setPhotoFile(await prepareAdminPhotoForUpload(file));
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : 'Failed to compress photo';
+      setError(msg);
+      setPhotoFile(null);
+    } finally {
+      setIsCompressingPhoto(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,6 +52,9 @@ export function ClassForm({ mode, classItem }: ClassFormProps) {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+    if (photoFile) {
+      formData.set('photo', photoFile);
+    }
 
     try {
       let result;
@@ -118,8 +146,22 @@ export function ClassForm({ mode, classItem }: ClassFormProps) {
         />
       </div>
 
+      <ImageUploadField
+        id="photo"
+        name="photo"
+        label={
+          isCompressingPhoto ? 'Photo (compressing…)' : 'Photo (optional)'
+        }
+        currentImageUrl={currentPhotoUrl}
+        removePhotoFieldName="remove_photo"
+        onFileChange={handlePhotoChange}
+      />
+
       <div className="flex gap-4">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting || isCompressingPhoto}
+        >
           {isSubmitting
             ? 'Saving...'
             : mode === 'create'

@@ -38,10 +38,16 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
     }
   };
 
+  const mobileNavButtonClass = isMobile
+    ? 'h-auto rounded-lg px-4 py-3 text-base font-medium text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg data-[active=true]:bg-ukraine-yellow/30 data-[active=true]:text-ukraine-yellow'
+    : undefined;
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarGroupLabel className={isMobile ? 'sr-only' : undefined}>
+        Navigation
+      </SidebarGroupLabel>
+      <SidebarMenu className={isMobile ? 'gap-2' : undefined}>
         {items.map((item) => {
           const isActive =
             pathname === item.path ||
@@ -67,7 +73,7 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
                       <SidebarMenuButton
                         tooltip={item.label}
                         isActive={isActive}
-                        className="w-full"
+                        className={cn('w-full', mobileNavButtonClass)}
                       >
                         <div className="flex w-full gap-2 items-center">
                           <Icon
@@ -158,7 +164,11 @@ export function NavMain({ items }: { items: RouteConfig[] }) {
                 <SidebarMenuButton
                   tooltip={item.label}
                   isActive={isActive}
-                  className={cn('w-full', 'group-data-[collapsible=icon]:p-2!')}
+                  className={cn(
+                    'w-full',
+                    'group-data-[collapsible=icon]:p-2!',
+                    mobileNavButtonClass
+                  )}
                   asChild
                 >
                   <Link

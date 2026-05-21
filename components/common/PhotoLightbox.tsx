@@ -24,6 +24,13 @@ type PhotoLightboxProps = {
 const SLIDE_TRANSITION_MS = 320;
 const SWIPE_RATIO = 0.18;
 
+/** Shared open/close motion for overlay, panel, and photo area. */
+const lightboxSurfaceMotion =
+  'duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0';
+
+const lightboxContentMotion =
+  'transition-opacity duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)]';
+
 export function PhotoLightbox({
   images,
   open,
@@ -45,6 +52,7 @@ export function PhotoLightbox({
   const [slideIndex, setSlideIndex] = useState(hasMultiple ? 1 : 0);
   const [dragPx, setDragPx] = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [contentVisible, setContentVisible] = useState(false);
 
   const touchStartX = useRef<number | null>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -76,6 +84,15 @@ export function PhotoLightbox({
     if (!open || count === 0) return;
     resetSlidePosition(startIndex);
   }, [open, startIndex, count, resetSlidePosition]);
+
+  useEffect(() => {
+    if (!open) {
+      setContentVisible(false);
+      return;
+    }
+    const frame = requestAnimationFrame(() => setContentVisible(true));
+    return () => cancelAnimationFrame(frame);
+  }, [open]);
 
   const goNext = useCallback(() => {
     if (!hasMultiple) return;
@@ -183,105 +200,111 @@ export function PhotoLightbox({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="z-199 bg-black/90" />
+        <DialogOverlay className={cn('z-199 bg-black/90', lightboxSurfaceMotion)} />
         <DialogPrimitive.Content
           className={cn(
             'fixed left-1/2 top-1/2 z-200 flex h-dvh w-dvw max-w-none -translate-x-1/2 -translate-y-1/2',
             'flex-col gap-0 border-0 bg-black/95 p-0 shadow-none outline-none',
-            'origin-center duration-300',
-            'data-[state=open]:animate-in data-[state=closed]:animate-out',
-            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-            'data-[state=closed]:zoom-out-90 data-[state=open]:zoom-in-90',
-            'data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0',
-            'data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0',
-            'sm:rounded-none'
+            'origin-center sm:rounded-none',
+            lightboxSurfaceMotion,
+            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95'
           )}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <DialogTitle className="sr-only">{title}</DialogTitle>
 
-          <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-            {hasMultiple ? (
-              <p className="text-sm tabular-nums text-white/80">
-                {displayIndex + 1} / {count}
-              </p>
-            ) : (
-              <span />
+          <div
+            className={cn(
+              'flex min-h-0 flex-1 flex-col',
+              lightboxContentMotion,
+              contentVisible ? 'opacity-100' : 'opacity-0'
             )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="shrink-0 text-white hover:bg-white/10 hover:text-white"
-              onClick={() => onOpenChange(false)}
-              aria-label="Close"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-
-          <div className="relative flex min-h-0 w-full flex-1 flex-col">
-            {hasMultiple && (
+          >
+            <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+              {hasMultiple ? (
+                <p className="text-sm tabular-nums text-white/80">
+                  {displayIndex + 1} / {count}
+                </p>
+              ) : (
+                <span />
+              )}
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute left-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 text-white hover:bg-white/10 hover:text-white md:left-4 md:inline-flex"
-                onClick={goPrev}
-                aria-label="Previous photo"
+                className="shrink-0 text-white hover:bg-white/10 hover:text-white"
+                onClick={() => onOpenChange(false)}
+                aria-label="Close"
               >
-                <ChevronLeft className="h-8 w-8" />
+                <X className="h-5 w-5" />
               </Button>
-            )}
-
-            <div
-              ref={viewportRef}
-              className="relative min-h-0 w-full flex-1 overflow-hidden touch-pan-y"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onTouchCancel={handleTouchCancel}
-            >
-              <div
-                className="flex h-full"
-                style={{
-                  transform: translateX,
-                  transition: trackTransition
-                }}
-                onTransitionEnd={handleTransitionEnd}
-              >
-                {(hasMultiple ? extendedImages : images).map((image, i) => (
-                  <div
-                    key={`${image.src}-${i}`}
-                    className="flex h-full w-full shrink-0 items-center justify-center px-0 md:px-4"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={image.src}
-                      alt={image.alt ?? ''}
-                      className={cn(
-                        'h-auto w-full max-h-[min(85dvh,calc(100dvh-5.5rem))] object-contain select-none',
-                        'md:h-auto md:w-auto md:max-h-full md:max-w-full'
-                      )}
-                      draggable={false}
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {hasMultiple && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 text-white hover:bg-white/10 hover:text-white md:right-4 md:inline-flex"
-                onClick={goNext}
-                aria-label="Next photo"
+            <div className="relative flex min-h-0 w-full flex-1 flex-col">
+              {hasMultiple && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 text-white hover:bg-white/10 hover:text-white md:left-4 md:inline-flex"
+                  onClick={goPrev}
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft className="h-8 w-8" />
+                </Button>
+              )}
+
+              <div
+                ref={viewportRef}
+                className="relative min-h-0 w-full flex-1 overflow-hidden touch-pan-y"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onTouchCancel={handleTouchCancel}
               >
-                <ChevronRight className="h-8 w-8" />
-              </Button>
-            )}
+                <div
+                  className="flex h-full"
+                  style={{
+                    transform: translateX,
+                    transition: trackTransition
+                  }}
+                  onTransitionEnd={handleTransitionEnd}
+                >
+                  {(hasMultiple ? extendedImages : images).map((image, i) => (
+                    <div
+                      key={`${image.src}-${i}`}
+                      className="flex h-full w-full shrink-0 items-center justify-center px-0 md:px-4"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={image.src}
+                        alt={image.alt ?? ''}
+                        className={cn(
+                          'h-auto w-full max-h-[min(85dvh,calc(100dvh-5.5rem))] object-contain select-none',
+                          'md:h-auto md:w-auto md:max-h-full md:max-w-full',
+                          'transition-transform duration-380ms ease-[cubic-bezier(0.32,0.72,0,1)]',
+                          contentVisible ? 'scale-100' : 'scale-[0.98]'
+                        )}
+                        draggable={false}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {hasMultiple && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 text-white hover:bg-white/10 hover:text-white md:right-4 md:inline-flex"
+                  onClick={goNext}
+                  aria-label="Next photo"
+                >
+                  <ChevronRight className="h-8 w-8" />
+                </Button>
+              )}
+            </div>
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>

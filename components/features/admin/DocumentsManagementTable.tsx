@@ -17,6 +17,10 @@ import { DOCUMENT_TYPE_LABELS } from '@/app/admin/documents/constants';
 import { isHtmlContent } from '@/utils/rich-text';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateCellClass,
+  adminDateHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
@@ -73,7 +77,7 @@ export default function DocumentsManagementTable({
             <TableHead className="w-50">Title</TableHead>
             <TableHead className="w-30">Type</TableHead>
             <TableHead>Content preview</TableHead>
-            <TableHead className="w-30">Created</TableHead>
+            <TableHead className={adminDateHeadClass}>Created</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
         </TableHeader>
@@ -96,7 +100,7 @@ export default function DocumentsManagementTable({
                   </span>
                 )}
               </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
+              <TableCell className={adminDateCellClass}>
                 {formatDateLabel(doc.created_at)}
               </TableCell>
               <TableCell>

@@ -16,6 +16,10 @@ import { deleteReview } from '@/app/admin/reviews/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { isHtmlContent } from '@/utils/rich-text';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateCellClass,
+  adminDateHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
@@ -71,7 +75,7 @@ export default function ReviewsManagementTable({
           <TableRow>
             <TableHead className="w-45">Parents (EN)</TableHead>
             <TableHead className="w-45">Parents (UK)</TableHead>
-            <TableHead className="w-30">Date</TableHead>
+            <TableHead className={adminDateHeadClass}>Date</TableHead>
             <TableHead className="min-w-50">Content (EN)</TableHead>
             <TableHead className="min-w-50">Content (UK)</TableHead>
             <TableHead className="w-15" />
@@ -90,7 +94,7 @@ export default function ReviewsManagementTable({
                   '—'
                 )}
               </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
+              <TableCell className={adminDateCellClass}>
                 {formatDateLabel(item.data)}
               </TableCell>
               <TableCell className="max-w-70 text-sm text-muted-foreground">

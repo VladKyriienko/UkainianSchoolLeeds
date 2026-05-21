@@ -16,6 +16,10 @@ import type { AdminGalleryItem } from '@/types';
 import { deleteGalleryItem } from '@/lib/class-gallery/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateCellClass,
+  adminDateHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
@@ -79,16 +83,22 @@ export default function ClassGalleryManagementTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-25">Photo</TableHead>
-            <TableHead className="w-50">Class</TableHead>
             <TableHead className="w-20">Order</TableHead>
-            <TableHead className="w-30">Created</TableHead>
+            <TableHead className="w-50">Class</TableHead>
+            <TableHead className="w-25">Photo</TableHead>
+            <TableHead className={adminDateHeadClass}>Created</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {items.map((item) => (
             <TableRow key={item.id}>
+              <TableCell className="text-sm text-muted-foreground">
+                {item.order}
+              </TableCell>
+              <TableCell className="font-medium">
+                {classTitleMap.get(item.class_id) ?? item.class_id}
+              </TableCell>
               <TableCell>
                 <div className="relative size-14 shrink-0 overflow-hidden rounded border bg-muted">
                   <Image
@@ -101,13 +111,7 @@ export default function ClassGalleryManagementTable({
                   />
                 </div>
               </TableCell>
-              <TableCell className="font-medium">
-                {classTitleMap.get(item.class_id) ?? item.class_id}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {item.order}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
+              <TableCell className={adminDateCellClass}>
                 {formatDateLabel(item.created_at)}
               </TableCell>
               <TableCell>

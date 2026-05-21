@@ -39,7 +39,7 @@ export default async function AdminGalleryPage({
   return (
     <PageWrapper
       title="Gallery"
-      description="Manage photos for the school gallery."
+      description="Manage photos for the school gallery. Drag rows to change display order on the public site."
       actions={
         <Button asChild>
           <Link href="/admin/gallery/create">

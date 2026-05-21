@@ -33,7 +33,7 @@ function schoolGalleryPublicSrc(
 
 /**
  * Public gallery photos from `gallery` (RLS: anon SELECT).
- * Order matches admin: higher `order` first, then newest.
+ * Order matches admin list: `order` ascending, then newest.
  */
 export async function getPublicGalleryImages(
   limit?: number
@@ -43,7 +43,7 @@ export async function getPublicGalleryImages(
     let query = supabase
       .from('gallery')
       .select('id, photo')
-      .order('order', { ascending: false })
+      .order('order', { ascending: true })
       .order('created_at', { ascending: false });
 
     if (limit !== undefined) {
@@ -113,9 +113,14 @@ export async function getPublicParentVoices(
       return [];
     }
 
-    return ((data ?? []) as ParentVoiceRow[]).filter(
-      (row) => row.content?.trim() && row.perens?.trim()
-    );
+    const seen = new Set<string>();
+    return ((data ?? []) as ParentVoiceRow[])
+      .filter((row) => row.content?.trim() && row.perens?.trim())
+      .filter((row) => {
+        if (seen.has(row.id)) return false;
+        seen.add(row.id);
+        return true;
+      });
   } catch (e) {
     console.error('getPublicParentVoices:', e);
     return [];

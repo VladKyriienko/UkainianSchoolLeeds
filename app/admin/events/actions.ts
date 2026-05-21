@@ -231,18 +231,25 @@ export async function updateEvent(
       location_uk: locationUk
     };
 
-    if (removePhoto) {
+    if (removePhoto || photoPath) {
       const { data: existing } = await supabaseAdmin
         .from('events')
         .select('photo')
         .eq('id', id)
         .single();
-      if (existing?.photo) {
-        await supabaseAdmin.storage.from('events-photos').remove([existing.photo]);
+      const previousPhoto = existing?.photo ?? null;
+
+      if (removePhoto) {
+        if (previousPhoto) {
+          await supabaseAdmin.storage.from('events-photos').remove([previousPhoto]);
+        }
+        updatePayload.photo = null;
+      } else if (photoPath) {
+        if (previousPhoto && previousPhoto !== photoPath) {
+          await supabaseAdmin.storage.from('events-photos').remove([previousPhoto]);
+        }
+        updatePayload.photo = photoPath;
       }
-      updatePayload.photo = null;
-    } else if (photoPath) {
-      updatePayload.photo = photoPath;
     }
 
     const { error: updateError } = await supabaseAdmin

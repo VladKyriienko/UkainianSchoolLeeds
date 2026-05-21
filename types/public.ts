@@ -24,7 +24,14 @@ export type PublicHomeClientProps = {
   parentVoices: PublicParentVoiceReview[];
 };
 
-export type PublicClass = Tables<'classes'>;
+export type PublicClass = Tables<'classes'> & {
+  photoUrl: string | null;
+};
+
+export type PublicClassGalleryImage = {
+  id: string;
+  src: string;
+};
 
 export type PublicTeacher = Tables<'teachers'> & {
   photoUrl: string | null;

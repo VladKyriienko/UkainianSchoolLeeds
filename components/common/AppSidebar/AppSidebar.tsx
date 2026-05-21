@@ -12,8 +12,6 @@ import {
   SidebarTrigger,
   useSidebar
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 import { NavMain } from './NavMain';
 import { NavUser } from './NavUser';
 import { CompletionBanner } from '@/components/common/CompletionBanner/CompletionBanner';
@@ -35,14 +33,8 @@ export function AppSidebar({
   side: desktopSidebarPosition = 'left',
   ...props
 }: AppSidebarProps) {
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { isMobile } = useSidebar();
   const { language } = useLanguage();
-
-  const handleMobileClose = () => {
-    if (isMobile) {
-      setOpenMobile(false);
-    }
-  };
 
   return (
     <Sidebar
@@ -51,56 +43,70 @@ export function AppSidebar({
       className={cn(className)}
       {...props}
     >
-      <SidebarHeader className="border-b border-sidebar-border">
-        {/* Expanded state */}
-        <div className="flex items-center justify-between p-2 group-data-[collapsible=icon]:hidden">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
-            <span className="flex flex-col text-xs font-semibold leading-tight text-sidebar-foreground">
-              <span>{BRAND_NAME_LINES[language].line1}</span>
-              <span>{BRAND_NAME_LINES[language].line2}</span>
-            </span>
-          </Link>
+      {!isMobile ? (
+        <SidebarHeader className="border-b border-sidebar-border">
+          <div className="flex items-center justify-between p-2 group-data-[collapsible=icon]:hidden">
+            <Link
+              href="/"
+              className="flex items-center gap-2 transition-opacity hover:opacity-80"
+            >
+              <Image
+                src="/logo.png"
+                alt="Ukrainia School"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
+              <span className="flex flex-col text-xs font-semibold leading-tight text-sidebar-foreground">
+                <span>{BRAND_NAME_LINES[language].line1}</span>
+                <span>{BRAND_NAME_LINES[language].line2}</span>
+              </span>
+            </Link>
 
-          {/* Controls */}
-          <div className="flex items-center gap-2">
-            {showLanguageToggle && <LanguageToggle />}
-            {showDarkModeToggle && <DarkModeToggle />}
-            {showSidebarTrigger && !isMobile && (
-              <SidebarTrigger className="h-8 w-8" />
-            )}
-            {/* Mobile close button */}
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleMobileClose}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close sidebar</span>
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {showLanguageToggle && <LanguageToggle />}
+              {showDarkModeToggle && <DarkModeToggle />}
+              {showSidebarTrigger && (
+                <SidebarTrigger className="h-8 w-8" />
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Collapsed state */}
-        {!isMobile && (
           <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-2 p-2">
-            <Link href="/" className="hover:opacity-80 transition-opacity">
-              <Image src="/logo.png" alt="Ukrainia School" width={32} height={32} className="h-8 w-8 object-contain" />
+            <Link href="/" className="transition-opacity hover:opacity-80">
+              <Image
+                src="/logo.png"
+                alt="Ukrainia School"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
             </Link>
             {showSidebarTrigger && <SidebarTrigger className="h-8 w-8" />}
           </div>
-        )}
 
-        {/* Completion Banner - only show when expanded and data exists */}
-        {completionBannerData && (
-          <div className="px-2 pb-2 group-data-[collapsible=icon]:hidden">
+          {completionBannerData ? (
+            <div className="px-2 pb-2 group-data-[collapsible=icon]:hidden">
+              <CompletionBanner
+                completionData={completionBannerData.completionData}
+                settings={completionBannerData.settings}
+                postSignupSettings={completionBannerData.postSignupSettings}
+                fieldConfig={completionBannerData.fieldConfig}
+                variant="sidebar"
+                className="border-0 shadow-none"
+              />
+            </div>
+          ) : null}
+        </SidebarHeader>
+      ) : null}
+
+      <SidebarContent
+        className={cn(
+          isMobile && 'flex-1 overflow-y-auto bg-ukraine-header-bg px-2 pt-4'
+        )}
+      >
+        {isMobile && completionBannerData ? (
+          <div className="mb-4">
             <CompletionBanner
               completionData={completionBannerData.completionData}
               settings={completionBannerData.settings}
@@ -110,14 +116,18 @@ export function AppSidebar({
               className="border-0 shadow-none"
             />
           </div>
-        )}
-      </SidebarHeader>
-
-      <SidebarContent>
+        ) : null}
         <NavMain items={navItems} />
       </SidebarContent>
 
-      <SidebarFooter className="shrink-0 border-t border-sidebar-border bg-sidebar pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <SidebarFooter
+        className={cn(
+          'shrink-0 border-t pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+          isMobile
+            ? 'border-white/10 bg-ukraine-header-bg'
+            : 'border-sidebar-border bg-sidebar'
+        )}
+      >
         <NavUser />
       </SidebarFooter>
 

@@ -7,8 +7,6 @@ import type { PublicNews } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Newspaper, ChevronRight } from 'lucide-react';
-import { format } from 'date-fns';
-import { enUS, uk } from 'date-fns/locale';
 import { isHtmlContent } from '@/utils/rich-text';
 
 type Props = {
@@ -54,13 +52,6 @@ export default function NewsContent({ news }: Props) {
                   </div>
                 ) : null}
                 <CardContent className="pt-4 pb-4">
-                  <p className="text-xs text-muted-foreground mb-2">
-                    {item.date
-                      ? format(new Date(item.date), 'd MMM yyyy', {
-                        locale: language === 'uk' ? uk : enUS
-                      })
-                      : ''}
-                  </p>
                   <h3 className="font-semibold leading-snug font-display text-foreground mb-2 line-clamp-2">
                     {title}
                   </h3>

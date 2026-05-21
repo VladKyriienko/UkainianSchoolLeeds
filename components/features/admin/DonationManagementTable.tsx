@@ -12,6 +12,10 @@ import { PoundSterling } from 'lucide-react';
 import type { AdminDonation } from '@/types';
 import { formatDateTimeLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateTimeCellClass,
+  adminDateTimeHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { StatusBadge } from '@/components/common/admin/StatusBadge';
 
@@ -45,7 +49,7 @@ export default function DonationManagementTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-40">Date</TableHead>
+            <TableHead className={adminDateTimeHeadClass}>Date</TableHead>
             <TableHead className="w-30">Amount</TableHead>
             <TableHead className="w-25">Status</TableHead>
             <TableHead className="w-55">Donor Email</TableHead>
@@ -55,7 +59,7 @@ export default function DonationManagementTable({
         <TableBody>
           {donations.map((donation) => (
             <TableRow key={donation.id}>
-              <TableCell className="text-muted-foreground">
+              <TableCell className={adminDateTimeCellClass}>
                 {formatDateTimeLabel(donation.created_at)}
               </TableCell>
               <TableCell className="font-medium">

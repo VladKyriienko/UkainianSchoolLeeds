@@ -23,14 +23,13 @@ export default async function HomePage() {
     redirect('/teacher');
   }
 
-  const [allNews, upcomingEvents, atmosphereGalleryImages, parentVoices] =
+  const [latestNews, upcomingEvents, atmosphereGalleryImages, parentVoices] =
     await Promise.all([
-      getNews(),
+      getNews(HOME_NEWS_LIMIT),
       getUpcomingPublicEvents(HOME_EVENTS_LIMIT),
       getSchoolAtmosphereGalleryImages(),
       getPublicParentVoices()
     ]);
-  const latestNews = allNews.slice(0, HOME_NEWS_LIMIT);
 
   return (
     <PublicLayout showHeader={true} showDarkModeToggle={false} showFooter={true}>

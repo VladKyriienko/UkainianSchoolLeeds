@@ -31,6 +31,12 @@ const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
+/** Align with public site mobile header (`min-h-18` / `pt-21`). */
+const MOBILE_NAV_TOP = '4.5rem';
+const MOBILE_NAV_HEIGHT = `calc(100dvh - ${MOBILE_NAV_TOP})`;
+const MOBILE_NAV_SHEET_CLASS =
+  'top-18! h-[calc(100dvh-4.5rem)] max-h-[calc(100dvh-4.5rem)] w-[min(100vw,24rem)] border-0 bg-ukraine-header-bg p-0 text-ukraine-header-fg shadow-none sm:w-100 [&>button]:hidden';
+const MOBILE_NAV_OVERLAY_CLASS = 'top-18! h-[calc(100dvh-4.5rem)] left-0 right-0';
 
 type SidebarContextProps = {
   state: 'expanded' | 'collapsed';
@@ -101,6 +107,15 @@ const SidebarProvider = React.forwardRef<
         ? setOpenMobile((open) => !open)
         : setOpen((open) => !open);
     }, [isMobile, setOpen, setOpenMobile]);
+
+    React.useEffect(() => {
+      if (!isMobile || !openMobile) return;
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }, [isMobile, openMobile]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -200,17 +215,28 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <Sheet open={openMobile} onOpenChange={setOpenMobile} modal={false} {...props}>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button):hidden"
+            showCloseButton={false}
+            overlayClassName={MOBILE_NAV_OVERLAY_CLASS}
+            overlayStyle={{
+              top: MOBILE_NAV_TOP,
+              height: MOBILE_NAV_HEIGHT,
+              left: 0,
+              right: 0,
+              pointerEvents: 'auto'
+            }}
+            className={cn(MOBILE_NAV_SHEET_CLASS, className)}
             style={
               {
                 '--sidebar-width': SIDEBAR_WIDTH_MOBILE
               } as React.CSSProperties
             }
             side={side}
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onInteractOutside={(e) => e.preventDefault()}
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Sidebar</SheetTitle>

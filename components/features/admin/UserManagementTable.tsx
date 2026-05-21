@@ -38,6 +38,12 @@ import {
 } from '@/app/admin/users/actions';
 import { formatDateLabel, formatDateTimeLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateCellClass,
+  adminDateHeadClass,
+  adminDateTimeCellClass,
+  adminDateTimeHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { StatusBadge } from '@/components/common/admin/StatusBadge';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
@@ -136,8 +142,8 @@ export default function UserManagementTable({
             <TableHead className="w-50">Email</TableHead>
             <TableHead className="w-20">Role</TableHead>
             <TableHead className="w-25">Status</TableHead>
-            <TableHead className="w-30">Created</TableHead>
-            <TableHead className="w-40">Last Sign In</TableHead>
+            <TableHead className={adminDateHeadClass}>Created</TableHead>
+            <TableHead className={adminDateTimeHeadClass}>Last Sign In</TableHead>
             <TableHead className="w-20">Orgs</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
@@ -198,12 +204,12 @@ export default function UserManagementTable({
                 </TableCell>
 
                 {/* Created Date */}
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className={adminDateCellClass}>
                   {user.created_at ? formatDateLabel(user.created_at) : 'Never'}
                 </TableCell>
 
                 {/* Last Sign In */}
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className={adminDateTimeCellClass}>
                   {user.last_sign_in_at
                     ? formatDateTimeLabel(user.last_sign_in_at)
                     : 'Never'}

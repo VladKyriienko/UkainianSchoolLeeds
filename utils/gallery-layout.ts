@@ -59,6 +59,35 @@ export function packGalleryPhotosIntoRows(
   return rows;
 }
 
+/** Share of row width for one photo (capped at half the container). */
+export function getGalleryPhotoWidthFraction(
+  photo: GalleryLayoutPhoto,
+  rowLength: number
+): number {
+  const fraction = photo.units / GALLERY_ROW_CAPACITY;
+  if (rowLength === 1) {
+    return Math.min(fraction, 0.5);
+  }
+  return fraction;
+}
+
+function getGalleryPhotoSlotWidth(
+  photo: GalleryLayoutPhoto,
+  row: GalleryLayoutPhoto[],
+  containerWidth: number,
+  gapPx: number
+): number {
+  if (row.length === 1) {
+    return containerWidth * getGalleryPhotoWidthFraction(photo, 1);
+  }
+
+  const totalUnits = row.reduce((sum, p) => sum + p.units, 0);
+  const gapTotal = gapPx * Math.max(0, row.length - 1);
+  const availableWidth = containerWidth - gapTotal;
+  const unitWidth = availableWidth / totalUnits;
+  return unitWidth * photo.units;
+}
+
 /** Row height = tallest photo when scaled to its slot width. */
 export function computeGalleryRowHeight(
   row: GalleryLayoutPhoto[],
@@ -67,14 +96,14 @@ export function computeGalleryRowHeight(
 ): number {
   if (containerWidth <= 0 || row.length === 0) return 0;
 
-  const totalUnits = row.reduce((sum, photo) => sum + photo.units, 0);
-  const gapTotal = gapPx * Math.max(0, row.length - 1);
-  const availableWidth = containerWidth - gapTotal;
-  const unitWidth = availableWidth / totalUnits;
-
   let maxHeight = 0;
   for (const photo of row) {
-    const itemWidth = unitWidth * photo.units;
+    const itemWidth = getGalleryPhotoSlotWidth(
+      photo,
+      row,
+      containerWidth,
+      gapPx
+    );
     const itemHeight = itemWidth * (photo.height / photo.width);
     maxHeight = Math.max(maxHeight, itemHeight);
   }

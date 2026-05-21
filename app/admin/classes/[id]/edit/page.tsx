@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { PageWrapper } from '@/components/common/PageWrapper';
 import { ClassForm } from '@/components/features/admin/ClassForm';
 import { getClassById } from '@/app/admin/classes/actions';
@@ -21,12 +22,22 @@ export default async function EditClassPage({
     notFound();
   }
 
+  const supabaseAdmin = createAdminClient();
+  const currentPhotoUrl = item.photo
+    ? supabaseAdmin.storage.from('classes-photos').getPublicUrl(item.photo).data
+        .publicUrl
+    : null;
+
   return (
     <PageWrapper
       title="Edit class"
       description={`Editing: ${item.title}`}
     >
-      <ClassForm mode="edit" classItem={item} />
+      <ClassForm
+        mode="edit"
+        classItem={item}
+        currentPhotoUrl={currentPhotoUrl}
+      />
     </PageWrapper>
   );
 }
