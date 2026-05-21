@@ -15,6 +15,10 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { formatDateTimeLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateTimeCellClass,
+  adminDateTimeHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { StatusBadge } from '@/components/common/admin/StatusBadge';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
@@ -74,7 +78,7 @@ export default function MessagesManagementTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-35">Date</TableHead>
+            <TableHead className={adminDateTimeHeadClass}>Date</TableHead>
             <TableHead className="w-30">Name</TableHead>
             <TableHead className="w-45">Email</TableHead>
             <TableHead className="w-35">Subject</TableHead>
@@ -89,7 +93,7 @@ export default function MessagesManagementTable({
               key={msg.id}
               className={msg.read ? '' : 'bg-muted/30'}
             >
-              <TableCell className="text-sm text-muted-foreground">
+              <TableCell className={adminDateTimeCellClass}>
                 {formatDateTimeLabel(msg.created_at)}
               </TableCell>
               <TableCell className="font-medium">{msg.name}</TableCell>

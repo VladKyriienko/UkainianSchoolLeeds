@@ -1,6 +1,12 @@
 'use client';
 
-import { ChevronsUpDown, User } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, ChevronsUpDown, User } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from '@/components/ui/collapsible';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -22,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/providers/auth-provider';
 import { Icon } from '@/components/common/Icon';
+import { cn } from '@/utils/cn';
 import type { ValidLucideIconName } from '@/utils/lucide-icons';
 
 type NavUserMenuItem = {
@@ -35,6 +42,7 @@ export function NavUser() {
   const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
   const { user, userData, signOut } = useAuthContext();
+  const [accountOpen, setAccountOpen] = useState(false);
 
   const handleMobileNavigation = () => {
     if (isMobile) {
@@ -122,29 +130,50 @@ export function NavUser() {
   if (isMobile) {
     return (
       <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuButton size="lg" className="pointer-events-none opacity-100">
-            {userInfo}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-        <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <Link href={profileHref} onClick={handleMobileNavigation}>
-              <Icon iconName="User" className="h-4 w-4" />
-              <span>Profile</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-        <SidebarMenuItem>
-          <form onSubmit={handleSignOut} className="w-full">
-            <SidebarMenuButton asChild>
-              <button type="submit" className="flex w-full items-center gap-2">
-                <Icon iconName="LogOut" className="h-4 w-4" />
-                <span>Sign Out</span>
-              </button>
-            </SidebarMenuButton>
-          </form>
-        </SidebarMenuItem>
+        <Collapsible open={accountOpen} onOpenChange={setAccountOpen}>
+          <SidebarMenuItem>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="h-auto rounded-lg px-4 py-3 text-ukraine-header-fg hover:bg-white/10 hover:text-ukraine-header-fg data-[state=open]:bg-white/10"
+              >
+                {userInfo}
+                <ChevronDown
+                  className={cn(
+                    'ml-auto h-4 w-4 shrink-0 transition-transform',
+                    accountOpen && 'rotate-180'
+                  )}
+                />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+          </SidebarMenuItem>
+          <CollapsibleContent className="space-y-1 px-2 pb-2">
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className="h-auto rounded-lg px-4 py-3 text-base text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg"
+              >
+                <Link href={profileHref} onClick={handleMobileNavigation}>
+                  <Icon iconName="User" className="h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <form onSubmit={handleSignOut} className="w-full">
+                <SidebarMenuButton
+                  asChild
+                  className="h-auto rounded-lg px-4 py-3 text-base text-ukraine-header-muted hover:bg-white/10 hover:text-ukraine-header-fg"
+                >
+                  <button type="submit" className="flex w-full items-center gap-2">
+                    <Icon iconName="LogOut" className="h-4 w-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </SidebarMenuButton>
+              </form>
+            </SidebarMenuItem>
+          </CollapsibleContent>
+        </Collapsible>
       </SidebarMenu>
     );
   }

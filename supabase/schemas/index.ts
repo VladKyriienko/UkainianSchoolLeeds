@@ -485,6 +485,7 @@ export const classes = pgTable(
     description: text('description'),
     descriptionUk: text('description_uk'),
     order: integer('order').notNull().default(0),
+    photo: text('photo'),
     ...timestamps
   },
   () => {

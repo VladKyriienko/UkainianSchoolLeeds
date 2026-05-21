@@ -14,7 +14,14 @@ import { CalendarClock } from 'lucide-react';
 import { deleteSchedule } from '@/app/admin/schedule/actions';
 import type { AdminSchedule } from '@/types';
 import { formatDateLabel, formatDateTimeLabel } from '@/utils/date-format';
+import { cn } from '@/utils/cn';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateCellClass,
+  adminDateHeadClass,
+  adminDateTimeCellClass,
+  adminDateTimeHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
@@ -66,9 +73,9 @@ export default function ScheduleManagementTable({ schedule }: Props) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-45">Date</TableHead>
+            <TableHead className={adminDateHeadClass}>Date</TableHead>
             <TableHead>File</TableHead>
-            <TableHead className="w-45">Uploaded</TableHead>
+            <TableHead className={adminDateTimeHeadClass}>Uploaded</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
         </TableHeader>
@@ -77,11 +84,13 @@ export default function ScheduleManagementTable({ schedule }: Props) {
             const dateLabel = formatDateLabel(item.date);
             return (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{dateLabel}</TableCell>
+                <TableCell className={cn('font-medium', adminDateCellClass)}>
+                  {dateLabel}
+                </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
                   {item.file}
                 </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className={adminDateTimeCellClass}>
                   {formatDateTimeLabel(item.created_at)}
                 </TableCell>
                 <TableCell>

@@ -123,7 +123,7 @@ export function HomeHeroSection({ content }: { content: HeroSectionContent }) {
             asChild
             className="h-12 rounded-full bg-primary px-8 text-primary-foreground shadow-lg shadow-primary/10 transition-colors duration-150 ease-in-out hover:bg-[rgb(29,78,216)]"
           >
-            <Link href="/about/whos-who" className="gap-2">
+            <Link href="/about/welcome" className="gap-2">
               {content.hero.primaryCta}
               <ArrowRight className="h-4 w-4" />
             </Link>

@@ -47,7 +47,7 @@ export default async function AdminClassesPage({
   return (
     <PageWrapper
       title="Classes"
-      description="Create and manage classes."
+      description="Create and manage classes. Drag rows to change display order on the public site."
       actions={
         <Button asChild>
           <Link href="/admin/classes/create">

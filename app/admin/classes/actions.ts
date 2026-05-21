@@ -1,12 +1,50 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { randomUUID } from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminClass } from '@/types';
+import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
+
+async function uploadClassPhotoIfPresent(
+  photoFile: File | null
+): Promise<string | null> {
+  if (!photoFile || photoFile.size === 0) return null;
+
+  if (!photoFile.type.startsWith('image/')) {
+    throw new Error('Photo must be an image');
+  }
+
+  const maxBytes = 5 * 1024 * 1024;
+  if (photoFile.size > maxBytes) {
+    throw new Error('Photo is too large (max 5MB)');
+  }
+
+  const bucket = 'classes-photos';
+  const originalName = photoFile.name || 'photo';
+  const safeName = sanitizeFilename(originalName);
+  const ext = safeName.includes('.') ? safeName.split('.').pop() : null;
+  const base = ext ? safeName.slice(0, -(ext.length + 1)) : safeName;
+  const filename = `${randomUUID()}-${base}${ext ? `.${ext}` : ''}`;
+  const path = `classes/${filename}`;
+
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from(bucket)
+    .upload(path, photoFile, {
+      contentType: photoFile.type,
+      upsert: true
+    });
+
+  if (uploadError) {
+    throw new Error(`Failed to upload photo: ${uploadError.message}`);
+  }
+
+  return path;
+}
 
 export async function listClasses(options?: {
   page?: number;
@@ -29,7 +67,7 @@ export async function listClasses(options?: {
   }
 
   const { data, error, count } = await query
-    .order('order', { ascending: false })
+    .order('order', { ascending: true })
     .order('created_at', { ascending: false })
     .range(from, to);
 
@@ -77,12 +115,17 @@ export async function createClass(
     const orderRaw = formData.get('order');
     const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
 
+    const photoEntry = formData.get('photo');
+    const photoFile = photoEntry instanceof File ? photoEntry : null;
+    const photoPath = await uploadClassPhotoIfPresent(photoFile);
+
     const { error: insertError } = await supabaseAdmin.from('classes').insert({
       title: title.trim(),
       title_uk: titleUk,
       description: description ?? null,
       description_uk: descriptionUk ?? null,
-      order
+      order,
+      ...(photoPath && { photo: photoPath })
     });
 
     if (insertError) {
@@ -118,15 +161,47 @@ export async function updateClass(
     const orderRaw = formData.get('order');
     const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
 
+    const removePhoto = formData.get('remove_photo') === '1';
+    const photoEntry = formData.get('photo');
+    const photoFile = photoEntry instanceof File ? photoEntry : null;
+    const photoPath = await uploadClassPhotoIfPresent(photoFile);
+
+    const updatePayload: Record<string, unknown> = {
+      title: title.trim(),
+      title_uk: titleUk,
+      description: description ?? null,
+      description_uk: descriptionUk ?? null,
+      order
+    };
+
+    if (removePhoto || photoPath) {
+      const { data: existing } = await supabaseAdmin
+        .from('classes')
+        .select('photo')
+        .eq('id', id)
+        .single();
+      const previousPhoto = existing?.photo ?? null;
+
+      if (removePhoto) {
+        if (previousPhoto) {
+          await supabaseAdmin.storage
+            .from('classes-photos')
+            .remove([previousPhoto]);
+        }
+        updatePayload.photo = null;
+      } else if (photoPath) {
+        if (previousPhoto && previousPhoto !== photoPath) {
+          await supabaseAdmin.storage
+            .from('classes-photos')
+            .remove([previousPhoto]);
+        }
+        updatePayload.photo = photoPath;
+      }
+    }
+
     const { error: updateError } = await supabaseAdmin
       .from('classes')
-      .update({
-        title: title.trim(),
-        title_uk: titleUk,
-        description: description ?? null,
-        description_uk: descriptionUk ?? null,
-        order
-      })
+      .update(updatePayload)
       .eq('id', id);
 
     if (updateError) {
@@ -138,6 +213,7 @@ export async function updateClass(
 
     revalidatePath('/admin/classes');
     revalidatePath(`/admin/classes/${id}`);
+    revalidatePath('/parents/class-pages');
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -151,6 +227,16 @@ export async function deleteClass(
   try {
     await verifyAdminAccess();
 
+    const { data: item, error: fetchError } = await supabaseAdmin
+      .from('classes')
+      .select('photo')
+      .eq('id', id)
+      .single();
+
+    if (!fetchError && item?.photo) {
+      await supabaseAdmin.storage.from('classes-photos').remove([item.photo]);
+    }
+
     const { error } = await supabaseAdmin.from('classes').delete().eq('id', id);
 
     if (error) {
@@ -158,6 +244,43 @@ export async function deleteClass(
     }
 
     revalidatePath('/admin/classes');
+    revalidatePath('/parents/class-pages');
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error: msg };
+  }
+}
+
+export async function reorderClasses(
+  orderedIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+  await verifyAdminAccess();
+
+  if (orderedIds.length === 0) {
+    return { success: true };
+  }
+
+  const uniqueIds = new Set(orderedIds);
+  if (uniqueIds.size !== orderedIds.length) {
+    return { success: false, error: 'Duplicate ids in reorder payload' };
+  }
+
+  try {
+    const results = await Promise.all(
+      orderedIds.map((id, index) =>
+        supabaseAdmin.from('classes').update({ order: index }).eq('id', id)
+      )
+    );
+
+    const failed = results.find((result) => result.error);
+    if (failed?.error) {
+      return { success: false, error: failed.error.message };
+    }
+
+    revalidatePath('/admin/classes');
+    revalidatePath('/parents/class-pages');
+
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';

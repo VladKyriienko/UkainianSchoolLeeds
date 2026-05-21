@@ -77,8 +77,9 @@ export async function listNews(options?: {
   }
 
   const { data, error, count } = await query
+    .order('order', { ascending: true })
     .order('date', { ascending: false })
-    .order('order', { ascending: false })
+    .order('created_at', { ascending: false })
     .range(from, to);
 
   if (error) {
@@ -122,11 +123,6 @@ export async function createNews(
     const titleUk = normalizeText(formData.get('title_uk'));
     const description = normalizeText(formData.get('description'));
     const descriptionUk = normalizeText(formData.get('description_uk'));
-    const dateRaw = formData.get('date');
-    const dateStr =
-      dateRaw && typeof dateRaw === 'string' && dateRaw.trim()
-        ? `${dateRaw.trim()}T12:00:00.000Z`
-        : new Date().toISOString();
     const orderRaw = formData.get('order');
     const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
 
@@ -139,7 +135,7 @@ export async function createNews(
       title_uk: titleUk,
       description: description ?? null,
       description_uk: descriptionUk ?? null,
-      date: dateStr,
+      date: new Date().toISOString(),
       order,
       ...(photoPath && { photo: photoPath })
     });
@@ -174,11 +170,6 @@ export async function updateNews(
     const titleUk = normalizeText(formData.get('title_uk'));
     const description = normalizeText(formData.get('description'));
     const descriptionUk = normalizeText(formData.get('description_uk'));
-    const dateRaw = formData.get('date');
-    const dateStr =
-      dateRaw && typeof dateRaw === 'string' && dateRaw.trim()
-        ? `${dateRaw.trim()}T12:00:00.000Z`
-        : new Date().toISOString();
     const orderRaw = formData.get('order');
     const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
 
@@ -192,23 +183,27 @@ export async function updateNews(
       title_uk: titleUk,
       description: description ?? null,
       description_uk: descriptionUk ?? null,
-      date: dateStr,
       order
     };
-    if (removePhoto) {
+    if (removePhoto || photoPath) {
       const { data: existing } = await supabaseAdmin
         .from('news')
         .select('photo')
         .eq('id', id)
         .single();
-      if (existing?.photo) {
-        await supabaseAdmin.storage
-          .from('news-photos')
-          .remove([existing.photo]);
+      const previousPhoto = existing?.photo ?? null;
+
+      if (removePhoto) {
+        if (previousPhoto) {
+          await supabaseAdmin.storage.from('news-photos').remove([previousPhoto]);
+        }
+        updatePayload.photo = null;
+      } else if (photoPath) {
+        if (previousPhoto && previousPhoto !== photoPath) {
+          await supabaseAdmin.storage.from('news-photos').remove([previousPhoto]);
+        }
+        updatePayload.photo = photoPath;
       }
-      updatePayload.photo = null;
-    } else if (photoPath) {
-      updatePayload.photo = photoPath;
     }
 
     const { error: updateError } = await supabaseAdmin
@@ -255,6 +250,45 @@ export async function deleteNews(
     }
 
     revalidatePath('/admin/news');
+    revalidatePath('/parents/news');
+    revalidatePath('/');
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error: msg };
+  }
+}
+
+export async function reorderNews(
+  orderedIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+  await verifyAdminAccess();
+
+  if (orderedIds.length === 0) {
+    return { success: true };
+  }
+
+  const uniqueIds = new Set(orderedIds);
+  if (uniqueIds.size !== orderedIds.length) {
+    return { success: false, error: 'Duplicate ids in reorder payload' };
+  }
+
+  try {
+    const results = await Promise.all(
+      orderedIds.map((id, index) =>
+        supabaseAdmin.from('news').update({ order: index }).eq('id', id)
+      )
+    );
+
+    const failed = results.find((result) => result.error);
+    if (failed?.error) {
+      return { success: false, error: failed.error.message };
+    }
+
+    revalidatePath('/admin/news');
+    revalidatePath('/parents/news');
+    revalidatePath('/');
+
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';

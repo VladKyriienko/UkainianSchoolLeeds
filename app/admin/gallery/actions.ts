@@ -13,6 +13,7 @@ const GALLERY_BUCKET = 'gallery-photos';
 
 function revalidateGalleryPaths(id?: string) {
   revalidatePath('/');
+  revalidatePath('/parents/gallery');
   revalidatePath('/admin/gallery');
   if (id) {
     revalidatePath(`/admin/gallery/${id}`);
@@ -58,7 +59,7 @@ export async function listSchoolGalleryItems(options?: {
   const { data, error, count } = await supabaseAdmin
     .from('gallery')
     .select('*', { count: 'exact' })
-    .order('order', { ascending: false })
+    .order('order', { ascending: true })
     .order('created_at', { ascending: false })
     .range(from, to);
 
@@ -183,6 +184,42 @@ export async function deleteSchoolGalleryItem(
     if (error) return { success: false, error: error.message };
 
     revalidateGalleryPaths(id);
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error'
+    };
+  }
+}
+
+export async function reorderSchoolGallery(
+  orderedIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+  await verifyAdminAccess();
+
+  if (orderedIds.length === 0) {
+    return { success: true };
+  }
+
+  const uniqueIds = new Set(orderedIds);
+  if (uniqueIds.size !== orderedIds.length) {
+    return { success: false, error: 'Duplicate ids in reorder payload' };
+  }
+
+  try {
+    const results = await Promise.all(
+      orderedIds.map((id, index) =>
+        supabaseAdmin.from('gallery').update({ order: index }).eq('id', id)
+      )
+    );
+
+    const failed = results.find((result) => result.error);
+    if (failed?.error) {
+      return { success: false, error: failed.error.message };
+    }
+
+    revalidateGalleryPaths();
     return { success: true };
   } catch (err) {
     return {

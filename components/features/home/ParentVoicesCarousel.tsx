@@ -5,19 +5,29 @@ import { Quote } from 'lucide-react';
 import { CARD_SURFACE_CLASSNAME } from '@/components/ui/card';
 import { isHtmlContent } from '@/utils/rich-text';
 import { clampScrollLeft, scrollSlideIntoView } from './carousel-utils';
+import type { ParentVoiceItem } from '@/types';
 import { PARENT_VOICES_LOOP_SETS } from './home-constants';
 
-export type ParentVoiceItem = { quote: string; attribution: string };
+/** lg layout shows up to 3 cards — avoid cloning reviews when all fit in one viewport row. */
+const PARENT_VOICES_MAX_VISIBLE = 3;
 
-/** Parent testimonials: horizontal scroll + snap; triple DOM loop for infinite wrap; flex-basis % (peek / 3-up). */
+function getParentVoicesLoopSets(itemCount: number): number {
+  if (itemCount <= 1) return 1;
+  if (itemCount <= PARENT_VOICES_MAX_VISIBLE) return 1;
+  return PARENT_VOICES_LOOP_SETS;
+}
+
+/** Parent testimonials: horizontal scroll + snap; optional triple DOM loop for infinite wrap. */
 export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const jumpingRef = useRef(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [canPaginate, setCanPaginate] = useState(false);
 
   const n = items.length;
-  const totalSlides = n * PARENT_VOICES_LOOP_SETS;
+  const loopSets = getParentVoicesLoopSets(n);
+  const totalSlides = n * loopSets;
 
   const getFocusedPhysicalIndex = useCallback((): number => {
     const root = scrollerRef.current;
@@ -51,7 +61,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
   const jumpLoopIfNeeded = useCallback(() => {
     const root = scrollerRef.current;
     const slides = slideRefs.current;
-    if (!root || n <= 1 || jumpingRef.current) return;
+    if (!root || n <= 1 || loopSets <= 1 || jumpingRef.current) return;
 
     const pi = getFocusedPhysicalIndex();
     let delta = 0;
@@ -73,7 +83,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     requestAnimationFrame(() => {
       jumpingRef.current = false;
     });
-  }, [getFocusedPhysicalIndex, n]);
+  }, [getFocusedPhysicalIndex, loopSets, n]);
 
   useEffect(() => {
     slideRefs.current = new Array(totalSlides).fill(null);
@@ -84,30 +94,32 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
     const root = scrollerRef.current;
     if (!root || n === 0) return;
 
-    const mid = slideRefs.current[n];
-    if (!mid) return;
+    const initial = loopSets > 1 ? slideRefs.current[n] : slideRefs.current[0];
+    if (!initial) return;
 
     root.style.scrollBehavior = 'auto';
-    scrollSlideIntoView(root, mid, 'center', 'auto');
+    scrollSlideIntoView(root, initial, 'center', 'auto');
     root.style.scrollBehavior = '';
     setSelectedIndex(0);
-  }, [n]);
+  }, [loopSets, n]);
 
-  /** When all slides fit (no horizontal overflow), center the row; avoids lopsided peek / clipped edges. */
+  /** When all slides fit (no horizontal overflow), center the row and hide pagination dots. */
   useEffect(() => {
     const root = scrollerRef.current;
     if (!root || n === 0) return undefined;
 
-    const syncJustify = () => {
+    const syncLayout = () => {
       const overflow = root.scrollWidth - root.clientWidth;
-      root.style.justifyContent = overflow <= 2 ? 'center' : 'flex-start';
+      const paginate = n > 1 && overflow > 2;
+      root.style.justifyContent = paginate ? 'flex-start' : 'center';
+      setCanPaginate(paginate);
     };
 
-    syncJustify();
-    const ro = new ResizeObserver(syncJustify);
+    syncLayout();
+    const ro = new ResizeObserver(syncLayout);
     ro.observe(root);
     return () => ro.disconnect();
-  }, [n]);
+  }, [loopSets, n, totalSlides]);
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -140,7 +152,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
       root.removeEventListener('scrollend', onScrollEnd);
       window.removeEventListener('resize', updateSelectedFromScroll);
     };
-  }, [n, updateSelectedFromScroll, jumpLoopIfNeeded]);
+  }, [loopSets, n, updateSelectedFromScroll, jumpLoopIfNeeded]);
 
   /** Scroll snap fights programmatic `scrollTo` — disable snap briefly when jumping via dots/keyboard. */
   const scrollToPhysical = useCallback(
@@ -172,7 +184,8 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
       if (n === 0) return;
       const i = ((logicalIdx % n) + n) % n;
       const currentPhysical = getFocusedPhysicalIndex();
-      const candidates = [i, i + n, i + 2 * n];
+      const candidates =
+        loopSets > 1 ? [i, i + n, i + 2 * n] : [i];
       const targetPhysical = candidates.reduce((best, cand) =>
         Math.abs(cand - currentPhysical) < Math.abs(best - currentPhysical) ? cand : best
       );
@@ -180,7 +193,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
         scrollToPhysical(targetPhysical);
       });
     },
-    [n, getFocusedPhysicalIndex, scrollToPhysical]
+    [loopSets, n, getFocusedPhysicalIndex, scrollToPhysical]
   );
 
   const goNext = useCallback(() => {
@@ -204,7 +217,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
         aria-roledescription="carousel"
         aria-label="Parent testimonials"
         onKeyDown={(e) => {
-          if (n <= 1) return;
+          if (!canPaginate) return;
           if (e.key === 'ArrowRight') {
             e.preventDefault();
             goNext();
@@ -219,7 +232,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
           className="flex w-full min-w-0 snap-x snap-mandatory items-stretch gap-4 overflow-x-auto overflow-y-visible overscroll-x-contain px-2 py-5 scroll-pl-2 scroll-pr-2 [-ms-overflow-style:none] scroll-smooth scrollbar-none sm:gap-5 sm:px-3 sm:scroll-pl-3 sm:scroll-pr-3 sm:py-6 lg:gap-6 lg:px-3 lg:scroll-pl-3 lg:scroll-pr-3 lg:py-6 [&::-webkit-scrollbar]:hidden"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {Array.from({ length: PARENT_VOICES_LOOP_SETS }, (_, set) =>
+          {Array.from({ length: loopSets }, (_, set) =>
             items.map((item, index) => {
               const physicalIndex = set * n + index;
               return (
@@ -229,7 +242,7 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
                     slideRefs.current[physicalIndex] = el;
                   }}
                   className="flex min-h-0 shrink-0 grow-0 snap-center flex-col overflow-visible basis-[85%] py-1 md:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-3rem)/3)]"
-                  aria-hidden={set !== 1}
+                  aria-hidden={loopSets > 1 && set !== 1}
                 >
                   <article
                     className={`relative flex min-h-220px flex-1 flex-col p-6 ${CARD_SURFACE_CLASSNAME}`}
@@ -256,24 +269,27 @@ export function ParentVoicesCarousel({ items }: { items: ParentVoiceItem[] }) {
         </div>
       </div>
 
-      <div className="mt-4 flex justify-center gap-2 px-2">
-        {items.map((_, idx) => (
-          <button
-            key={idx}
-            type="button"
-            className={`h-2.5 w-2.5 rounded-full transition-colors ${idx === selectedIndex
-              ? 'bg-primary'
-              : 'bg-muted-foreground/30'
+      {canPaginate ? (
+        <div className="mt-4 flex justify-center gap-2 px-2">
+          {items.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={`h-2.5 w-2.5 rounded-full transition-colors ${
+                idx === selectedIndex
+                  ? 'bg-primary'
+                  : 'bg-muted-foreground/30'
               }`}
-            aria-label={`Slide ${idx + 1}`}
-            aria-current={idx === selectedIndex ? true : undefined}
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSlide(idx);
-            }}
-          />
-        ))}
-      </div>
+              aria-label={`Slide ${idx + 1}`}
+              aria-current={idx === selectedIndex ? true : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSlide(idx);
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
     </>
   );
 }

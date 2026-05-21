@@ -9,8 +9,6 @@ import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminNews } from '@/types';
 import { createNews, updateNews } from '@/app/admin/news/actions';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
-import { parseInputDate, toInputDateValue } from '@/utils/date-format';
-import { DatePicker } from '@/components/common/admin/DatePicker';
 import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 
 type NewsFormProps = {
@@ -26,9 +24,6 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [description, setDescription] = useState(newsItem?.description ?? '');
   const [descriptionUk, setDescriptionUk] = useState(newsItem?.description_uk ?? '');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    parseInputDate(newsItem?.date ?? '')
-  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -117,29 +112,16 @@ export function NewsForm({ mode, newsItem, currentPhotoUrl }: NewsFormProps) {
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="date">Date *</Label>
-          <DatePicker
-            date={selectedDate}
-            onDateChange={setSelectedDate}
-            placeholder="Select date"
-            buttonClassName="h-10"
-          />
-          <input name="date" type="hidden" required value={toInputDateValue(selectedDate)} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="order">Order</Label>
-          <Input
-            id="order"
-            name="order"
-            type="number"
-            min={0}
-            defaultValue={newsItem?.order ?? 0}
-            placeholder="0"
-          />
-        </div>
+      <div className="space-y-2 sm:max-w-xs">
+        <Label htmlFor="order">Order</Label>
+        <Input
+          id="order"
+          name="order"
+          type="number"
+          min={0}
+          defaultValue={newsItem?.order ?? 0}
+          placeholder="0"
+        />
       </div>
 
       <ImageUploadField

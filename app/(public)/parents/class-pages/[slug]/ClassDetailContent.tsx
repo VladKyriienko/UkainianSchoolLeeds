@@ -1,15 +1,16 @@
 'use client';
 
 import { useLanguage } from '@/providers/language-provider';
-import type { PublicNews } from '@/types';
+import type { PublicClass, PublicClassGalleryImage } from '@/types';
 import { isHtmlContent } from '@/utils/rich-text';
-import { AdminDetailPhoto } from '@/components/common/admin/AdminDetailPhoto';
+import { ClassDetailGallery } from './ClassDetailGallery';
 
 type Props = {
-  item: PublicNews;
+  item: PublicClass;
+  galleryPhotos: PublicClassGalleryImage[];
 };
 
-export function NewsDetailContent({ item }: Props) {
+export function ClassDetailContent({ item, galleryPhotos }: Props) {
   const { language } = useLanguage();
   const isUk = language === 'uk';
   const description = isUk
@@ -20,12 +21,14 @@ export function NewsDetailContent({ item }: Props) {
   return (
     <article className="prose prose-neutral dark:prose-invert max-w-none">
       {item.photoUrl ? (
-        <AdminDetailPhoto
-          src={item.photoUrl}
-          alt={title}
-          showLabel={false}
-          className="mb-6"
-        />
+        <div className="not-prose mx-auto mb-6 w-full max-w-4xl overflow-hidden rounded-lg bg-muted">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.photoUrl}
+            alt={title}
+            className="h-[50vh] min-h-72 w-full object-cover"
+          />
+        </div>
       ) : null}
       {description ? (
         isHtmlContent(description) ? (
@@ -39,8 +42,11 @@ export function NewsDetailContent({ item }: Props) {
           </div>
         )
       ) : (
-        <p className="text-muted-foreground">Content will be added soon.</p>
+        <p className="text-muted-foreground">
+          Content for this class will be added soon.
+        </p>
       )}
+      <ClassDetailGallery photos={galleryPhotos} classTitle={title} />
     </article>
   );
 }

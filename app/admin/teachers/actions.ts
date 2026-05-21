@@ -200,20 +200,29 @@ export async function updateTeacher(id: string, formData: FormData) {
     description_uk: descriptionUk,
     category
   };
-  if (removePhoto) {
+  if (removePhoto || photoPath) {
     const { data: existing } = await supabaseAdmin
       .from('teachers')
       .select('photo')
       .eq('id', id)
       .single();
-    if (existing?.photo) {
-      await supabaseAdmin.storage
-        .from('teachers-photos')
-        .remove([existing.photo]);
+    const previousPhoto = existing?.photo ?? null;
+
+    if (removePhoto) {
+      if (previousPhoto) {
+        await supabaseAdmin.storage
+          .from('teachers-photos')
+          .remove([previousPhoto]);
+      }
+      updatePayload.photo = null;
+    } else if (photoPath) {
+      if (previousPhoto && previousPhoto !== photoPath) {
+        await supabaseAdmin.storage
+          .from('teachers-photos')
+          .remove([previousPhoto]);
+      }
+      updatePayload.photo = photoPath;
     }
-    updatePayload.photo = null;
-  } else if (photoPath) {
-    updatePayload.photo = photoPath;
   }
 
   const { error } = await supabaseAdmin

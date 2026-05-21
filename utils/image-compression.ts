@@ -147,7 +147,7 @@ export function validateImageFile(file: File): {
   return { isValid: true };
 }
 
-/** Default compression for admin content photos (news, events, teachers, gallery). */
+/** Default compression for admin content photos (news, events, teachers, classes, gallery). */
 export const ADMIN_PHOTO_COMPRESSION_OPTIONS: CompressionOptions = {
   maxWidth: 1600,
   maxHeight: 1600,

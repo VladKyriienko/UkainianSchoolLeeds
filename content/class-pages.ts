@@ -9,6 +9,8 @@ export type ClassPagesContent = {
   viewClassLabelUk: string;
   noClasses: string;
   noClassesUk: string;
+  galleryHeading: string;
+  galleryHeadingUk: string;
 };
 
 export const CLASS_PAGES_CONTENT: ClassPagesContent = {
@@ -22,4 +24,6 @@ export const CLASS_PAGES_CONTENT: ClassPagesContent = {
   viewClassLabelUk: 'Переглянути клас',
   noClasses: 'No classes yet.',
   noClassesUk: 'Класи ще не додані.',
+  galleryHeading: 'Photo gallery',
+  galleryHeadingUk: 'Галерея фото',
 };

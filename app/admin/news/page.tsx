@@ -53,7 +53,7 @@ export default async function AdminNewsPage({
   return (
     <PageWrapper
       title="News"
-      description="Create and manage news items."
+      description="Create and manage news items. Drag rows to change display order on the public site."
       actions={
         <Button asChild>
           <Link href="/admin/news/create">

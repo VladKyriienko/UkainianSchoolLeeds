@@ -42,28 +42,50 @@ export default function ClassPagesContent({ classes }: Props) {
           const slug = createDocumentSlug({ id: cls.id, title: cls.title });
 
           return (
-            <li key={cls.id}>
-              <Card className="h-full">
-                <CardContent className="pt-6 pb-6">
-                  <h3 className="font-semibold leading-snug font-display text-foreground mb-2">{title}</h3>
-                  {description ? (
-                    isHtmlContent(description) ? (
-                      <div
-                        className="rich-text-preview mb-4"
-                        dangerouslySetInnerHTML={{ __html: description }}
-                      />
-                    ) : (
-                      <p className="mb-4 line-clamp-3 text-muted-foreground">
-                        {description}
-                      </p>
-                    )
-                  ) : null}
-                  <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
-                    <Link href={`/parents/class-pages/${slug}`} className="gap-2">
-                      {viewLabel}
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+            <li key={cls.id} className="h-full">
+              <Card className="flex h-full flex-col overflow-hidden">
+                {cls.photoUrl ? (
+                  <div className="aspect-video w-full shrink-0 overflow-hidden bg-muted">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={cls.photoUrl}
+                      alt={title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : null}
+                <CardContent className="flex flex-1 flex-col pt-4 pb-6">
+                  <div className="mt-auto flex flex-col">
+                    <h3 className="mb-2 line-clamp-2 font-display font-semibold leading-snug text-foreground">
+                      {title}
+                    </h3>
+                    {description ? (
+                      isHtmlContent(description) ? (
+                        <div
+                          className="rich-text-preview mb-4"
+                          dangerouslySetInnerHTML={{ __html: description }}
+                        />
+                      ) : (
+                        <p className="mb-4 line-clamp-3 text-muted-foreground">
+                          {description}
+                        </p>
+                      )
+                    ) : null}
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                    >
+                      <Link
+                        href={`/parents/class-pages/${slug}`}
+                        className="gap-2"
+                      >
+                        {viewLabel}
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </li>

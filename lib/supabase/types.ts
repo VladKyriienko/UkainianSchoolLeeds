@@ -51,6 +51,7 @@ export type Database = {
           description_uk: string | null
           id: string
           order: number
+          photo: string | null
           title: string
           title_uk: string | null
           updated_at: string
@@ -61,6 +62,7 @@ export type Database = {
           description_uk?: string | null
           id?: string
           order?: number
+          photo?: string | null
           title: string
           title_uk?: string | null
           updated_at?: string
@@ -71,6 +73,7 @@ export type Database = {
           description_uk?: string | null
           id?: string
           order?: number
+          photo?: string | null
           title?: string
           title_uk?: string | null
           updated_at?: string

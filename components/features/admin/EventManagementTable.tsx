@@ -15,6 +15,10 @@ import { deleteEvent } from '@/app/admin/events/actions';
 import { useState } from 'react';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
+import {
+  adminDateCellClass,
+  adminDateHeadClass
+} from '@/components/common/admin/dateColumnClasses';
 import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
@@ -89,7 +93,7 @@ export default function EventManagementTable({
           <TableRow>
             <TableHead className="w-22">Photo</TableHead>
             <TableHead className="w-65">Title</TableHead>
-            <TableHead className="w-35">Date</TableHead>
+            <TableHead className={adminDateHeadClass}>Date</TableHead>
             <TableHead className="w-30">Start Time</TableHead>
             <TableHead className="w-30">End Time</TableHead>
             <TableHead className="w-50">Location</TableHead>
@@ -116,7 +120,7 @@ export default function EventManagementTable({
                 )}
               </TableCell>
               <TableCell className="font-medium">{event.title}</TableCell>
-              <TableCell className="text-muted-foreground">
+              <TableCell className={adminDateCellClass}>
                 {formatDateLabel(event.date)}
               </TableCell>
               <TableCell className="text-muted-foreground">

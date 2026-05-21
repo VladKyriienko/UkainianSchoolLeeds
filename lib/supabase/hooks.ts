@@ -713,16 +713,6 @@ export function useInfiniteSupabase<T = Record<string, unknown>>(
     lastQueryIdentity.current = queryIdentity;
   }, [queryIdentity, initialQuery, pageSize, initialPage]);
 
-  // Don't set initial pagination filters - the server already did this
-  // Keeping this commented out for reference:
-  // const hasSetInitialFilters = useRef(false);
-  // useEffect(() => {
-  //   if (!hasSetInitialFilters.current) {
-  //     hasSetInitialFilters.current = true;
-  //     updateFilters({ limit: pageSize, offset: 0 });
-  //   }
-  // }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   // Update allData when pageData changes - only for new pages
   useEffect(() => {
     // Skip if no data

@@ -31,21 +31,33 @@ function AuthenticatedLayoutContent({
   return (
     <>
       <SidebarInset>
-        {/* Mobile Header */}
-        {isMobile && (
-          <MobileHeader
-            showDarkModeToggle={showDarkModeToggle ?? true}
-            burgerPosition={mobileBurgerPosition || 'right'}
-            showLanguageToggle={showLanguageToggle ?? true}
-          />
-        )}
+        {isMobile ? (
+          <>
+            <MobileHeader
+              variant="public"
+              showDarkModeToggle={showDarkModeToggle ?? true}
+              burgerPosition={mobileBurgerPosition || 'right'}
+              showLanguageToggle={showLanguageToggle ?? true}
+            />
+            {/* In-flow spacer for fixed mobile header (same idea as public `pt-21` on main). */}
+            <div
+              className="min-h-18 w-full shrink-0"
+              aria-hidden
+            />
+          </>
+        ) : null}
 
-        <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 md:p-6">
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 flex-col gap-4',
+            isMobile ? 'px-4 pb-4 pt-8' : 'p-4 md:p-6'
+          )}
+        >
           <div
             className={cn(
               'mx-auto w-full min-w-0 max-w-6xl',
               disableCardHover &&
-                '**:data-card:transition-none **:data-card:hover:translate-y-0 **:data-card:hover:shadow-md **:data-card:hover:shadow-primary/5'
+              '**:data-card:transition-none **:data-card:hover:translate-y-0 **:data-card:hover:shadow-md **:data-card:hover:shadow-primary/5'
             )}
           >
             {children}

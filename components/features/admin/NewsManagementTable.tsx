@@ -3,8 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
-  Table,
-  TableBody,
   TableCell,
   TableHead,
   TableHeader,
@@ -12,12 +10,16 @@ import {
 } from '@/components/ui/table';
 import { Newspaper } from 'lucide-react';
 import type { AdminNews } from '@/types';
-import { deleteNews } from '@/app/admin/news/actions';
+import { deleteNews, reorderNews } from '@/app/admin/news/actions';
 import { formatDateLabel } from '@/utils/date-format';
 import { isHtmlContent } from '@/utils/rich-text';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
-import { EntityTableShell } from '@/components/common/admin/EntityTableShell';
 import { RowActionMenu } from '@/components/common/admin/RowActionMenu';
+import {
+  adminDateCellClass,
+  adminDateHeadClass
+} from '@/components/common/admin/dateColumnClasses';
+import { SortableTable } from '@/components/common/admin/SortableTable';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
 
 type NewsManagementTableProps = {
@@ -61,6 +63,14 @@ export default function NewsManagementTable({
     });
   };
 
+  const handleReorder = async (orderedIds: string[]) => {
+    const result = await reorderNews(orderedIds);
+    if (result.success) {
+      router.refresh();
+    }
+    return result;
+  };
+
   if (newsItems.length === 0) {
     return (
       <EntityEmptyState
@@ -71,70 +81,73 @@ export default function NewsManagementTable({
     );
   }
 
+  const canDrag = newsItems.length > 1;
+
   return (
-    <EntityTableShell>
-      <Table>
+    <SortableTable
+      items={newsItems}
+      onReorder={handleReorder}
+      header={
         <TableHeader>
           <TableRow>
-            <TableHead className="w-22">Photo</TableHead>
-            <TableHead className="w-55">Title</TableHead>
-            <TableHead className="w-30">Date</TableHead>
-            <TableHead>Description</TableHead>
+            {canDrag ? <TableHead className="w-12" /> : null}
             <TableHead className="w-20">Order</TableHead>
+            <TableHead className="w-55">Title</TableHead>
+            <TableHead className="w-22">Photo</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead className={adminDateHeadClass}>Created</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {newsItems.map((item) => {
-            const photoUrl = getNewsPhotoUrl(item.photo);
-            return (
-            <TableRow key={item.id}>
-              <TableCell>
-                {photoUrl ? (
-                  <div className="size-14 rounded border overflow-hidden bg-muted shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={photoUrl}
-                      alt=""
-                      className="size-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <span className="text-muted-foreground text-xs">—</span>
-                )}
-              </TableCell>
-              <TableCell className="font-medium">{item.title}</TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {formatDateLabel(item.date)}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm max-w-70">
-                {isHtmlContent(item.description) ? (
-                  <div
-                    className="rich-text-preview"
-                    dangerouslySetInnerHTML={{ __html: item.description || '' }}
+      }
+      renderRow={(item, { canDrag: rowCanDrag, displayIndex }) => {
+        const photoUrl = getNewsPhotoUrl(item.photo);
+        return (
+          <>
+            <TableCell className="text-sm text-muted-foreground">
+              {rowCanDrag ? displayIndex : item.order}
+            </TableCell>
+            <TableCell className="font-medium">{item.title}</TableCell>
+            <TableCell>
+              {photoUrl ? (
+                <div className="size-14 shrink-0 overflow-hidden rounded border bg-muted">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photoUrl}
+                    alt=""
+                    className="size-full object-cover"
                   />
-                ) : (
-                  <span className="line-clamp-3" title={item.description ?? ''}>
-                    {item.description || '—'}
-                  </span>
-                )}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {item.order}
-              </TableCell>
-              <TableCell>
-                <RowActionMenu
-                  isLoading={loadingId === item.id}
-                  onView={() => router.push(`/admin/news/${item.id}`)}
-                  onEdit={() => router.push(`/admin/news/${item.id}/edit`)}
-                  onDelete={() => handleDelete(item.id, item.title)}
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </TableCell>
+            <TableCell className="max-w-70 text-sm text-muted-foreground">
+              {isHtmlContent(item.description) ? (
+                <div
+                  className="rich-text-preview"
+                  dangerouslySetInnerHTML={{ __html: item.description || '' }}
                 />
-              </TableCell>
-            </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </EntityTableShell>
+              ) : (
+                <span className="line-clamp-3" title={item.description ?? ''}>
+                  {item.description || '—'}
+                </span>
+              )}
+            </TableCell>
+            <TableCell className={adminDateCellClass}>
+              {formatDateLabel(item.created_at)}
+            </TableCell>
+            <TableCell>
+              <RowActionMenu
+                isLoading={loadingId === item.id}
+                onView={() => router.push(`/admin/news/${item.id}`)}
+                onEdit={() => router.push(`/admin/news/${item.id}/edit`)}
+                onDelete={() => handleDelete(item.id, item.title)}
+              />
+            </TableCell>
+          </>
+        );
+      }}
+    />
   );
 }

@@ -11,14 +11,19 @@ function withPhotoUrl(supabase: ReturnType<typeof createAdminClient>, item: Tabl
   return { ...item, photoUrl };
 }
 
-export async function getNews(): Promise<PublicNews[]> {
+export async function getNews(limit?: number): Promise<PublicNews[]> {
   const supabase = createAdminClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from('news')
     .select('*')
     .order('order', { ascending: true })
-    .order('date', { ascending: false })
     .order('created_at', { ascending: false });
+
+  if (limit !== undefined) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching news:', error);

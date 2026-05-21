@@ -26,7 +26,7 @@ export async function createMessageAction(input: CreateMessageInput) {
 
   const supabase = createAdminClient();
 
-  // `messages` might not exist yet in `utils/supabase/types.ts`.
+  // `messages` might not exist yet in `lib/supabase/types.ts`.
   // Avoid `any` while still allowing inserts.
   type UntypedInsertResponse = { error: { message: string } | null };
   type UntypedSupabase = {
