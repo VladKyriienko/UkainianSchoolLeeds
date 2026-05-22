@@ -15,12 +15,12 @@ export function HomeAboutSection({ about }: { about: HomeContent['about'] }) {
       className="relative left-1/2 w-dvw max-w-none -translate-x-1/2 scroll-mt-24"
     >
       <div className="w-full overflow-visible rounded-none bg-card lg:grid lg:min-h-[min(28rem,65vh)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)]">
-        <div className="relative aspect-5/4 min-h-editor lg:aspect-auto lg:min-h-[min(28rem,65vh)]">
+        <div className="relative mx-auto aspect-5/4 w-full max-w-full overflow-hidden min-h-editor lg:mx-0 lg:aspect-auto lg:min-h-[min(28rem,65vh)]">
           <Image
             src={about.imageSrc}
             alt={about.imageAlt}
             fill
-            className="object-cover"
+            className="object-cover object-center"
             sizes="(max-width: 1024px) 100vw, 50vw"
             loading="lazy"
           />
