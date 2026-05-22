@@ -22,14 +22,30 @@ const manrope = Manrope({
 
 const title = 'Ukrainia School';
 const description = 'Ukrainia School is a school for Ukrainian children.';
+const themeColor = '#2563EB';
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: title,
   description: description,
-  icons: {
-    icon: '/logo.png'
+  applicationName: title,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title
   },
+  formatDetection: {
+    telephone: false
+  },
+  icons: {
+    icon: [
+      { url: '/logo.png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: '/icons/apple-touch-icon.png'
+  },
+  themeColor: themeColor,
   openGraph: {
     title: title,
     description: description
@@ -40,7 +56,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: themeColor
 };
 
 export default async function Layout({ children }: PropsWithChildren) {
@@ -63,17 +81,17 @@ export default async function Layout({ children }: PropsWithChildren) {
           src="https://tweakcn.com/live-preview.min.js"
         />
       </head>
-      <Providers user={user} userData={profileData}>
-        <body
-          className={cn(
-            inter.className,
-            'min-h-full touch-manipulation bg-background text-foreground antialiased text-body'
-          )}
-          suppressHydrationWarning
-        >
+      <body
+        className={cn(
+          inter.className,
+          'min-h-full touch-manipulation bg-background text-foreground antialiased text-body'
+        )}
+        suppressHydrationWarning
+      >
+        <Providers user={user} userData={profileData}>
           {children}
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   );
 }
