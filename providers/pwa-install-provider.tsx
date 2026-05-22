@@ -9,7 +9,11 @@ import {
   type ReactNode
 } from 'react';
 import type { BeforeInstallPromptEvent } from '@/lib/pwa/device';
-import { isIosDevice, isStandaloneMode } from '@/lib/pwa/device';
+import {
+  isIosDevice,
+  isPwaInstalledOnDevice,
+  isStandaloneMode
+} from '@/lib/pwa/device';
 
 type PwaInstallContextValue = {
   canShowInstall: boolean;
@@ -23,23 +27,56 @@ const PwaInstallContext = createContext<PwaInstallContextValue | null>(null);
 export function PwaInstallProvider({ children }: { children: ReactNode }) {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [isStandalone, setIsStandalone] = useState(false);
   const [isIos, setIsIos] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  const syncInstalledState = useCallback(async () => {
+    if (isStandaloneMode()) {
+      setIsInstalled(true);
+      return;
+    }
+
+    const onDevice = await isPwaInstalledOnDevice();
+    setIsInstalled(onDevice);
+  }, []);
 
   useEffect(() => {
-    setIsStandalone(isStandaloneMode());
     setIsIos(isIosDevice());
+    void syncInstalledState();
 
     const onBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
+    const onAppInstalled = () => {
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+    };
+
+    const standaloneMq = window.matchMedia('(display-mode: standalone)');
+    const onDisplayModeChange = () => {
+      void syncInstalledState();
+    };
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void syncInstalledState();
+      }
+    };
+
     window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('appinstalled', onAppInstalled);
+    standaloneMq.addEventListener('change', onDisplayModeChange);
+    document.addEventListener('visibilitychange', onVisible);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('appinstalled', onAppInstalled);
+      standaloneMq.removeEventListener('change', onDisplayModeChange);
+      document.removeEventListener('visibilitychange', onVisible);
     };
-  }, []);
+  }, [syncInstalledState]);
 
   const install = useCallback(async () => {
     if (!deferredPrompt) return false;
@@ -48,6 +85,9 @@ export function PwaInstallProvider({ children }: { children: ReactNode }) {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       setDeferredPrompt(null);
+      if (outcome === 'accepted') {
+        setIsInstalled(true);
+      }
       return outcome === 'accepted';
     } catch {
       return false;
@@ -55,7 +95,7 @@ export function PwaInstallProvider({ children }: { children: ReactNode }) {
   }, [deferredPrompt]);
 
   const value: PwaInstallContextValue = {
-    canShowInstall: !isStandalone,
+    canShowInstall: !isInstalled,
     hasNativeInstall: Boolean(deferredPrompt),
     isIos,
     install

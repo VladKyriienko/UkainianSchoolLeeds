@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
 import { PWA_COPY } from '@/lib/pwa/pwa-copy';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
+import {
+  dismissPwaBanner,
+  isPwaBannerDismissed
+} from '@/lib/pwa/banner-dismiss';
 import { cn } from '@/utils/cn';
-
-const DISMISS_KEY = 'pwa-install-dismissed';
 
 export function InstallPwaBanner() {
   const { language } = useLanguage();
@@ -17,8 +19,11 @@ export function InstallPwaBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!canShowInstall) return;
-    if (localStorage.getItem(DISMISS_KEY) === '1') return;
+    if (!canShowInstall) {
+      setVisible(false);
+      return;
+    }
+    if (isPwaBannerDismissed()) return;
 
     const narrow =
       typeof window !== 'undefined' &&
@@ -29,7 +34,7 @@ export function InstallPwaBanner() {
   }, [canShowInstall]);
 
   const dismiss = useCallback(() => {
-    localStorage.setItem(DISMISS_KEY, '1');
+    dismissPwaBanner();
     setVisible(false);
   }, []);
 
