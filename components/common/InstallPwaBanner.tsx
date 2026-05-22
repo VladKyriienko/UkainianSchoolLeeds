@@ -5,7 +5,7 @@ import { X, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
 import { PWA_COPY } from '@/lib/pwa/pwa-copy';
-import { isIosDevice, usePwaInstall } from '@/hooks/use-pwa-install';
+import { usePwaInstall } from '@/hooks/use-pwa-install';
 import { cn } from '@/utils/cn';
 
 const DISMISS_KEY = 'pwa-install-dismissed';
@@ -13,9 +13,8 @@ const DISMISS_KEY = 'pwa-install-dismissed';
 export function InstallPwaBanner() {
   const { language } = useLanguage();
   const copy = PWA_COPY[language];
-  const { canShowInstall, hasNativeInstall, install } = usePwaInstall();
+  const { canShowInstall, hasNativeInstall, isIos, install } = usePwaInstall();
   const [visible, setVisible] = useState(false);
-  const [isIosDeviceState, setIsIosDeviceState] = useState(false);
 
   useEffect(() => {
     if (!canShowInstall) return;
@@ -26,7 +25,6 @@ export function InstallPwaBanner() {
       window.matchMedia('(max-width: 768px)').matches;
     if (!narrow) return;
 
-    setIsIosDeviceState(isIosDevice());
     setVisible(true);
   }, [canShowInstall]);
 
@@ -56,11 +54,14 @@ export function InstallPwaBanner() {
           <div className="min-w-0 space-y-1">
             <p className="font-semibold text-foreground">{copy.title}</p>
             <p className="text-sm text-muted-foreground">{copy.body}</p>
-            {isIosDeviceState && !hasNativeInstall ? (
+            {isIos && !hasNativeInstall ? (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Share className="h-4 w-4 shrink-0" aria-hidden />
                 {copy.iosHint}
               </p>
+            ) : null}
+            {!isIos && !hasNativeInstall ? (
+              <p className="text-sm text-muted-foreground">{copy.browserHint}</p>
             ) : null}
           </div>
           <Button
