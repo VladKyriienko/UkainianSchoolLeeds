@@ -11,9 +11,6 @@ export const HERO_TRUST_ICON_PATHS = [
 ] as const;
 
 export const HERO_PNG_ICONS = {
-  learning: '/home/hero-icon-learning.png',
-  location: '/home/hero-icon-location.png',
-  book: '/home/hero-icon-book.png',
   teacher: '/home/hero-icon-teacher.png',
   community: '/home/hero-icon-community.png',
   creative: '/home/hero-icon-creative.png'
