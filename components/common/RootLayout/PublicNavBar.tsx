@@ -10,6 +10,7 @@ import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
 import { ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { InstallPwaMenuButton } from '@/components/common/InstallPwaMenuButton';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
 import {
@@ -316,8 +317,8 @@ export function PublicNavBar({
               >
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-                <div className="flex flex-col gap-6 pt-2">
-                  <nav className="flex flex-col gap-2 flex-1">
+                <div className="flex min-h-full flex-col gap-6 pt-2 pb-4">
+                  <nav className="flex flex-1 flex-col gap-2 overflow-y-auto">
                     {navigationItems.map((item) => {
                       const isActive = activeKey === item.key;
                       const hasChildren = item.key === 'keyInfo' || !!item.children?.length;
@@ -401,6 +402,10 @@ export function PublicNavBar({
                       );
                     })}
                   </nav>
+                  <InstallPwaMenuButton
+                    variant="public"
+                    onAction={closeMobileMenu}
+                  />
                 </div>
               </SheetContent>
             </Sheet>

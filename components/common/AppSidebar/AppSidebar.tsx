@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavMain } from './NavMain';
 import { NavUser } from './NavUser';
+import { InstallPwaMenuButton } from '@/components/common/InstallPwaMenuButton';
 import { CompletionBanner } from '@/components/common/CompletionBanner/CompletionBanner';
 import DarkModeToggle from '@/components/common/RootLayout/DarkModeToggle';
 import LanguageToggle from '@/components/common/RootLayout/LanguageToggle';
@@ -33,7 +34,7 @@ export function AppSidebar({
   side: desktopSidebarPosition = 'left',
   ...props
 }: AppSidebarProps) {
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
   const { language } = useLanguage();
 
   return (
@@ -129,6 +130,15 @@ export function AppSidebar({
         )}
       >
         <NavUser />
+        {isMobile ? (
+          <div className="px-2 pb-2">
+            <InstallPwaMenuButton
+              variant="public"
+              className="border-t-0 pt-2"
+              onAction={() => setOpenMobile(false)}
+            />
+          </div>
+        ) : null}
       </SidebarFooter>
 
       <SidebarRail />

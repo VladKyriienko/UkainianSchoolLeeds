@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { format, startOfToday, isSameDay, parseISO } from 'date-fns';
+import { format, startOfToday, startOfDay, isSameDay, parseISO } from 'date-fns';
 import { enUS, uk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -58,7 +58,10 @@ export function ListView({ events, schedules }: ListViewProps) {
   const dateLocale = language === 'uk' ? uk : enUS;
   const [mounted, setMounted] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(startOfToday());
-  const [currentPage, setCurrentPage] = useState(1);
+  /** Pages forward from anchor date (1-based). */
+  const [forwardPage, setForwardPage] = useState(1);
+  /** 0 = forward mode; 1+ = chunks into the past (10 items per step). */
+  const [backwardPage, setBackwardPage] = useState(0);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [showSelectedDateInTitle, setShowSelectedDateInTitle] = useState(true);
   const [selectedSchedule, setSelectedSchedule] = useState<{
@@ -96,22 +99,56 @@ export function ListView({ events, schedules }: ListViewProps) {
     });
   }, [events, schedules, content.schedule.title]);
 
-  // Filter events by start date
-  const filteredItems = useMemo(() => {
-    if (!startDate) return allItems;
+  const anchorDate = useMemo(
+    () => startOfDay(startDate ?? startOfToday()),
+    [startDate]
+  );
 
-    return allItems.filter((item) => {
-      const eventDate = parseISO(item.date);
-      return eventDate >= startDate || isSameDay(eventDate, startDate);
-    });
-  }, [allItems, startDate]);
+  const { forwardItems, pastItems } = useMemo(() => {
+    const forward: CalendarListItem[] = [];
+    const past: CalendarListItem[] = [];
 
-  // Paginate events
-  const totalPages = Math.ceil(filteredItems.length / EVENTS_PER_PAGE);
+    for (const item of allItems) {
+      const itemDay = startOfDay(parseISO(item.date));
+      if (itemDay >= anchorDate) {
+        forward.push(item);
+      } else {
+        past.push(item);
+      }
+    }
+
+    return { forwardItems: forward, pastItems: past };
+  }, [allItems, anchorDate]);
+
+  const forwardTotalPages = Math.max(
+    1,
+    Math.ceil(forwardItems.length / EVENTS_PER_PAGE)
+  );
+
   const paginatedItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
-    return filteredItems.slice(startIndex, startIndex + EVENTS_PER_PAGE);
-  }, [filteredItems, currentPage]);
+    if (backwardPage > 0) {
+      const end = pastItems.length - (backwardPage - 1) * EVENTS_PER_PAGE;
+      const start = Math.max(0, end - EVENTS_PER_PAGE);
+      return pastItems.slice(start, end);
+    }
+
+    const startIndex = (forwardPage - 1) * EVENTS_PER_PAGE;
+    return forwardItems.slice(startIndex, startIndex + EVENTS_PER_PAGE);
+  }, [forwardItems, pastItems, forwardPage, backwardPage]);
+
+  const canGoPrev = useMemo(() => {
+    if (backwardPage > 0) {
+      const end = pastItems.length - (backwardPage - 1) * EVENTS_PER_PAGE;
+      const start = Math.max(0, end - EVENTS_PER_PAGE);
+      return start > 0;
+    }
+    return forwardPage > 1 || pastItems.length > 0;
+  }, [backwardPage, forwardPage, pastItems.length]);
+
+  const canGoNext = useMemo(() => {
+    if (backwardPage > 0) return true;
+    return forwardPage < forwardTotalPages;
+  }, [backwardPage, forwardPage, forwardTotalPages]);
 
   // Calculate date range label
   const dateRangeLabel = useMemo(() => {
@@ -172,35 +209,64 @@ export function ListView({ events, schedules }: ListViewProps) {
 
   const sortedDates = Object.keys(groupedItems).sort();
 
-  // Reset to page 1 when start date changes
   useEffect(() => {
-    setCurrentPage(1);
+    setForwardPage(1);
+    setBackwardPage(0);
     setShowSelectedDateInTitle(true);
   }, [startDate]);
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+    if (backwardPage > 0) {
+      const end = pastItems.length - (backwardPage - 1) * EVENTS_PER_PAGE;
+      const start = Math.max(0, end - EVENTS_PER_PAGE);
+      if (start > 0) {
+        setBackwardPage(backwardPage + 1);
+        setShowSelectedDateInTitle(false);
+      }
+      return;
+    }
+
+    if (forwardPage > 1) {
+      setForwardPage(forwardPage - 1);
+      setShowSelectedDateInTitle(false);
+      return;
+    }
+
+    if (pastItems.length > 0) {
+      setBackwardPage(1);
       setShowSelectedDateInTitle(false);
     }
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+    if (backwardPage > 0) {
+      if (backwardPage === 1) {
+        setBackwardPage(0);
+        setForwardPage(1);
+      } else {
+        setBackwardPage(backwardPage - 1);
+      }
+      setShowSelectedDateInTitle(false);
+      return;
+    }
+
+    if (forwardPage < forwardTotalPages) {
+      setForwardPage(forwardPage + 1);
       setShowSelectedDateInTitle(false);
     }
   };
 
   const handleToday = () => {
     setStartDate(startOfToday());
-    setCurrentPage(1);
+    setForwardPage(1);
+    setBackwardPage(0);
     setShowSelectedDateInTitle(true);
   };
 
   const handleDateSelect = (date: Date | undefined) => {
     setStartDate(date);
-    setCurrentPage(1);
+    setForwardPage(1);
+    setBackwardPage(0);
     setDatePickerOpen(false);
     setShowSelectedDateInTitle(true);
   };
@@ -218,7 +284,7 @@ export function ListView({ events, schedules }: ListViewProps) {
             variant="outline"
             size="icon"
             onClick={handlePrevPage}
-            disabled={currentPage <= 1}
+            disabled={!canGoPrev}
             aria-label={content.navigation.previousPage}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -227,7 +293,7 @@ export function ListView({ events, schedules }: ListViewProps) {
             variant="outline"
             size="icon"
             onClick={handleNextPage}
-            disabled={currentPage >= totalPages}
+            disabled={!canGoNext}
             aria-label={content.navigation.nextPage}
           >
             <ChevronRight className="h-4 w-4" />

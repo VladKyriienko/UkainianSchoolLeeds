@@ -4,56 +4,21 @@ import { useCallback, useEffect, useState } from 'react';
 import { X, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
+import { PWA_COPY } from '@/lib/pwa/pwa-copy';
+import { isIosDevice, usePwaInstall } from '@/hooks/use-pwa-install';
 import { cn } from '@/utils/cn';
 
 const DISMISS_KEY = 'pwa-install-dismissed';
 
-const COPY = {
-  en: {
-    title: 'Install the app',
-    body: 'Add this site to your home screen for a full-screen experience without the browser bar.',
-    install: 'Install',
-    iosHint: 'Tap Share, then “Add to Home Screen”.',
-    dismiss: 'Not now'
-  },
-  uk: {
-    title: 'Встановити додаток',
-    body: 'Додайте сайт на головний екран — відкриватиметься на весь екран без смуги браузера.',
-    install: 'Встановити',
-    iosHint: 'Натисніть «Поділитися», потім «На Початковий екран».',
-    dismiss: 'Не зараз'
-  }
-} as const;
-
-function isStandaloneMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as Navigator & { standalone?: boolean }).standalone ===
-      true
-  );
-}
-
-function isIos(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-};
-
 export function InstallPwaBanner() {
   const { language } = useLanguage();
-  const copy = COPY[language];
+  const copy = PWA_COPY[language];
+  const { canShowInstall, hasNativeInstall, install } = usePwaInstall();
   const [visible, setVisible] = useState(false);
-  const [isIosDevice, setIsIosDevice] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [isIosDeviceState, setIsIosDeviceState] = useState(false);
 
   useEffect(() => {
-    if (isStandaloneMode()) return;
+    if (!canShowInstall) return;
     if (localStorage.getItem(DISMISS_KEY) === '1') return;
 
     const narrow =
@@ -61,32 +26,19 @@ export function InstallPwaBanner() {
       window.matchMedia('(max-width: 768px)').matches;
     if (!narrow) return;
 
-    setIsIosDevice(isIos());
+    setIsIosDeviceState(isIosDevice());
     setVisible(true);
-
-    const onBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener('beforeinstallprompt', onBeforeInstall);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
-    };
-  }, []);
+  }, [canShowInstall]);
 
   const dismiss = useCallback(() => {
     localStorage.setItem(DISMISS_KEY, '1');
     setVisible(false);
   }, []);
 
-  const install = useCallback(async () => {
-    if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    setDeferredPrompt(null);
-    dismiss();
-  }, [deferredPrompt, dismiss]);
+  const handleInstall = useCallback(async () => {
+    const accepted = await install();
+    if (accepted) dismiss();
+  }, [install, dismiss]);
 
   if (!visible) return null;
 
@@ -104,7 +56,7 @@ export function InstallPwaBanner() {
           <div className="min-w-0 space-y-1">
             <p className="font-semibold text-foreground">{copy.title}</p>
             <p className="text-sm text-muted-foreground">{copy.body}</p>
-            {isIosDevice ? (
+            {isIosDeviceState && !hasNativeInstall ? (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Share className="h-4 w-4 shrink-0" aria-hidden />
                 {copy.iosHint}
@@ -123,8 +75,8 @@ export function InstallPwaBanner() {
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
-          {deferredPrompt ? (
-            <Button type="button" size="sm" onClick={install}>
+          {hasNativeInstall ? (
+            <Button type="button" size="sm" onClick={handleInstall}>
               {copy.install}
             </Button>
           ) : null}
