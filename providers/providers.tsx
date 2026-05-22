@@ -2,6 +2,7 @@
 
 import { AuthProvider } from '@/providers/auth-provider';
 import { LanguageProvider } from './language-provider';
+import { PwaInstallProvider } from '@/providers/pwa-install-provider';
 import { InstallPwaBanner } from '@/components/common/InstallPwaBanner';
 import { ScrollToTopOnNavigate } from '@/components/common/ScrollToTopOnNavigate';
 import { User } from '@supabase/supabase-js';
@@ -18,11 +19,13 @@ export default function Providers({
 }) {
   return (
     <LanguageProvider>
-      <AuthProvider userResponse={user} userWithRoles={userData}>
-        <ScrollToTopOnNavigate />
-        {children}
-        <InstallPwaBanner />
-      </AuthProvider>
+      <PwaInstallProvider>
+        <AuthProvider userResponse={user} userWithRoles={userData}>
+          <ScrollToTopOnNavigate />
+          {children}
+          <InstallPwaBanner />
+        </AuthProvider>
+      </PwaInstallProvider>
     </LanguageProvider>
   );
 }

@@ -8,6 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Ukrainia School',
     description:
       'Ukrainian Saturday School of Leeds — school for Ukrainian children.',
+    id: '/',
     start_url: '/',
     scope: '/',
     display: 'standalone',

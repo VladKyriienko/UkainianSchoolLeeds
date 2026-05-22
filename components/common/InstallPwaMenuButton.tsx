@@ -22,7 +22,7 @@ export function InstallPwaMenuButton({
   const { language } = useLanguage();
   const copy = PWA_COPY[language];
   const { canShowInstall, hasNativeInstall, isIos, install } = usePwaInstall();
-  const [showIosHint, setShowIosHint] = useState(false);
+  const [hint, setHint] = useState<'ios' | 'browser' | null>(null);
 
   if (!canShowInstall) return null;
 
@@ -30,13 +30,20 @@ export function InstallPwaMenuButton({
 
   const handleClick = async () => {
     if (hasNativeInstall) {
-      await install();
-      onAction?.();
+      const accepted = await install();
+      if (accepted) {
+        setHint(null);
+        onAction?.();
+      }
       return;
     }
+
     if (isIos) {
-      setShowIosHint((prev) => !prev);
+      setHint('ios');
+      return;
     }
+
+    setHint('browser');
   };
 
   return (
@@ -60,7 +67,7 @@ export function InstallPwaMenuButton({
         <Download className="h-4 w-4 shrink-0" aria-hidden />
         {copy.install}
       </Button>
-      {showIosHint && isIos && !hasNativeInstall ? (
+      {hint === 'ios' ? (
         <p
           className={cn(
             'mt-2 flex items-start gap-1.5 text-sm',
@@ -69,6 +76,16 @@ export function InstallPwaMenuButton({
         >
           <Share className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           {copy.iosHint}
+        </p>
+      ) : null}
+      {hint === 'browser' ? (
+        <p
+          className={cn(
+            'mt-2 text-sm',
+            isPublic ? 'text-ukraine-header-muted' : 'text-muted-foreground'
+          )}
+        >
+          {copy.browserHint}
         </p>
       ) : null}
     </div>
