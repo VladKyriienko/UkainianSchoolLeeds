@@ -1,6 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import type { Database } from '@/lib/supabase/types';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import type { AdminEvent } from '@/types';
@@ -9,6 +10,13 @@ import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
+
+type EventUpdate = Database['public']['Tables']['events']['Update'];
+
+function getFormString(formData: FormData, key: string): string | null {
+  const value = formData.get(key);
+  return typeof value === 'string' ? value : null;
+}
 
 async function uploadEventPhotoIfPresent(
   photoFile: File | null
@@ -190,36 +198,35 @@ export async function updateEvent(
   try {
     await verifyAdminAccess();
 
-    const title = formData.get('title');
-    if (!title || typeof title !== 'string' || !title.trim()) {
+    const title = getFormString(formData, 'title');
+    if (!title?.trim()) {
       return { success: false, error: 'Title is required' };
     }
 
-    const date = formData.get('date');
-    if (!date || typeof date !== 'string') {
+    const date = getFormString(formData, 'date');
+    if (!date) {
       return { success: false, error: 'Date is required' };
     }
 
-    const description = normalizeText(formData.get('description'));
-    const descriptionUk = normalizeText(formData.get('description_uk'));
-    const location = normalizeText(formData.get('location'));
-    const locationUk = normalizeText(formData.get('location_uk'));
-    const titleUk = normalizeText(formData.get('title_uk'));
-    const startTime = normalizeTimeField(formData.get('start_time'));
-    const endTime = normalizeTimeField(formData.get('end_time'));
+    const description = normalizeText(getFormString(formData, 'description'));
+    const descriptionUk = normalizeText(getFormString(formData, 'description_uk'));
+    const location = normalizeText(getFormString(formData, 'location'));
+    const locationUk = normalizeText(getFormString(formData, 'location_uk'));
+    const titleUk = normalizeText(getFormString(formData, 'title_uk'));
+    const startTime = normalizeTimeField(getFormString(formData, 'start_time'));
+    const endTime = normalizeTimeField(getFormString(formData, 'end_time'));
 
-    // Parse date
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) {
       return { success: false, error: 'Invalid date format' };
     }
 
-    const removePhoto = formData.get('remove_photo') === '1';
+    const removePhoto = getFormString(formData, 'remove_photo') === '1';
     const photoEntry = formData.get('photo');
     const photoFile = photoEntry instanceof File ? photoEntry : null;
     const photoPath = await uploadEventPhotoIfPresent(photoFile);
 
-    const updatePayload: Record<string, unknown> = {
+    const updatePayload: EventUpdate = {
       title: title.trim(),
       title_uk: titleUk,
       description,

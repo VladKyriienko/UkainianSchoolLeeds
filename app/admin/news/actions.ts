@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
+import type { Database } from '@/lib/supabase/types';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminNews } from '@/types';
 import { randomUUID } from 'crypto';
@@ -9,6 +10,8 @@ import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
+
+type NewsUpdate = Database['public']['Tables']['news']['Update'];
 
 async function uploadNewsPhotoIfPresent(
   photoFile: File | null
@@ -178,7 +181,7 @@ export async function updateNews(
     const photoFile = photoEntry instanceof File ? photoEntry : null;
     const photoPath = await uploadNewsPhotoIfPresent(photoFile);
 
-    const updatePayload: Record<string, unknown> = {
+    const updatePayload: NewsUpdate = {
       title: title.trim(),
       title_uk: titleUk,
       description: description ?? null,
