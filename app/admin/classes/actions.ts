@@ -3,12 +3,20 @@
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
+import type { Database } from '@/lib/supabase/types';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminClass } from '@/types';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
+
+type ClassUpdate = Database['public']['Tables']['classes']['Update'];
+
+function getFormString(formData: FormData, key: string): string | null {
+  const value = formData.get(key);
+  return typeof value === 'string' ? value : null;
+}
 
 async function uploadClassPhotoIfPresent(
   photoFile: File | null
@@ -150,23 +158,25 @@ export async function updateClass(
   try {
     await verifyAdminAccess();
 
-    const title = formData.get('title');
-    if (!title || typeof title !== 'string' || !title.trim()) {
+    const title = getFormString(formData, 'title');
+    if (!title?.trim()) {
       return { success: false, error: 'Title is required' };
     }
 
-    const titleUk = normalizeText(formData.get('title_uk'));
-    const description = normalizeText(formData.get('description'));
-    const descriptionUk = normalizeText(formData.get('description_uk'));
-    const orderRaw = formData.get('order');
-    const order = Math.max(0, parseInt(String(orderRaw ?? '0'), 10) || 0);
+    const titleUk = normalizeText(getFormString(formData, 'title_uk'));
+    const description = normalizeText(getFormString(formData, 'description'));
+    const descriptionUk = normalizeText(getFormString(formData, 'description_uk'));
 
-    const removePhoto = formData.get('remove_photo') === '1';
+    const orderRaw = getFormString(formData, 'order');
+    const order = Math.max(0, parseInt(orderRaw ?? '0', 10) || 0);
+
+    const removePhoto = getFormString(formData, 'remove_photo') === '1';
+
     const photoEntry = formData.get('photo');
     const photoFile = photoEntry instanceof File ? photoEntry : null;
     const photoPath = await uploadClassPhotoIfPresent(photoFile);
 
-    const updatePayload: Record<string, unknown> = {
+    const updatePayload: ClassUpdate = {
       title: title.trim(),
       title_uk: titleUk,
       description: description ?? null,
