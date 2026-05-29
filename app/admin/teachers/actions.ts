@@ -1,6 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import type { Database } from '@/lib/supabase/types';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import type { AdminTeacher } from '@/types';
@@ -9,6 +10,8 @@ import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
 
 const supabaseAdmin = createAdminClient();
+
+type TeacherUpdate = Database['public']['Tables']['teachers']['Update'];
 
 async function uploadTeacherPhotoIfPresent(
   photoFile: File | null
@@ -189,7 +192,7 @@ export async function updateTeacher(id: string, formData: FormData) {
   const photoFile = photoEntry instanceof File ? photoEntry : null;
   const photoPath = await uploadTeacherPhotoIfPresent(photoFile);
 
-  const updatePayload: Record<string, unknown> = {
+  const updatePayload: TeacherUpdate = {
     name,
     name_uk: nameUk,
     title,
