@@ -12,7 +12,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/common/PasswordInput';
-import { GoogleOAuthButton } from '@/components/common/GoogleOAuthButton';
 import { getAuthTypes } from '@/lib/auth/settings';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -29,7 +28,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const { allowOauth, allowSignUp } = getAuthTypes();
+  const { allowSignUp } = getAuthTypes();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,21 +54,6 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {allowOauth && (
-            <div className="mb-6">
-              <GoogleOAuthButton text="Sign in with Google" />
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
