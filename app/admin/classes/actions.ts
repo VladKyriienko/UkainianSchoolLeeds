@@ -8,6 +8,7 @@ import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminClass } from '@/types';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
+import { CLASS_LIST_COLUMNS, CLASS_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -67,7 +68,7 @@ export async function listClasses(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('classes').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('classes').select(CLASS_LIST_COLUMNS, { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -94,7 +95,7 @@ export async function getClassById(id: string): Promise<AdminClass | null> {
 
   const { data, error } = await supabaseAdmin
     .from('classes')
-    .select('*')
+    .select(CLASS_COLUMNS)
     .eq('id', id)
     .single();
 

@@ -6,6 +6,7 @@ import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminDocument, DocumentType } from '@/types';
 import { DOCUMENT_TYPES } from '@/app/admin/documents/constants';
 import { normalizeText } from '@/utils/text';
+import { DOCUMENT_LIST_COLUMNS, DOCUMENT_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -24,7 +25,7 @@ export async function listDocuments(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('documents').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('documents').select(DOCUMENT_LIST_COLUMNS, { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -55,7 +56,7 @@ export async function getDocumentById(
 
   const { data, error } = await supabaseAdmin
     .from('documents')
-    .select('*')
+    .select(DOCUMENT_COLUMNS)
     .eq('id', id)
     .single();
 

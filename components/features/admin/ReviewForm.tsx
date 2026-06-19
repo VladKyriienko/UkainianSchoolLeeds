@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { RichTextEditor } from '@/components/common/RichTextEditorDynamic';
 import type { AdminReview } from '@/types';
 import { createReview, updateReview } from '@/app/admin/reviews/actions';
 import { parseInputDate, toInputDateValue } from '@/utils/date-format';

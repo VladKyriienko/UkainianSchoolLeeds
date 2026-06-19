@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminClass } from '@/types';
 import { createClass, updateClass } from '@/app/admin/classes/actions';
-import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { RichTextEditor } from '@/components/common/RichTextEditorDynamic';
 import { prepareAdminPhotoForUpload } from '@/utils/image-compression';
 
 type ClassFormProps = {

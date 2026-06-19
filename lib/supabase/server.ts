@@ -1,7 +1,11 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js';
+import {
+  createClient as createSupabaseClient,
+  SupabaseClient
+} from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import type { QueryResult, UserWithRoles } from '@/types';
+import { USER_PROFILE_WITH_ROLES } from '@/lib/supabase/columns';
 import { Database } from './types';
 // Note: We avoid importing PostgrestBuilder here because runtime shapes vary by
 // client version and we treat the incoming query as `unknown`.
@@ -209,7 +213,7 @@ export async function getCurrentUserQueryResult(
     return executeWithMetadata<UserWithRoles>(
       supabase
         .from('users')
-        .select('*, roles(*)')
+        .select(USER_PROFILE_WITH_ROLES)
         .eq('id', userData.user.id)
         .limit(1)
     );

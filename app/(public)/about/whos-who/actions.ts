@@ -2,13 +2,14 @@
 
 import { createClient } from '@/lib/supabase/server';
 import type { PublicTeacher } from '@/types';
+import { TEACHER_COLUMNS } from '@/lib/supabase/columns';
 
 export async function getTeachers(): Promise<PublicTeacher[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('teachers')
-    .select('*')
+    .select(TEACHER_COLUMNS)
     .order('created_at', { ascending: true });
 
   if (error) {
@@ -32,7 +33,7 @@ export async function getTeacherById(
 
   const { data, error } = await supabase
     .from('teachers')
-    .select('*')
+    .select(TEACHER_COLUMNS)
     .eq('id', id)
     .single();
 

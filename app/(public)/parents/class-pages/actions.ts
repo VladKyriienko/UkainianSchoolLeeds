@@ -5,6 +5,7 @@ import { createPublicClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types';
 import type { PublicClass, PublicClassGalleryImage } from '@/types';
 import { createDocumentSlug } from '@/utils/document-slug';
+import { CLASS_COLUMNS } from '@/lib/supabase/columns';
 
 const CLASS_GALLERY_BUCKET = 'class-gallery';
 
@@ -23,7 +24,7 @@ export async function getClasses(): Promise<PublicClass[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('classes')
-    .select('*')
+    .select(CLASS_COLUMNS)
     .order('order', { ascending: true })
     .order('created_at', { ascending: true });
 
@@ -40,7 +41,7 @@ export async function getClassById(id: string): Promise<PublicClass | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('classes')
-    .select('*')
+    .select(CLASS_COLUMNS)
     .eq('id', id)
     .single();
 

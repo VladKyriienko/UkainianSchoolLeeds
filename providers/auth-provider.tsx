@@ -21,12 +21,14 @@ export const AuthContext = createContext<{
   loading: boolean;
   signOut: () => Promise<void>;
   refreshUserData: () => Promise<void>;
+  hydrateProfile: (data: UserWithRoles | null) => void;
 }>({
   user: null,
   userData: null,
   loading: false,
   signOut: async () => { },
-  refreshUserData: async () => { }
+  refreshUserData: async () => { },
+  hydrateProfile: () => { }
 });
 
 export const AuthProvider = ({
@@ -58,6 +60,10 @@ export const AuthProvider = ({
   const refreshUserData = useCallback(async () => {
     router.refresh();
   }, [router]);
+
+  const hydrateProfile = useCallback((data: UserWithRoles | null) => {
+    setUserData(data);
+  }, []);
 
   const signOut = useCallback(async () => {
     setUser(null);
@@ -113,8 +119,8 @@ export const AuthProvider = ({
   }, []);
 
   const contextValue = useMemo(
-    () => ({ user, userData, loading, signOut, refreshUserData }),
-    [user, userData, loading, signOut, refreshUserData]
+    () => ({ user, userData, loading, signOut, refreshUserData, hydrateProfile }),
+    [user, userData, loading, signOut, refreshUserData, hydrateProfile]
   );
 
   return (

@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 import { Inter, Manrope } from 'next/font/google';
 import { getURL } from '@/utils/helpers';
 import { cookies } from 'next/headers';
 import Providers from '@/providers/providers';
 import 'styles/main.css';
-import { getCurrentUser } from '@/lib/auth/server';
+import { getSessionUser } from '@/lib/auth/server';
+import { UserProfileHydrator } from '@/providers/UserProfileHydrator';
 import { cn } from '@/utils/cn';
 
 const inter = Inter({
@@ -66,8 +67,7 @@ export default async function Layout({ children }: PropsWithChildren) {
   const cookieStore = await cookies();
   const theme = cookieStore.get('theme')?.value;
 
-  // Get user data for providers (cached, deduplicated with page.tsx)
-  const { user, profileData } = await getCurrentUser();
+  const { user } = await getSessionUser();
 
   return (
     <html
@@ -89,11 +89,13 @@ export default async function Layout({ children }: PropsWithChildren) {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        <script
-          async
-          crossOrigin="anonymous"
-          src="https://tweakcn.com/live-preview.min.js"
-        />
+        {process.env.NODE_ENV === 'development' && (
+          <script
+            async
+            crossOrigin="anonymous"
+            src="https://tweakcn.com/live-preview.min.js"
+          />
+        )}
       </head>
       <body
         className={cn(
@@ -102,7 +104,12 @@ export default async function Layout({ children }: PropsWithChildren) {
         )}
         suppressHydrationWarning
       >
-        <Providers user={user} userData={profileData}>
+        <Providers user={user} userData={null}>
+          {user ? (
+            <Suspense fallback={null}>
+              <UserProfileHydrator />
+            </Suspense>
+          ) : null}
           {children}
         </Providers>
       </body>

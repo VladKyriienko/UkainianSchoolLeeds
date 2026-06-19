@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminMessage } from '@/types';
+import { MESSAGE_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -25,7 +26,7 @@ export async function listMessages(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('messages').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('messages').select(MESSAGE_COLUMNS, { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -62,7 +63,7 @@ export async function getMessageById(id: string): Promise<AdminMessage | null> {
 
   const { data, error } = await supabaseAdmin
     .from('messages')
-    .select('*')
+    .select(MESSAGE_COLUMNS)
     .eq('id', id)
     .single();
 
