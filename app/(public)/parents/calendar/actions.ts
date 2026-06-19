@@ -12,7 +12,6 @@ import type {
 } from '@/types/calendar';
 import {
   EVENT_LIST_COLUMNS,
-  EVENT_COLUMNS,
   SCHEDULE_LIST_COLUMNS
 } from '@/lib/supabase/columns';
 
