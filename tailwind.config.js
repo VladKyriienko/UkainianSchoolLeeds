@@ -10,6 +10,7 @@ export default {
     'providers/**/*.{ts,tsx}',
     'lib/**/*.{ts,tsx}',
     'hooks/**/*.{ts,tsx}',
+    'utils/**/*.{ts,tsx}',
     'pages/**/*.{ts,tsx}'
   ],
   theme: {

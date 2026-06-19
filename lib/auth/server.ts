@@ -1,8 +1,10 @@
 'use server';
 
 import { cache } from 'react';
+import { cookies } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient, UserWithRoles } from '@/lib/supabase/server';
+import { USER_PROFILE_WITH_ROLES } from '@/lib/supabase/columns';
 import { hasAdminRole } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
@@ -13,12 +15,21 @@ function isValidEmail(email: string) {
   return regex.test(email);
 }
 
-import { USER_PROFILE_WITH_ROLES } from '@/lib/supabase/columns';
-
 const USER_PROFILE_SELECT = USER_PROFILE_WITH_ROLES;
 
-export const getSessionUser = cache(
-  async (): Promise<{ user: User | null }> => {
+/** Session-scoped cache key derived from Supabase auth cookies (not shared across users). */
+async function getAuthCacheKey(): Promise<string> {
+  const cookieStore = await cookies();
+  const authCookie = cookieStore
+    .getAll()
+    .filter(({ name }) => name.includes('-auth-token'))
+    .map(({ name, value }) => `${name}:${value?.slice(0, 32) ?? ''}`)
+    .join('|');
+  return authCookie || 'anonymous';
+}
+
+const getSessionUserCached = cache(
+  async (_cacheKey: string): Promise<{ user: User | null }> => {
     const supabase = createClient();
     const {
       data: { user }
@@ -27,34 +38,39 @@ export const getSessionUser = cache(
   }
 );
 
-export const getUserProfile = cache(async (): Promise<UserWithRoles | null> => {
-  const { user } = await getSessionUser();
-  if (!user) return null;
+export async function getSessionUser(): Promise<{ user: User | null }> {
+  const cacheKey = await getAuthCacheKey();
+  return getSessionUserCached(cacheKey);
+}
 
-  const supabase = createClient();
-  const { data: profileData } = await supabase
-    .from('users')
-    .select(USER_PROFILE_SELECT)
-    .eq('id', user.id)
-    .single();
+const getUserProfileById = cache(
+  async (userId: string): Promise<UserWithRoles | null> => {
+    const supabase = createClient();
+    const { data: profileData } = await supabase
+      .from('users')
+      .select(USER_PROFILE_SELECT)
+      .eq('id', userId)
+      .single();
 
-  return profileData as UserWithRoles | null;
-});
-
-/**
- * Per-request memoization via React cache() — scoped to a single server render,
- * not shared across users or requests. Deduplicates layout + page calls in one pass.
- */
-export const getCurrentUser = cache(
-  async (): Promise<{
-    user: User | null;
-    profileData: UserWithRoles | null;
-  }> => {
-    const { user } = await getSessionUser();
-    const profileData = user ? await getUserProfile() : null;
-    return { user, profileData };
+    return profileData as UserWithRoles | null;
   }
 );
+
+export async function getUserProfile(): Promise<UserWithRoles | null> {
+  const { user } = await getSessionUser();
+  if (!user) return null;
+  return getUserProfileById(user.id);
+}
+
+/** Auth session + profile; deduplicated per request via keyed cache(). */
+export async function getCurrentUser(): Promise<{
+  user: User | null;
+  profileData: UserWithRoles | null;
+}> {
+  const { user } = await getSessionUser();
+  const profileData = user ? await getUserProfileById(user.id) : null;
+  return { user, profileData };
+}
 
 export async function redirectToPath(path: string) {
   return redirect(path);

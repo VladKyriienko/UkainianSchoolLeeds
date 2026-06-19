@@ -5,8 +5,7 @@ import { getURL } from '@/utils/helpers';
 import { cookies } from 'next/headers';
 import Providers from '@/providers/providers';
 import 'styles/main.css';
-import { getSessionUser } from '@/lib/auth/server';
-import { UserProfileHydrator } from '@/providers/UserProfileHydrator';
+import { AuthSessionHydrator } from '@/providers/AuthSessionHydrator';
 import { cn } from '@/utils/cn';
 
 const inter = Inter({
@@ -67,8 +66,6 @@ export default async function Layout({ children }: PropsWithChildren) {
   const cookieStore = await cookies();
   const theme = cookieStore.get('theme')?.value;
 
-  const { user } = await getSessionUser();
-
   return (
     <html
       lang="en"
@@ -104,12 +101,10 @@ export default async function Layout({ children }: PropsWithChildren) {
         )}
         suppressHydrationWarning
       >
-        <Providers user={user} userData={null}>
-          {user ? (
-            <Suspense fallback={null}>
-              <UserProfileHydrator />
-            </Suspense>
-          ) : null}
+        <Providers user={null} userData={null}>
+          <Suspense fallback={null}>
+            <AuthSessionHydrator />
+          </Suspense>
           {children}
         </Providers>
       </body>

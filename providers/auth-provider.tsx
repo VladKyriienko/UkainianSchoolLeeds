@@ -21,6 +21,7 @@ export const AuthContext = createContext<{
   loading: boolean;
   signOut: () => Promise<void>;
   refreshUserData: () => Promise<void>;
+  hydrateSession: (user: User, profileData: UserWithRoles | null) => void;
   hydrateProfile: (data: UserWithRoles | null) => void;
 }>({
   user: null,
@@ -28,6 +29,7 @@ export const AuthContext = createContext<{
   loading: false,
   signOut: async () => { },
   refreshUserData: async () => { },
+  hydrateSession: () => { },
   hydrateProfile: () => { }
 });
 
@@ -64,6 +66,15 @@ export const AuthProvider = ({
   const hydrateProfile = useCallback((data: UserWithRoles | null) => {
     setUserData(data);
   }, []);
+
+  const hydrateSession = useCallback(
+    (nextUser: User, profileData: UserWithRoles | null) => {
+      setUser(nextUser);
+      setUserData(profileData);
+      setLoading(false);
+    },
+    []
+  );
 
   const signOut = useCallback(async () => {
     setUser(null);
@@ -119,8 +130,16 @@ export const AuthProvider = ({
   }, []);
 
   const contextValue = useMemo(
-    () => ({ user, userData, loading, signOut, refreshUserData, hydrateProfile }),
-    [user, userData, loading, signOut, refreshUserData, hydrateProfile]
+    () => ({
+      user,
+      userData,
+      loading,
+      signOut,
+      refreshUserData,
+      hydrateSession,
+      hydrateProfile
+    }),
+    [user, userData, loading, signOut, refreshUserData, hydrateSession, hydrateProfile]
   );
 
   return (

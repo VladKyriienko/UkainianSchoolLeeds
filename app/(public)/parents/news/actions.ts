@@ -1,17 +1,16 @@
 'use server';
 
-import { createAdminClient } from '@/lib/supabase/admin';
 import type { Tables } from '@/lib/supabase/types';
 import { NEWS_LIST_COLUMNS, NEWS_COLUMNS } from '@/lib/supabase/columns';
+import { getPublicStorageUrl } from '@/lib/supabase/public-storage-url';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { PublicNews } from '@/types';
 
-function withPhotoUrl(
-  supabase: ReturnType<typeof createAdminClient>,
-  item: Tables<'news'>
-): PublicNews {
+const NEWS_PHOTOS_BUCKET = 'news-photos';
+
+function withPhotoUrl(item: Tables<'news'>): PublicNews {
   const photoUrl = item.photo
-    ? supabase.storage.from('news-photos').getPublicUrl(item.photo).data
-        .publicUrl
+    ? getPublicStorageUrl(NEWS_PHOTOS_BUCKET, item.photo)
     : null;
   return { ...item, photoUrl };
 }
@@ -34,9 +33,7 @@ export async function getNews(limit?: number): Promise<PublicNews[]> {
     console.error('Error fetching news:', error);
     return [];
   }
-  return ((data as Tables<'news'>[]) ?? []).map((item) =>
-    withPhotoUrl(supabase, item)
-  );
+  return ((data as Tables<'news'>[]) ?? []).map(withPhotoUrl);
 }
 
 export async function getNewsById(id: string): Promise<PublicNews | null> {
@@ -48,5 +45,5 @@ export async function getNewsById(id: string): Promise<PublicNews | null> {
     .single();
 
   if (error || !data) return null;
-  return withPhotoUrl(supabase, data as Tables<'news'>);
+  return withPhotoUrl(data as Tables<'news'>);
 }
