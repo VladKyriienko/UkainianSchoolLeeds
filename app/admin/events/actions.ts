@@ -8,6 +8,7 @@ import type { AdminEvent } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
+import { EVENT_LIST_COLUMNS, EVENT_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -73,7 +74,7 @@ export async function listEvents(options?: {
   const dateFrom = options?.dateFrom?.trim();
   const dateTo = options?.dateTo?.trim();
 
-  let query = supabaseAdmin.from('events').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('events').select(EVENT_LIST_COLUMNS, { count: 'exact' });
 
   if (search) {
     query = query.or(
@@ -114,7 +115,7 @@ export async function getEventById(id: string): Promise<AdminEvent | null> {
 
   const { data, error } = await supabaseAdmin
     .from('events')
-    .select('*')
+    .select(EVENT_COLUMNS)
     .eq('id', id)
     .single();
 

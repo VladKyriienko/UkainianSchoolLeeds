@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminReview } from '@/types';
+import { REVIEW_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -25,7 +26,7 @@ export async function listReviews(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('review').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('review').select(REVIEW_COLUMNS, { count: 'exact' });
 
   if (parents) {
     const safe = parents.replace(/,/g, ' ');
@@ -58,7 +59,7 @@ export async function getReviewById(id: string): Promise<AdminReview | null> {
 
   const { data, error } = await supabaseAdmin
     .from('review')
-    .select('*')
+    .select(REVIEW_COLUMNS)
     .eq('id', id)
     .single();
 

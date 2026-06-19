@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
 import { hasAdminRole, hasTeacherRole } from '@/lib/auth/roles';
 import type { UserWithRoles } from '@/lib/supabase/server';
+import { USER_PROFILE_WITH_ROLES } from '@/lib/supabase/columns';
 
 export async function proxy(request: NextRequest) {
   const { supabase, supabaseResponse } =
@@ -27,7 +28,7 @@ export async function proxy(request: NextRequest) {
 
   const { data: profileData } = await supabase
     .from('users')
-    .select('*, roles(*)')
+    .select(USER_PROFILE_WITH_ROLES)
     .eq('id', user.id)
     .single();
 

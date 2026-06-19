@@ -6,6 +6,7 @@ import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminSchoolGalleryItem } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
+import { GALLERY_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -78,7 +79,7 @@ export async function getSchoolGalleryItemById(
 
   const { data, error } = await supabaseAdmin
     .from('gallery')
-    .select('*')
+    .select(GALLERY_COLUMNS)
     .eq('id', id)
     .single();
 

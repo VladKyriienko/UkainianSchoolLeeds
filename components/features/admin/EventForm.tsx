@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { AdminEvent } from '@/types';
 import { createEvent, updateEvent } from '@/app/admin/events/actions';
-import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { RichTextEditor } from '@/components/common/RichTextEditorDynamic';
 import {
   formatTimeForInput,
   parseInputDate,

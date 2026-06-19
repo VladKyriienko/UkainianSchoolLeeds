@@ -19,7 +19,7 @@ import {
   adminDateCellClass,
   adminDateHeadClass
 } from '@/components/common/admin/dateColumnClasses';
-import { SortableTable } from '@/components/common/admin/SortableTable';
+import { SortableTable } from '@/components/common/admin/SortableTableDynamic';
 import { useConfirmAction } from '@/hooks/useConfirmAction';
 
 type ClassesManagementTableProps = {

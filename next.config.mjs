@@ -1,3 +1,5 @@
+import bundleAnalyzer from '@next/bundle-analyzer';
+
 /** @type {import('next').NextConfig} */
 
 function supabaseStorageImageRemotePatterns() {
@@ -33,4 +35,9 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false
+});
+
+export default withBundleAnalyzer(nextConfig);

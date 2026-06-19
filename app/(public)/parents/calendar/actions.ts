@@ -10,6 +10,11 @@ import type {
   EventsFilter,
   PublicEvent
 } from '@/types/calendar';
+import {
+  EVENT_LIST_COLUMNS,
+  EVENT_COLUMNS,
+  SCHEDULE_LIST_COLUMNS
+} from '@/lib/supabase/columns';
 
 function withEventPhotoUrl(
   supabase: ReturnType<typeof createAdminClient>,
@@ -23,7 +28,9 @@ function withEventPhotoUrl(
 }
 
 /** Upcoming events from today onward (soonest first), for home page. */
-export async function getUpcomingPublicEvents(limit = 3): Promise<PublicEvent[]> {
+export async function getUpcomingPublicEvents(
+  limit = 3
+): Promise<PublicEvent[]> {
   noStore();
 
   try {
@@ -32,7 +39,7 @@ export async function getUpcomingPublicEvents(limit = 3): Promise<PublicEvent[]>
 
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select(EVENT_LIST_COLUMNS)
       .gte('date', todayStart)
       .order('date', { ascending: true })
       .order('start_time', { ascending: true })
@@ -52,14 +59,16 @@ export async function getUpcomingPublicEvents(limit = 3): Promise<PublicEvent[]>
   }
 }
 
-export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEvent[]> {
+export async function getEvents(
+  filter: EventsFilter = {}
+): Promise<CalendarEvent[]> {
   noStore();
 
   try {
     const supabase = createAdminClient();
     let query = supabase
       .from('events')
-      .select('*')
+      .select(EVENT_LIST_COLUMNS)
       .order('date', { ascending: true })
       .order('start_time', { ascending: true });
 
@@ -92,13 +101,15 @@ export async function getEvents(filter: EventsFilter = {}): Promise<CalendarEven
   }
 }
 
-export async function getEventById(id: string): Promise<CalendarEventDetail | null> {
+export async function getEventById(
+  id: string
+): Promise<CalendarEventDetail | null> {
   noStore();
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select(EVENT_LIST_COLUMNS)
       .eq('id', id)
       .single();
 
@@ -106,7 +117,8 @@ export async function getEventById(id: string): Promise<CalendarEventDetail | nu
 
     const photo = data.photo as string | null;
     const photoUrl = photo
-      ? supabase.storage.from('events-photos').getPublicUrl(photo).data.publicUrl
+      ? supabase.storage.from('events-photos').getPublicUrl(photo).data
+          .publicUrl
       : null;
 
     return {
@@ -126,7 +138,7 @@ export async function getSchedules(): Promise<CalendarSchedule[]> {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('schedule')
-      .select('*')
+      .select(SCHEDULE_LIST_COLUMNS)
       .order('date', { ascending: true });
 
     if (error || !data) return [];

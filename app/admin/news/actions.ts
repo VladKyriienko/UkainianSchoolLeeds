@@ -8,6 +8,7 @@ import type { AdminNews } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
+import { NEWS_LIST_COLUMNS, NEWS_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -66,7 +67,7 @@ export async function listNews(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('news').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('news').select(NEWS_LIST_COLUMNS, { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -100,7 +101,7 @@ export async function getNewsById(id: string): Promise<AdminNews | null> {
 
   const { data, error } = await supabaseAdmin
     .from('news')
-    .select('*')
+    .select(NEWS_COLUMNS)
     .eq('id', id)
     .single();
 

@@ -22,7 +22,7 @@ import {
   createTeacher,
   updateTeacher
 } from '@/app/admin/teachers/actions';
-import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { RichTextEditor } from '@/components/common/RichTextEditorDynamic';
 
 type TeacherFormProps = {
   mode: 'create' | 'edit';

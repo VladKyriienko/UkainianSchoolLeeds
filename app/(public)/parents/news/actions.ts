@@ -2,11 +2,16 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Tables } from '@/lib/supabase/types';
+import { NEWS_LIST_COLUMNS, NEWS_COLUMNS } from '@/lib/supabase/columns';
 import type { PublicNews } from '@/types';
 
-function withPhotoUrl(supabase: ReturnType<typeof createAdminClient>, item: Tables<'news'>): PublicNews {
+function withPhotoUrl(
+  supabase: ReturnType<typeof createAdminClient>,
+  item: Tables<'news'>
+): PublicNews {
   const photoUrl = item.photo
-    ? supabase.storage.from('news-photos').getPublicUrl(item.photo).data.publicUrl
+    ? supabase.storage.from('news-photos').getPublicUrl(item.photo).data
+        .publicUrl
     : null;
   return { ...item, photoUrl };
 }
@@ -15,7 +20,7 @@ export async function getNews(limit?: number): Promise<PublicNews[]> {
   const supabase = createAdminClient();
   let query = supabase
     .from('news')
-    .select('*')
+    .select(NEWS_LIST_COLUMNS)
     .order('order', { ascending: true })
     .order('created_at', { ascending: false });
 
@@ -29,14 +34,16 @@ export async function getNews(limit?: number): Promise<PublicNews[]> {
     console.error('Error fetching news:', error);
     return [];
   }
-  return ((data as Tables<'news'>[]) ?? []).map((item) => withPhotoUrl(supabase, item));
+  return ((data as Tables<'news'>[]) ?? []).map((item) =>
+    withPhotoUrl(supabase, item)
+  );
 }
 
 export async function getNewsById(id: string): Promise<PublicNews | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('news')
-    .select('*')
+    .select(NEWS_COLUMNS)
     .eq('id', id)
     .single();
 
