@@ -37,7 +37,7 @@ export function SchedulePreviewDialog({ schedule, onOpenChange }: SchedulePrevie
 
   return (
     <Dialog open={Boolean(schedule)} onOpenChange={onOpenChange}>
-      <DialogContent className="z-[200] max-w-6xl w-[98vw] p-0 overflow-hidden [&>button]:z-[201]">
+      <DialogContent className="z-200 max-w-6xl w-[98vw] p-0 overflow-hidden [&>button]:z-201">
         <DialogTitle className="sr-only">{hiddenTitle}</DialogTitle>
         <DialogDescription className="sr-only">
           {language === 'uk'
