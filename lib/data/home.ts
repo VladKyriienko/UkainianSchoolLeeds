@@ -1,41 +1,39 @@
+import { unstable_cache } from 'next/cache';
 import { createPublicClient } from '@/lib/supabase/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database, Tables } from '@/lib/supabase/types';
+import type { Tables } from '@/lib/supabase/types';
+import { getPublicStorageUrl } from '@/lib/supabase/public-storage-url';
 import type {
   PublicParentVoiceReview,
   SchoolAtmosphereGalleryImage
 } from '@/types';
 
 const SCHOOL_ATMOSPHERE_GALLERY_LIMIT = 4;
+const PARENT_VOICES_PUBLIC_LIMIT = 40;
+const GALLERY_PHOTOS_BUCKET = 'gallery-photos';
+
+/** Revalidate public home data every 5 minutes; bust via revalidateTag('public-home'). */
+const PUBLIC_HOME_REVALIDATE_SECONDS = 300;
 
 type GalleryRow = {
   id: string;
   photo: string;
 };
 
-const GALLERY_PHOTOS_BUCKET = 'gallery-photos';
+type ParentVoiceRow = Pick<
+  Tables<'review'>,
+  'id' | 'content' | 'content_uk' | 'perens' | 'perens_uk'
+>;
 
-function schoolGalleryPublicSrc(
-  supabase: SupabaseClient<Database>,
-  photoStored: string
-): string | null {
+function galleryPublicSrc(photoStored: string): string | null {
   const raw = photoStored.trim();
   if (!raw) return null;
   if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
 
   const pathInBucket = raw.replace(/^\/?gallery-photos\/?/, '');
-
-  const { data } = supabase.storage
-    .from(GALLERY_PHOTOS_BUCKET)
-    .getPublicUrl(pathInBucket);
-  return data.publicUrl || null;
+  return getPublicStorageUrl(GALLERY_PHOTOS_BUCKET, pathInBucket);
 }
 
-/**
- * Public gallery photos from `gallery` (RLS: anon SELECT).
- * Order matches admin list: `order` ascending, then newest.
- */
-export async function getPublicGalleryImages(
+async function fetchPublicGalleryImages(
   limit?: number
 ): Promise<SchoolAtmosphereGalleryImage[]> {
   try {
@@ -57,48 +55,25 @@ export async function getPublicGalleryImages(
       return [];
     }
 
-    const rows = (data ?? []) as GalleryRow[];
-    const out: SchoolAtmosphereGalleryImage[] = [];
-
-    for (const row of rows) {
-      const src = schoolGalleryPublicSrc(supabase, row.photo);
-      if (!src) continue;
-
-      out.push({
+    return ((data ?? []) as GalleryRow[]).flatMap((row) => {
+      const src = galleryPublicSrc(row.photo);
+      if (!src) return [];
+      const item: SchoolAtmosphereGalleryImage = {
         id: row.id,
         src,
         altEn: 'Photo from the school gallery',
         altUk: 'Фото з галереї школи'
-      });
-    }
-
-    return out;
+      };
+      return [item];
+    });
   } catch (e) {
     console.error('getPublicGalleryImages:', e);
     return [];
   }
 }
 
-/** Home “school atmosphere” strip — first N gallery photos. */
-export async function getSchoolAtmosphereGalleryImages(
-  limit = SCHOOL_ATMOSPHERE_GALLERY_LIMIT
-): Promise<SchoolAtmosphereGalleryImage[]> {
-  return getPublicGalleryImages(limit);
-}
-
-const PARENT_VOICES_PUBLIC_LIMIT = 40;
-
-type ParentVoiceRow = Pick<
-  Tables<'review'>,
-  'id' | 'content' | 'content_uk' | 'perens' | 'perens_uk'
->;
-
-/**
- * Public home — parent testimonials from `review` (RLS: anon SELECT).
- * Newest first by `data`.
- */
-export async function getPublicParentVoices(
-  limit = PARENT_VOICES_PUBLIC_LIMIT
+async function fetchPublicParentVoices(
+  limit: number
 ): Promise<PublicParentVoiceReview[]> {
   try {
     const supabase = createPublicClient();
@@ -125,4 +100,42 @@ export async function getPublicParentVoices(
     console.error('getPublicParentVoices:', e);
     return [];
   }
+}
+
+const getPublicGalleryImagesCached = (limit?: number) =>
+  unstable_cache(
+    () => fetchPublicGalleryImages(limit),
+    ['public-gallery-images', limit === undefined ? 'all' : String(limit)],
+    {
+      revalidate: PUBLIC_HOME_REVALIDATE_SECONDS,
+      tags: ['public-home', 'gallery']
+    }
+  )();
+
+const getPublicParentVoicesCached = (limit: number) =>
+  unstable_cache(
+    () => fetchPublicParentVoices(limit),
+    ['public-parent-voices', String(limit)],
+    {
+      revalidate: PUBLIC_HOME_REVALIDATE_SECONDS,
+      tags: ['public-home', 'review']
+    }
+  )();
+
+export async function getPublicGalleryImages(
+  limit?: number
+): Promise<SchoolAtmosphereGalleryImage[]> {
+  return getPublicGalleryImagesCached(limit);
+}
+
+export async function getSchoolAtmosphereGalleryImages(
+  limit = SCHOOL_ATMOSPHERE_GALLERY_LIMIT
+): Promise<SchoolAtmosphereGalleryImage[]> {
+  return getPublicGalleryImagesCached(limit);
+}
+
+export async function getPublicParentVoices(
+  limit = PARENT_VOICES_PUBLIC_LIMIT
+): Promise<PublicParentVoiceReview[]> {
+  return getPublicParentVoicesCached(limit);
 }

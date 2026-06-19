@@ -1,12 +1,18 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { revalidatePublicHomeData } from '@/lib/cache/public-revalidate';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminReview } from '@/types';
 import { REVIEW_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
+
+function revalidatePublicReviews() {
+  revalidatePath('/');
+  revalidatePublicHomeData('review');
+}
 
 export async function listReviews(options?: {
   page?: number;
@@ -26,7 +32,9 @@ export async function listReviews(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('review').select(REVIEW_COLUMNS, { count: 'exact' });
+  let query = supabaseAdmin
+    .from('review')
+    .select(REVIEW_COLUMNS, { count: 'exact' });
 
   if (parents) {
     const safe = parents.replace(/,/g, ' ');
@@ -114,10 +122,14 @@ export async function createReview(
     });
 
     if (insertError) {
-      return { success: false, error: `Failed to create review: ${insertError.message}` };
+      return {
+        success: false,
+        error: `Failed to create review: ${insertError.message}`
+      };
     }
 
     revalidatePath('/admin/reviews');
+    revalidatePublicReviews();
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -172,11 +184,15 @@ export async function updateReview(
       .eq('id', id);
 
     if (updateError) {
-      return { success: false, error: `Failed to update review: ${updateError.message}` };
+      return {
+        success: false,
+        error: `Failed to update review: ${updateError.message}`
+      };
     }
 
     revalidatePath('/admin/reviews');
     revalidatePath(`/admin/reviews/${id}`);
+    revalidatePublicReviews();
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -197,6 +213,7 @@ export async function deleteReview(
     }
 
     revalidatePath('/admin/reviews');
+    revalidatePublicReviews();
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';

@@ -1,8 +1,9 @@
 'use server';
 
 import { format, startOfToday } from 'date-fns';
+import { unstable_cache, unstable_noStore as noStore } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { unstable_noStore as noStore } from 'next/cache';
+import { getPublicStorageUrl } from '@/lib/supabase/public-storage-url';
 import type {
   CalendarEvent,
   CalendarEventDetail,
@@ -15,43 +16,69 @@ import {
   SCHEDULE_LIST_COLUMNS
 } from '@/lib/supabase/columns';
 
+const EVENTS_PHOTOS_BUCKET = 'events-photos';
+const PUBLIC_EVENTS_REVALIDATE_SECONDS = 300;
+
 function withEventPhotoUrl(
-  supabase: ReturnType<typeof createAdminClient>,
   row: CalendarEvent & { photo?: string | null }
 ): PublicEvent {
   const photo = row.photo ?? null;
   const photoUrl = photo
-    ? supabase.storage.from('events-photos').getPublicUrl(photo).data.publicUrl
+    ? getPublicStorageUrl(EVENTS_PHOTOS_BUCKET, photo)
     : null;
   return { ...row, photo, photoUrl };
 }
 
-/** Upcoming events from today onward (soonest first), for home page. */
+async function fetchUpcomingPublicEvents(
+  limit: number
+): Promise<PublicEvent[]> {
+  const supabase = createAdminClient();
+  const todayStart = `${format(startOfToday(), 'yyyy-MM-dd')}T00:00:00.000Z`;
+
+  const { data, error } = await supabase
+    .from('events')
+    .select(EVENT_LIST_COLUMNS)
+    .gte('date', todayStart)
+    .order('date', { ascending: true })
+    .order('start_time', { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching upcoming public events:', error);
+    return [];
+  }
+
+  return ((data as (CalendarEvent & { photo?: string | null })[]) ?? []).map(
+    withEventPhotoUrl
+  );
+}
+
+function getUpcomingPublicEventsCached(limit: number) {
+  return unstable_cache(
+    () => fetchUpcomingPublicEvents(limit),
+    ['upcoming-public-events', String(limit)],
+    {
+      revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS,
+      tags: ['events', 'public-home']
+    }
+  )();
+}
+
+/** Cached upcoming events for the home page (revalidates every 5 min). */
+export async function getCachedUpcomingPublicEvents(
+  limit = 3
+): Promise<PublicEvent[]> {
+  return getUpcomingPublicEventsCached(limit);
+}
+
+/** Upcoming events — always fresh (calendar views). */
 export async function getUpcomingPublicEvents(
   limit = 3
 ): Promise<PublicEvent[]> {
   noStore();
 
   try {
-    const supabase = createAdminClient();
-    const todayStart = `${format(startOfToday(), 'yyyy-MM-dd')}T00:00:00.000Z`;
-
-    const { data, error } = await supabase
-      .from('events')
-      .select(EVENT_LIST_COLUMNS)
-      .gte('date', todayStart)
-      .order('date', { ascending: true })
-      .order('start_time', { ascending: true })
-      .limit(limit);
-
-    if (error) {
-      console.error('Error fetching upcoming public events:', error);
-      return [];
-    }
-
-    return ((data as (CalendarEvent & { photo?: string | null })[]) ?? []).map(
-      (row) => withEventPhotoUrl(supabase, row)
-    );
+    return await fetchUpcomingPublicEvents(limit);
   } catch (err) {
     console.error('Error fetching upcoming public events:', err);
     return [];
@@ -116,8 +143,7 @@ export async function getEventById(
 
     const photo = data.photo as string | null;
     const photoUrl = photo
-      ? supabase.storage.from('events-photos').getPublicUrl(photo).data
-          .publicUrl
+      ? getPublicStorageUrl(EVENTS_PHOTOS_BUCKET, photo)
       : null;
 
     return {
