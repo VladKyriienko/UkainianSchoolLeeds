@@ -9,7 +9,7 @@ import DarkModeToggle from './DarkModeToggle';
 import LanguageToggle from './LanguageToggle';
 import { cn } from '@/utils/cn';
 import { ChevronDown } from 'lucide-react';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { InstallPwaMenuButton } from '@/components/common/InstallPwaMenuButton';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/providers/language-provider';
@@ -298,7 +298,6 @@ export function PublicNavBar({
                 side="right"
                 showCloseButton={false}
                 portalContainer={sheetPortalContainer}
-                aria-describedby={undefined}
                 className={cn(
                   'w-75 sm:w-100 overflow-y-auto px-4 bg-ukraine-header-bg text-ukraine-header-fg border-0 shadow-none',
                   'top-18! h-[calc(100dvh-4.5rem)]'
@@ -316,6 +315,9 @@ export function PublicNavBar({
                 onInteractOutside={(e) => e.preventDefault()}
               >
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Main site navigation links.
+                </SheetDescription>
 
                 <div className="flex min-h-full flex-col gap-6 pt-2 pb-4">
                   <nav className="flex flex-1 flex-col gap-2 overflow-y-auto">

@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { revalidatePublicHomeData } from '@/lib/cache/public-revalidate';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Database } from '@/lib/supabase/types';
 import { verifyAdminAccess } from '@/lib/auth/server';
@@ -11,6 +12,12 @@ import { normalizeText } from '@/utils/text';
 import { NEWS_LIST_COLUMNS, NEWS_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
+
+function revalidatePublicNews() {
+  revalidatePath('/parents/news');
+  revalidatePath('/');
+  revalidatePublicHomeData('news');
+}
 
 type NewsUpdate = Database['public']['Tables']['news']['Update'];
 
@@ -67,7 +74,9 @@ export async function listNews(options?: {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabaseAdmin.from('news').select(NEWS_LIST_COLUMNS, { count: 'exact' });
+  let query = supabaseAdmin
+    .from('news')
+    .select(NEWS_LIST_COLUMNS, { count: 'exact' });
 
   if (search) {
     const safe = search.replace(/,/g, ' ');
@@ -152,6 +161,7 @@ export async function createNews(
     }
 
     revalidatePath('/admin/news');
+    revalidatePublicNews();
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -199,12 +209,16 @@ export async function updateNews(
 
       if (removePhoto) {
         if (previousPhoto) {
-          await supabaseAdmin.storage.from('news-photos').remove([previousPhoto]);
+          await supabaseAdmin.storage
+            .from('news-photos')
+            .remove([previousPhoto]);
         }
         updatePayload.photo = null;
       } else if (photoPath) {
         if (previousPhoto && previousPhoto !== photoPath) {
-          await supabaseAdmin.storage.from('news-photos').remove([previousPhoto]);
+          await supabaseAdmin.storage
+            .from('news-photos')
+            .remove([previousPhoto]);
         }
         updatePayload.photo = photoPath;
       }
@@ -224,6 +238,7 @@ export async function updateNews(
 
     revalidatePath('/admin/news');
     revalidatePath(`/admin/news/${id}`);
+    revalidatePublicNews();
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -254,8 +269,7 @@ export async function deleteNews(
     }
 
     revalidatePath('/admin/news');
-    revalidatePath('/parents/news');
-    revalidatePath('/');
+    revalidatePublicNews();
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -290,8 +304,7 @@ export async function reorderNews(
     }
 
     revalidatePath('/admin/news');
-    revalidatePath('/parents/news');
-    revalidatePath('/');
+    revalidatePublicNews();
 
     return { success: true };
   } catch (err) {

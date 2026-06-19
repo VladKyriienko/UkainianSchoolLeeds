@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { PublicHomeClient } from './client';
 import { PublicLayout } from '@/components/common/RootLayout/PublicLayout';
 import { getNews } from '@/app/(public)/parents/news/actions';
-import { getUpcomingPublicEvents } from '@/app/(public)/parents/calendar/actions';
+import { getCachedUpcomingPublicEvents } from '@/app/(public)/parents/calendar/actions';
 import {
   getPublicParentVoices,
   getSchoolAtmosphereGalleryImages
@@ -26,7 +26,7 @@ export default async function HomePage() {
   const [latestNews, upcomingEvents, atmosphereGalleryImages, parentVoices] =
     await Promise.all([
       getNews(HOME_NEWS_LIMIT),
-      getUpcomingPublicEvents(HOME_EVENTS_LIMIT),
+      getCachedUpcomingPublicEvents(HOME_EVENTS_LIMIT),
       getSchoolAtmosphereGalleryImages(),
       getPublicParentVoices()
     ]);

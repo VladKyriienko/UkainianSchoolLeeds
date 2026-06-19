@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useLanguage } from '@/providers/language-provider';
 
 type SelectedSchedule = {
@@ -39,6 +39,11 @@ export function SchedulePreviewDialog({ schedule, onOpenChange }: SchedulePrevie
     <Dialog open={Boolean(schedule)} onOpenChange={onOpenChange}>
       <DialogContent className="z-[200] max-w-6xl w-[98vw] p-0 overflow-hidden [&>button]:z-[201]">
         <DialogTitle className="sr-only">{hiddenTitle}</DialogTitle>
+        <DialogDescription className="sr-only">
+          {language === 'uk'
+            ? 'Попередній перегляд PDF-розкладу.'
+            : 'PDF schedule preview.'}
+        </DialogDescription>
         {schedule?.publicUrl ? (
           <div className="w-full bg-muted/10 max-h-[92dvh]">
             <iframe

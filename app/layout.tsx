@@ -46,7 +46,6 @@ export const metadata: Metadata = {
     shortcut: '/favicon-32x32.png',
     apple: '/icons/apple-touch-icon.png'
   },
-  themeColor: themeColor,
   openGraph: {
     title: title,
     description: description

@@ -240,8 +240,10 @@ const Sidebar = React.forwardRef<
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
             </SheetHeader>
+            <SheetDescription className="sr-only">
+              Displays the mobile sidebar.
+            </SheetDescription>
             <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">{children}</div>
           </SheetContent>
         </Sheet>
@@ -357,7 +359,7 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
-        className={cn(
+      className={cn(
         'relative flex min-h-svh min-w-0 flex-1 flex-col bg-background',
         'md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow',
         className

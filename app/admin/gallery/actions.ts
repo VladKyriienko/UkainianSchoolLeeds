@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { revalidatePublicHomeData } from '@/lib/cache/public-revalidate';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import type { AdminSchoolGalleryItem } from '@/types';
@@ -16,6 +17,7 @@ function revalidateGalleryPaths(id?: string) {
   revalidatePath('/');
   revalidatePath('/parents/gallery');
   revalidatePath('/admin/gallery');
+  revalidatePublicHomeData('gallery');
   if (id) {
     revalidatePath(`/admin/gallery/${id}`);
     revalidatePath(`/admin/gallery/${id}/edit`);
@@ -145,7 +147,9 @@ export async function updateSchoolGalleryItem(
     if (photoFile && photoFile.size > 0) {
       const existing = await getSchoolGalleryItemById(id);
       if (existing?.photo) {
-        await supabaseAdmin.storage.from(GALLERY_BUCKET).remove([existing.photo]);
+        await supabaseAdmin.storage
+          .from(GALLERY_BUCKET)
+          .remove([existing.photo]);
       }
       payload.photo = await uploadGalleryPhoto(photoFile);
     }

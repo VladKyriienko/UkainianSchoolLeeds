@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dialog,
+  DialogDescription,
   DialogOverlay,
   DialogPortal,
   DialogTitle
@@ -212,6 +213,10 @@ export function PhotoLightbox({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <DialogTitle className="sr-only">{title}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Browse gallery photos. Use arrow keys or swipe to navigate between
+            images.
+          </DialogDescription>
 
           <div
             className={cn(
