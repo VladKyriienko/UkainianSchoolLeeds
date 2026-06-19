@@ -57,12 +57,50 @@ export async function getUsersCount(): Promise<number> {
   await verifyAdminAccess();
   const { count, error } = await supabaseAdmin
     .from('users')
-    .select('*', { count: 'exact', head: true });
+    .select('id', { count: 'exact', head: true });
   if (error) return 0;
   return count ?? 0;
 }
 
-// Get all users with their roles and organisations
+type ListAdminUserRow = {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  email_confirmed_at: string | null;
+  created_at: string | null;
+  last_sign_in_at: string | null;
+  role: string;
+  is_active: boolean;
+  teacher_class_id: string | null;
+  total_count: number;
+};
+
+async function fetchOrganisationMemberships(userIds: string[]) {
+  if (userIds.length === 0) return [];
+
+  const { data, error } = await supabaseAdmin
+    .from('organisation_memberships')
+    .select(
+      `
+        id,
+        user_id,
+        organisation_id,
+        role,
+        organisation:organisations(id, name, slug)
+      `
+    )
+    .in('user_id', userIds);
+
+  if (error) {
+    console.error('Error fetching organisation memberships:', error);
+    return [];
+  }
+
+  return data ?? [];
+}
+
+// Get users with roles and organisations (paginated in the database).
 export async function getAllUsers(options?: {
   page?: number;
   limit?: number;
@@ -73,212 +111,49 @@ export async function getAllUsers(options?: {
 
   const page = options?.page || 1;
   const limit = options?.limit || 20;
-  const search = options?.search;
-  const roleFilter = options?.role;
+  const search = options?.search?.trim();
+  const roleFilter = options?.role?.trim();
 
-  // Get all users first (needed for server-side filtering)
-  const allAuthUsers: Array<{
-    id: string;
-    email?: string;
-    created_at?: string;
-    last_sign_in_at?: string;
-    email_confirmed_at?: string;
-  }> = [];
-  let fetchPage = 1;
-  const fetchPerPage = 1000; // Max per page
-
-  while (true) {
-    const {
-      data: { users: pageUsers },
-      error: fetchError
-    } = await supabaseAdmin.auth.admin.listUsers({
-      page: fetchPage,
-      perPage: fetchPerPage
-    });
-
-    if (fetchError) {
-      throw new Error(`Failed to fetch users: ${fetchError.message}`);
-    }
-
-    allAuthUsers.push(...pageUsers);
-
-    if (pageUsers.length < fetchPerPage) {
-      break; // Last page reached
-    }
-    fetchPage++;
-
-    // Safety limit to prevent infinite loops
-    if (fetchPage > 100) {
-      console.log('Reached maximum page limit while fetching users');
-      break;
-    }
-  }
-
-  // Get all user IDs for fetching related data
-  const allUserIds = allAuthUsers
-    .filter((authUser) => authUser.email)
-    .map((user) => user.id);
-
-  // Get roles for all users in batches to avoid URI too long error
-  let roles: Array<{ user_id: string; role: string }> = [];
-  const rolesBatchSize = 100; // Reduced batch size to avoid URI too long error
-
-  for (let i = 0; i < allUserIds.length; i += rolesBatchSize) {
-    const batch = allUserIds.slice(i, i + rolesBatchSize);
-    const { data: batchRoles, error: rolesError } = await supabaseAdmin
-      .from('roles')
-      .select('user_id, role')
-      .in('user_id', batch);
-
-    if (rolesError) {
-      console.error(
-        `Error fetching roles batch ${Math.floor(i / rolesBatchSize) + 1}:`,
-        rolesError
-      );
-    } else if (batchRoles) {
-      roles = roles.concat(batchRoles);
-    }
-  }
-
-  // Get organisations in batches
-  let organisations: Array<{
-    id: string;
-    user_id: string;
-    organisation_id: string;
-    role: string;
-    organisation: { id: string; name: string; slug: string };
-  }> = [];
-
-  for (let i = 0; i < allUserIds.length; i += rolesBatchSize) {
-    const batch = allUserIds.slice(i, i + rolesBatchSize);
-    const { data: batchOrgs } = await supabaseAdmin
-      .from('organisation_memberships')
-      .select(
-        `
-        id,
-        user_id,
-        organisation_id,
-        role,
-        organisation:organisations(id, name, slug)
-      `
-      )
-      .in('user_id', batch);
-
-    if (batchOrgs) {
-      organisations = organisations.concat(batchOrgs);
-    }
-  }
-
-  // Get public user data in batches
-  let publicUsers: Array<{
-    id: string;
-    full_name: string | null;
-    avatar_url: string | null;
-    is_active: boolean;
-  }> = [];
-
-  for (let i = 0; i < allUserIds.length; i += rolesBatchSize) {
-    const batch = allUserIds.slice(i, i + rolesBatchSize);
-    const { data: batchUsers } = await supabaseAdmin
-      .from('users')
-      .select('id, full_name, avatar_url, is_active')
-      .in('id', batch);
-
-    if (batchUsers) {
-      publicUsers = publicUsers.concat(batchUsers);
-    }
-  }
-
-  // Get teacher class assignments in batches
-  let teacherClasses: Array<{ teacher_id: string; class_id: string }> = [];
-  for (let i = 0; i < allUserIds.length; i += rolesBatchSize) {
-    const batch = allUserIds.slice(i, i + rolesBatchSize);
-    const { data: batchTeacherClasses, error: teacherClassesError } =
-      await supabaseAdmin
-        .from('teacher_class')
-        .select('teacher_id, class_id')
-        .in('teacher_id', batch);
-
-    if (teacherClassesError) {
-      console.error(
-        `Error fetching teacher classes batch ${Math.floor(i / rolesBatchSize) + 1}:`,
-        teacherClassesError
-      );
-    } else if (batchTeacherClasses) {
-      teacherClasses = teacherClasses.concat(batchTeacherClasses);
-    }
-  }
-
-  // Combine all data into AdminUser objects
-  const allUsers: AdminUser[] = allAuthUsers
-    .filter((authUser) => authUser.email) // Filter out users without email
-    .map((authUser) => {
-      const role = roles?.find((r) => r.user_id === authUser.id);
-      const userOrgs =
-        organisations?.filter((org) => org.user_id === authUser.id) || [];
-      const publicUser = publicUsers?.find((p) => p.id === authUser.id);
-
-      const adminUser: AdminUser = {
-        id: authUser.id,
-        email: authUser.email!, // Safe to use ! after filter
-        organisations: userOrgs
-      };
-
-      // Add optional properties
-      if (
-        publicUser?.full_name !== undefined &&
-        publicUser.full_name !== null
-      ) {
-        adminUser.full_name = publicUser.full_name;
-      }
-      if (
-        publicUser?.avatar_url !== undefined &&
-        publicUser.avatar_url !== null
-      ) {
-        adminUser.avatar_url = publicUser.avatar_url;
-      }
-      if (authUser.email_confirmed_at) {
-        adminUser.email_confirmed_at = authUser.email_confirmed_at;
-      }
-      if (authUser.created_at) {
-        adminUser.created_at = authUser.created_at;
-      }
-      if (authUser.last_sign_in_at) {
-        adminUser.last_sign_in_at = authUser.last_sign_in_at;
-      }
-      // Always assign a role (default to 'user' if no role found)
-      adminUser.role = role?.role || 'user';
-      if (publicUser?.is_active !== undefined) {
-        adminUser.is_active = publicUser.is_active;
-      }
-      adminUser.teacher_class_id =
-        teacherClasses.find((item) => item.teacher_id === authUser.id)
-          ?.class_id ?? null;
-
-      return adminUser;
-    });
-
-  // Apply server-side filtering
-  const filteredUsers = allUsers.filter((user) => {
-    // Search filter
-    const matchesSearch =
-      !search ||
-      user.email?.toLowerCase().includes(search.toLowerCase()) ||
-      user.full_name?.toLowerCase().includes(search.toLowerCase());
-
-    // Role filter
-    const matchesRole = !roleFilter || user.role === roleFilter;
-
-    return matchesSearch && matchesRole;
+  const { data: rows, error } = await supabaseAdmin.rpc('list_admin_users', {
+    p_page: page,
+    p_limit: limit,
+    ...(search ? { p_search: search } : {}),
+    ...(roleFilter ? { p_role: roleFilter } : {})
   });
 
-  // Apply pagination to filtered results
-  const totalUsers = filteredUsers.length;
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  if (error) {
+    throw new Error(`Failed to fetch users: ${error.message}`);
+  }
 
-  return { users: paginatedUsers, total: totalUsers };
+  const list = (rows as ListAdminUserRow[] | null) ?? [];
+  const total = list[0]?.total_count ?? 0;
+  const userIds = list.map((row) => row.id);
+  const organisations = await fetchOrganisationMemberships(userIds);
+
+  const users: AdminUser[] = list.map((row) => {
+    const userOrgs = organisations.filter((org) => org.user_id === row.id);
+
+    const adminUser: AdminUser = {
+      id: row.id,
+      email: row.email,
+      organisations: userOrgs,
+      role: row.role || 'user',
+      teacher_class_id: row.teacher_class_id
+    };
+
+    if (row.full_name) adminUser.full_name = row.full_name;
+    if (row.avatar_url) adminUser.avatar_url = row.avatar_url;
+    if (row.email_confirmed_at) {
+      adminUser.email_confirmed_at = row.email_confirmed_at;
+    }
+    if (row.created_at) adminUser.created_at = row.created_at;
+    if (row.last_sign_in_at) adminUser.last_sign_in_at = row.last_sign_in_at;
+    if (row.is_active !== undefined) adminUser.is_active = row.is_active;
+
+    return adminUser;
+  });
+
+  return { users, total: Number(total) };
 }
 
 // Get all organisations with their members

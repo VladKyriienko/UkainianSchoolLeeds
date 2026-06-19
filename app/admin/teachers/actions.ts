@@ -8,6 +8,7 @@ import type { AdminTeacher } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
+import { TEACHER_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -63,7 +64,7 @@ export async function listTeachers(options?: {
   const search = options?.search?.trim();
   const categoryRaw = options?.category?.trim();
 
-  let query = supabaseAdmin.from('teachers').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('teachers').select(TEACHER_COLUMNS, { count: 'exact' });
 
   if (search) {
     query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
@@ -101,7 +102,7 @@ export async function getTeacherById(id: string): Promise<AdminTeacher | null> {
 
   const { data, error } = await supabaseAdmin
     .from('teachers')
-    .select('*')
+    .select(TEACHER_COLUMNS)
     .eq('id', id)
     .single();
 

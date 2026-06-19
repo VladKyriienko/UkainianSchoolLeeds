@@ -6,7 +6,11 @@ import type {
   UsersCompletionFieldConfig
 } from '@/types';
 
-export type { CompletionFieldConfig, ProfileCompletionResult, UsersCompletionFieldConfig };
+export type {
+  CompletionFieldConfig,
+  ProfileCompletionResult,
+  UsersCompletionFieldConfig
+};
 
 /**
  * Default completion fields configuration
@@ -24,7 +28,7 @@ export const DEFAULT_COMPLETION_FIELDS: UsersCompletionFieldConfig[] = [
     label: 'Birth Date',
     table: 'users',
     field: 'birthdate'
-  },
+  }
 ];
 
 /**
@@ -56,9 +60,7 @@ function computeCompletionFromTableData(
     }
   });
 
-  const percentage = Math.round(
-    (completedFields.length / fields.length) * 100
-  );
+  const percentage = Math.round((completedFields.length / fields.length) * 100);
 
   return {
     percentage,
@@ -104,7 +106,33 @@ export async function calculateProfileCompletion(
       {} as Record<string, CompletionFieldConfig[]>
     );
 
+    const tableNames = Object.keys(fieldsByTable);
     const tableData: Record<string, Record<string, unknown>> = {};
+
+    if (tableNames.length === 1 && tableNames[0] === 'users') {
+      const selectFields = fieldsByTable.users!.map((f) => f.field).join(', ');
+      const { data, error } = await supabase
+        .from('users')
+        .select(selectFields)
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error(
+          'Error fetching user data for completion calculation:',
+          error
+        );
+        return {
+          percentage: 0,
+          completedFields: [],
+          missingFields: fields.map((f) => f.id),
+          totalFields: fields.length
+        };
+      }
+
+      tableData.users = (data as unknown as Record<string, unknown>) || {};
+      return computeCompletionFromTableData(tableData, fields);
+    }
 
     for (const [tableName, tableFields] of Object.entries(fieldsByTable)) {
       const selectFields = tableFields.map((f) => f.field).join(', ');

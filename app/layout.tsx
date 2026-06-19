@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 import { Inter, Manrope } from 'next/font/google';
 import { getURL } from '@/utils/helpers';
 import { cookies } from 'next/headers';
 import Providers from '@/providers/providers';
 import 'styles/main.css';
-import { getCurrentUser } from '@/lib/auth/server';
+import { AuthSessionHydrator } from '@/providers/AuthSessionHydrator';
 import { cn } from '@/utils/cn';
 
 const inter = Inter({
@@ -46,7 +46,6 @@ export const metadata: Metadata = {
     shortcut: '/favicon-32x32.png',
     apple: '/icons/apple-touch-icon.png'
   },
-  themeColor: themeColor,
   openGraph: {
     title: title,
     description: description
@@ -65,9 +64,6 @@ export const viewport: Viewport = {
 export default async function Layout({ children }: PropsWithChildren) {
   const cookieStore = await cookies();
   const theme = cookieStore.get('theme')?.value;
-
-  // Get user data for providers (cached, deduplicated with page.tsx)
-  const { user, profileData } = await getCurrentUser();
 
   return (
     <html
@@ -89,11 +85,13 @@ export default async function Layout({ children }: PropsWithChildren) {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        <script
-          async
-          crossOrigin="anonymous"
-          src="https://tweakcn.com/live-preview.min.js"
-        />
+        {process.env.NODE_ENV === 'development' && (
+          <script
+            async
+            crossOrigin="anonymous"
+            src="https://tweakcn.com/live-preview.min.js"
+          />
+        )}
       </head>
       <body
         className={cn(
@@ -102,7 +100,10 @@ export default async function Layout({ children }: PropsWithChildren) {
         )}
         suppressHydrationWarning
       >
-        <Providers user={user} userData={profileData}>
+        <Providers user={null} userData={null}>
+          <Suspense fallback={null}>
+            <AuthSessionHydrator />
+          </Suspense>
           {children}
         </Providers>
       </body>

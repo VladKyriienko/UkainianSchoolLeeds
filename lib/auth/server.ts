@@ -1,8 +1,10 @@
 'use server';
 
 import { cache } from 'react';
+import { cookies } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient, UserWithRoles } from '@/lib/supabase/server';
+import { USER_PROFILE_WITH_ROLES } from '@/lib/supabase/columns';
 import { hasAdminRole } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
@@ -13,37 +15,62 @@ function isValidEmail(email: string) {
   return regex.test(email);
 }
 
-/**
- * Cached function to get current user with profile data.
- * This ensures only one database query is made per request,
- * even if called multiple times (e.g., in layout and page).
- */
-export const getCurrentUser = cache(
-  async (): Promise<{
-    user: User | null;
-    profileData: UserWithRoles | null;
-  }> => {
-    const supabase = createClient();
+const USER_PROFILE_SELECT = USER_PROFILE_WITH_ROLES;
 
-    // Get authenticated user
+/** Session-scoped cache key derived from Supabase auth cookies (not shared across users). */
+async function getAuthCacheKey(): Promise<string> {
+  const cookieStore = await cookies();
+  const authCookie = cookieStore
+    .getAll()
+    .filter(({ name }) => name.includes('-auth-token'))
+    .map(({ name, value }) => `${name}:${value?.slice(0, 32) ?? ''}`)
+    .join('|');
+  return authCookie || 'anonymous';
+}
+
+const getSessionUserCached = cache(
+  async (_cacheKey: string): Promise<{ user: User | null }> => {
+    const supabase = createClient();
     const {
       data: { user }
     } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { user: null, profileData: null };
-    }
-
-    // Get user profile data from users table
-    const { data: profileData } = await supabase
-      .from('users')
-      .select('*, roles(*)')
-      .eq('id', user.id)
-      .single();
-
-    return { user, profileData };
+    return { user };
   }
 );
+
+export async function getSessionUser(): Promise<{ user: User | null }> {
+  const cacheKey = await getAuthCacheKey();
+  return getSessionUserCached(cacheKey);
+}
+
+const getUserProfileById = cache(
+  async (userId: string): Promise<UserWithRoles | null> => {
+    const supabase = createClient();
+    const { data: profileData } = await supabase
+      .from('users')
+      .select(USER_PROFILE_SELECT)
+      .eq('id', userId)
+      .single();
+
+    return profileData as UserWithRoles | null;
+  }
+);
+
+export async function getUserProfile(): Promise<UserWithRoles | null> {
+  const { user } = await getSessionUser();
+  if (!user) return null;
+  return getUserProfileById(user.id);
+}
+
+/** Auth session + profile; deduplicated per request via keyed cache(). */
+export async function getCurrentUser(): Promise<{
+  user: User | null;
+  profileData: UserWithRoles | null;
+}> {
+  const { user } = await getSessionUser();
+  const profileData = user ? await getUserProfileById(user.id) : null;
+  return { user, profileData };
+}
 
 export async function redirectToPath(path: string) {
   return redirect(path);
@@ -98,33 +125,24 @@ export async function SignIn(email: string, password: string) {
     throw new Error(error.message);
   }
 
-  // Check if user is active
   if (authData.user) {
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('is_active')
+      .select('is_active, roles(role)')
       .eq('id', authData.user.id)
       .single();
 
     if (userError) {
       console.error('Error checking user status:', userError);
-      // If we can't check the status, allow login but log the error
-    } else if (userData && userData.is_active === false) {
-      // Sign out the user immediately
+    } else if (userData?.is_active === false) {
       await supabase.auth.signOut();
       throw new Error(
         'Your account has been deactivated. Please contact an administrator.'
       );
     }
-  }
 
-  if (authData.user) {
-    const { data: roleRows } = await supabase
-      .from('roles')
-      .select('role')
-      .eq('user_id', authData.user.id);
-
-    const roles = roleRows?.map((item) => item.role) ?? [];
+    const roles =
+      userData?.roles?.map((item: { role: string }) => item.role) ?? [];
     if (roles.includes('admin')) {
       return '/admin';
     }
@@ -323,32 +341,21 @@ export async function requestPasswordReset(formData: FormData) {
   const supabaseAdmin = createAdminClient();
 
   try {
-    // First check if auth user exists - we need to use listUsers and filter by email
-    const { data: authUsers, error: authError } =
-      await supabaseAdmin.auth.admin.listUsers();
+    const { data: authUserId, error: authLookupError } =
+      await supabaseAdmin.rpc('get_auth_user_id_by_email', { p_email: email });
 
-    if (authError) {
-      console.error('Error listing users:', authError);
-      // Continue with reset attempt if we can't check status
-    }
-
-    let authUser = null;
-    if (authUsers && authUsers.users) {
-      authUser = authUsers.users.find((user) => user.email === email);
-    }
-
-    if (authUser) {
-      // Check if the user is active in our users table using admin client for permissions
+    if (authLookupError) {
+      console.error('Error looking up auth user by email:', authLookupError);
+    } else if (authUserId) {
       const { data: userData, error: userDataError } = await supabaseAdmin
         .from('users')
         .select('is_active')
-        .eq('id', authUser.id)
+        .eq('id', authUserId)
         .single();
 
       if (userDataError) {
         console.error('Error checking user active status:', userDataError);
-        // Continue with reset attempt if we can't check status
-      } else if (userData && userData.is_active === false) {
+      } else if (userData?.is_active === false) {
         return getErrorRedirect(
           '/auth/forgot-password',
           'Your account has been deactivated.',

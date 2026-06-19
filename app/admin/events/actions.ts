@@ -4,12 +4,20 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { Database } from '@/lib/supabase/types';
 import { verifyAdminAccess } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
+import { revalidatePublicHomeData } from '@/lib/cache/public-revalidate';
 import type { AdminEvent } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
 import { normalizeText } from '@/utils/text';
+import { EVENT_LIST_COLUMNS, EVENT_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
+
+function revalidatePublicEvents() {
+  revalidatePath('/parents/calendar');
+  revalidatePath('/');
+  revalidatePublicHomeData('events');
+}
 
 type EventUpdate = Database['public']['Tables']['events']['Update'];
 
@@ -73,7 +81,9 @@ export async function listEvents(options?: {
   const dateFrom = options?.dateFrom?.trim();
   const dateTo = options?.dateTo?.trim();
 
-  let query = supabaseAdmin.from('events').select('*', { count: 'exact' });
+  let query = supabaseAdmin
+    .from('events')
+    .select(EVENT_LIST_COLUMNS, { count: 'exact' });
 
   if (search) {
     query = query.or(
@@ -114,7 +124,7 @@ export async function getEventById(id: string): Promise<AdminEvent | null> {
 
   const { data, error } = await supabaseAdmin
     .from('events')
-    .select('*')
+    .select(EVENT_COLUMNS)
     .eq('id', id)
     .single();
 
@@ -183,6 +193,7 @@ export async function createEvent(
     }
 
     revalidatePath('/admin/events');
+    revalidatePublicEvents();
     return { success: true };
   } catch (error) {
     const errorMessage =
@@ -209,7 +220,9 @@ export async function updateEvent(
     }
 
     const description = normalizeText(getFormString(formData, 'description'));
-    const descriptionUk = normalizeText(getFormString(formData, 'description_uk'));
+    const descriptionUk = normalizeText(
+      getFormString(formData, 'description_uk')
+    );
     const location = normalizeText(getFormString(formData, 'location'));
     const locationUk = normalizeText(getFormString(formData, 'location_uk'));
     const titleUk = normalizeText(getFormString(formData, 'title_uk'));
@@ -248,12 +261,16 @@ export async function updateEvent(
 
       if (removePhoto) {
         if (previousPhoto) {
-          await supabaseAdmin.storage.from('events-photos').remove([previousPhoto]);
+          await supabaseAdmin.storage
+            .from('events-photos')
+            .remove([previousPhoto]);
         }
         updatePayload.photo = null;
       } else if (photoPath) {
         if (previousPhoto && previousPhoto !== photoPath) {
-          await supabaseAdmin.storage.from('events-photos').remove([previousPhoto]);
+          await supabaseAdmin.storage
+            .from('events-photos')
+            .remove([previousPhoto]);
         }
         updatePayload.photo = photoPath;
       }
@@ -273,6 +290,7 @@ export async function updateEvent(
 
     revalidatePath('/admin/events');
     revalidatePath(`/admin/events/${id}`);
+    revalidatePublicEvents();
     return { success: true };
   } catch (error) {
     const errorMessage =
@@ -310,6 +328,7 @@ export async function deleteEvent(
     }
 
     revalidatePath('/admin/events');
+    revalidatePublicEvents();
     return { success: true };
   } catch (error) {
     const errorMessage =

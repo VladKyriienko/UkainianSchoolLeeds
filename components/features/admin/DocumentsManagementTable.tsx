@@ -14,7 +14,6 @@ import { FileText } from 'lucide-react';
 import type { AdminDocument } from '@/types';
 import { deleteDocument } from '@/app/admin/documents/actions';
 import { DOCUMENT_TYPE_LABELS } from '@/app/admin/documents/constants';
-import { isHtmlContent } from '@/utils/rich-text';
 import { formatDateLabel } from '@/utils/date-format';
 import { EntityEmptyState } from '@/components/common/admin/EntityEmptyState';
 import {
@@ -76,7 +75,6 @@ export default function DocumentsManagementTable({
           <TableRow>
             <TableHead className="w-50">Title</TableHead>
             <TableHead className="w-30">Type</TableHead>
-            <TableHead>Content preview</TableHead>
             <TableHead className={adminDateHeadClass}>Created</TableHead>
             <TableHead className="w-15"></TableHead>
           </TableRow>
@@ -87,18 +85,6 @@ export default function DocumentsManagementTable({
               <TableCell className="font-medium">{doc.title}</TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {DOCUMENT_TYPE_LABELS[doc.type as keyof typeof DOCUMENT_TYPE_LABELS] ?? doc.type}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm max-w-80">
-                {isHtmlContent(doc.content) ? (
-                  <div
-                    className="rich-text-preview"
-                    dangerouslySetInnerHTML={{ __html: doc.content || '' }}
-                  />
-                ) : (
-                  <span className="line-clamp-3" title={doc.content}>
-                    {doc.content || '—'}
-                  </span>
-                )}
               </TableCell>
               <TableCell className={adminDateCellClass}>
                 {formatDateLabel(doc.created_at)}

@@ -7,6 +7,10 @@ export default {
   content: [
     'app/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
+    'providers/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
+    'hooks/**/*.{ts,tsx}',
+    'utils/**/*.{ts,tsx}',
     'pages/**/*.{ts,tsx}'
   ],
   theme: {

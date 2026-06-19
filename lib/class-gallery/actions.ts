@@ -7,6 +7,7 @@ import { hasAdminRole, hasTeacherRole } from '@/lib/auth/roles';
 import type { AdminGalleryItem, GalleryClass } from '@/types';
 import { randomUUID } from 'crypto';
 import { sanitizeFilename } from '@/utils/file-name';
+import { CLASS_PHOTO_GALLERY_COLUMNS, CLASS_COLUMNS } from '@/lib/supabase/columns';
 
 const supabaseAdmin = createAdminClient();
 
@@ -107,7 +108,7 @@ export async function listGalleryItems(options?: {
 
   let query = supabaseAdmin
     .from('class_photo_galery')
-    .select('*', { count: 'exact' });
+    .select(CLASS_PHOTO_GALLERY_COLUMNS, { count: 'exact' });
 
   if (options?.classId?.trim()) {
     const selectedClassId = options.classId.trim();
@@ -140,7 +141,7 @@ export async function getGalleryItemById(
 
   const { data, error } = await supabaseAdmin
     .from('class_photo_galery')
-    .select('*')
+    .select(CLASS_PHOTO_GALLERY_COLUMNS)
     .eq('id', id)
     .single();
 
@@ -158,7 +159,7 @@ export async function listAccessibleClassesForGallery(): Promise<{
 }> {
   const access = await getGalleryAccessContext();
 
-  let query = supabaseAdmin.from('classes').select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('classes').select(CLASS_COLUMNS, { count: 'exact' });
 
   if (!access.isAdmin) {
     if (!access.allowedClassIds || access.allowedClassIds.length === 0) {
@@ -191,7 +192,7 @@ export async function getTeacherAssignedClassForGallery(): Promise<GalleryClass 
 
   const { data, error } = await supabaseAdmin
     .from('classes')
-    .select('*')
+    .select(CLASS_COLUMNS)
     .in('id', access.allowedClassIds)
     .order('order', { ascending: false })
     .order('created_at', { ascending: false })

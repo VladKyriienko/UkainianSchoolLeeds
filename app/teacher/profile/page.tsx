@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ProfileForm } from '@/components/features/profile/ProfileForm';
 import { PageWrapper } from '@/components/common/PageWrapper';
+import { USER_PROFILE_COLUMNS } from '@/lib/supabase/columns';
 
 export default async function TeacherProfilePage() {
   const supabase = createClient();
@@ -17,7 +18,7 @@ export default async function TeacherProfilePage() {
 
   const { data: userData, error: profileError } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_PROFILE_COLUMNS)
     .eq('id', user.id)
     .single();
 
