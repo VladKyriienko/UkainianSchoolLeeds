@@ -1,233 +1,262 @@
-# Admin Panel Documentation
+# Admin Panel
 
-## Overview
+CMS and operations dashboard for **Ukrainia School**. Admins manage public-site content, users, teachers, donations, and inbound messages.
 
-The admin panel provides comprehensive user and organisation management capabilities for administrators. It includes features for creating, editing, and managing users, as well as organisational management when organisations are enabled.
+## Access
 
-## Features
+A user must:
 
-### User Management
+1. Be signed in (Supabase session cookie).
+2. Have the `admin` role in the `roles` table.
 
-- **List all users** with filtering and search capabilities
-- **Create new users** with optional organisation assignment
-- **Edit user details** including email, name, and role
-- **Delete users** with confirmation prompts
-- **Password management**:
-  - Send password reset emails
-  - Send magic login links
-  - Set new passwords directly
-- **Role management** (admin/user)
-- **Organisation assignment** (when organisations are enabled)
+### Request flow
 
-### Organisation Management
+```
+Browser → proxy.ts          Session required for /admin/*
+       → app/admin/layout.tsx   Admin role check; teachers → /teacher, others → /
+       → page / server action     verifyAdminAccess() on mutations
+```
 
-- **List all organisations** with member counts
-- **Create new organisations** with admin assignment
-- **View organisation details** and member lists
-- **Manage organisation memberships**
+| Layer   | File                      | Responsibility                                  |
+| ------- | ------------------------- | ----------------------------------------------- |
+| Proxy   | `proxy.ts`                | Redirect unauthenticated users to `/auth/login` |
+| Layout  | `app/admin/layout.tsx`    | Enforce `admin` role; render sidebar shell      |
+| Actions | `app/admin/**/actions.ts` | `verifyAdminAccess()` before writes             |
 
-### System Settings
-
-- **View current authentication settings**
-- **View organisation feature toggles**
-- **Environment information display**
-
-## Access Requirements
-
-To access the admin panel, a user must:
-
-1. Be signed in to the application
-2. Have the `admin` role in the `roles` table
+Teachers with a non-admin session who open `/admin` are redirected to `/teacher`.
 
 ## Navigation
 
-When a user has admin privileges, an "Admin Panel" link appears in the main navigation bar.
+Admin UI uses the **sidebar** (`AuthenticatedLayout` + `AppSidebar`), not the public site navbar. Items are defined in `utils/route-protection.ts` (`navigationRoutes`).
 
-## Pages Structure
+| Route                  | Section                               |
+| ---------------------- | ------------------------------------- |
+| `/admin`               | Dashboard (entity counts)             |
+| `/admin/users`         | User accounts                         |
+| `/admin/teachers`      | Teacher profiles (public “Who’s who”) |
+| `/admin/events`        | School calendar events                |
+| `/admin/donations`     | Stripe donation records               |
+| `/admin/messages`      | Contact form submissions              |
+| `/admin/documents`     | Key-info / policy documents           |
+| `/admin/news`          | News articles                         |
+| `/admin/reviews`       | Parent testimonials                   |
+| `/admin/classes`       | Class pages                           |
+| `/admin/gallery`       | School photo gallery                  |
+| `/admin/class-gallery` | Per-class photo galleries             |
+| `/admin/schedule`      | PDF schedule uploads                  |
+| `/admin/profile`       | Admin’s own profile                   |
+
+Standard CRUD pattern per section:
 
 ```
-/admin                     - Main admin dashboard
-├── /users                 - User management page
-│   └── /create           - Create new user form
-├── /organisations        - Organisation management (if enabled)
-│   └── /create          - Create new organisation form
-└── /system              - System settings and configuration
+/admin/<section>              List (+ search / pagination)
+/admin/<section>/create       Create form
+/admin/<section>/[id]         Detail view
+/admin/<section>/[id]/edit    Edit form
 ```
 
-## Server Actions
+## Features by area
 
-All admin operations are performed via secure server actions located in `utils/admin/actions.ts`. These actions:
+### Dashboard (`/admin`)
 
-- Use the Supabase service role client for elevated permissions
-- Include proper authorization checks
-- Handle both auth.users and public table operations
-- Provide comprehensive error handling
+- Welcome message with admin name.
+- Counts for users, teachers, events, messages, donations, documents, news, reviews, classes, class-gallery items, and school gallery items.
+- Aggregated in `app/admin/actions.ts` → `getAdminDashboardStats()`.
 
-### Key Server Actions
+### User management (`/admin/users`)
 
-#### User Management
+- Paginated list with search and role filter (`list_admin_users` RPC).
+- Create user via email invite (`inviteUserByEmail`).
+- Edit email, name, role, and teacher class assignment.
+- Roles: `admin`, `teacher`, `user`.
+- Deactivate / reactivate accounts (`users.is_active`).
+- Delete user (auth + related public rows).
+- Send password reset (verified users) or re-invite (unverified users) — `sendPasswordResetOrInvite()`.
 
-- `getAllUsers()` - Fetch all users with roles and organisations
-- `createUser(data)` - Create new user with optional organisation assignment
-- `updateUser(userId, data)` - Update user details and role
-- `deleteUser(userId)` - Remove user from system
-- `sendPasswordReset(userId)` - Send password reset email
-- `sendMagicLink(userId)` - Send magic login link
-- `resetUserPassword(userId, newPassword)` - Set new password directly
+Organisation assignment is supported at the **database/API** level (`getAllOrganisations()`, triggers on user create) but **organisation UI is disabled** — see [Configuration](#configuration).
 
-#### Organisation Management
+### Content management
 
-- `getAllOrganisations()` - Fetch all organisations with members
-- `createOrganisationForUser(name, slug, adminUserId)` - Create organisation
-- `addUserToOrganisation(userId, orgId, role)` - Add user to organisation
+| Section       | Public impact            | Storage bucket (if any) |
+| ------------- | ------------------------ | ----------------------- |
+| Teachers      | `/about/whos-who`        | `teachers-photos`       |
+| Events        | Calendar, home page      | `events-photos`         |
+| News          | `/parents/news`, home    | `news-photos`           |
+| Documents     | Key info, policies       | —                       |
+| Reviews       | Home parent voices       | —                       |
+| Classes       | `/parents/class-pages`   | `classes-photos`        |
+| Gallery       | `/parents/gallery`, home | `gallery-photos`        |
+| Class gallery | Class detail pages       | `class-gallery`         |
+| Schedule      | Calendar PDF preview     | `schedule-files`        |
 
-## Security Features
+Most list endpoints support **offset pagination** and **ILIKE search** (trigram indexes on common text columns). News, gallery, and classes support **drag-and-drop reorder**.
 
-### Authorization
+### Donations (`/admin/donations`)
 
-- All admin actions verify the user has `admin` role
-- Service role client is only used server-side
-- Row Level Security (RLS) policies are respected
+Read-only list of Stripe checkout sessions (created via `/api/donate` webhook flow). No manual create/edit in admin.
 
-### Input Validation
+### Messages (`/admin/messages`)
 
-- Email format validation
-- Required field validation
-- Organisation slug format validation
-- Password strength requirements
+View contact submissions; mark as read; delete.
 
-### Error Handling
+### Admin profile (`/admin/profile`)
 
-- Comprehensive error messages
-- Graceful degradation on failures
-- User-friendly error displays
+Self-service: name, avatar, email change, password change (`ChangeEmailDialog`, `ChangePasswordDialog`). Optional post-signup completion flow at `/admin/profile/complete` when enabled in settings.
+
+## Server actions
+
+Each domain keeps actions colocated with routes:
+
+```
+app/admin/
+  actions.ts              # Dashboard stats
+  users/actions.ts
+  teachers/actions.ts
+  events/actions.ts
+  news/actions.ts
+  documents/actions.ts
+  reviews/actions.ts
+  classes/actions.ts
+  gallery/actions.ts
+  schedule/actions.ts
+  messages/actions.ts
+  donations/actions.ts
+  profile/actions.ts
+```
+
+Shared gallery logic for admin + teacher lives in `lib/class-gallery/actions.ts`.
+
+### Conventions
+
+- `'use server'` at top of action files.
+- `await verifyAdminAccess()` (or role-aware helpers in class-gallery) before mutations.
+- `createAdminClient()` from `lib/supabase/admin` for service-role operations.
+- `revalidatePath()` + `revalidatePublicHomeData()` from `lib/cache/public-revalidate.ts` when public pages must refresh.
+
+### Key user actions (`app/admin/users/actions.ts`)
+
+| Function                                     | Purpose                            |
+| -------------------------------------------- | ---------------------------------- |
+| `getAllUsers({ page, limit, search, role })` | Paginated user list                |
+| `getAllOrganisations()`                      | Fetch orgs (API only; UI disabled) |
+| `createUser(data)`                           | Invite user by email               |
+| `updateUser(userId, data)`                   | Profile, role, teacher class       |
+| `deleteUser(userId)`                         | Remove user                        |
+| `deactivateUser` / `reactivateUser`          | Toggle `is_active`                 |
+| `sendPasswordResetOrInvite(userId)`          | Reset or invite email              |
+
+## UI components
+
+Admin-specific UI lives under `components/features/admin/`:
+
+- `*ManagementTable` — list views with pagination links.
+- `*Form` — create/edit forms (often with `RichTextEditorDynamic` for rich text).
+- `*SearchForm` — URL-based filters.
+- `SortableTableDynamic` — reorderable rows (news, gallery, classes).
+
+Shared shells: `components/common/admin/` (`EntityTableShell`, `AdminDetailPhoto`, etc.).
 
 ## Configuration
 
-### Authentication Settings
-
-Located in `utils/auth-helpers/settings.ts`:
+Auth and feature toggles: `lib/auth/settings.ts`
 
 ```typescript
-// Organisation feature toggles
-const allowOrganisations = true;
-const allowUserCreateOrganisations = true;
-const allowOrganisationInvites = true;
-const allowOrganisationRoleManagement = true;
-const requireOrganisationForSignup = false;
+// Auth methods
+allowOauth = true;
+allowEmail = true;
+allowPassword = true;
+allowSignUp = false; // Public self-registration off
+
+// Organisations (schema exists; admin UI not exposed)
+allowOrganisations = false;
+allowUserCreateOrganisations = false;
+allowOrganisationInvites = false;
+allowOrganisationRoleManagement = false;
+
+// Optional forced profile completion after invite
+requirePostSignupCompletion = false;
+postSignupCompletionPath = '/admin/profile/complete';
 ```
 
-### Environment Variables
+### Required environment variables
 
-Required environment variables:
+| Variable                        | Used for                                      |
+| ------------------------------- | --------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase client                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser / SSR client                          |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Admin server actions (never expose to client) |
+| `NEXT_PUBLIC_SITE_URL`          | Email redirect URLs                           |
+| `STRIPE_*`                      | Donations list (webhook-populated data)       |
 
-- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
-- `SUPABASE_SERVICE_ROLE_KEY` - Service role key for admin operations
-- `NEXT_PUBLIC_SITE_URL` - Site URL for email redirects
+## Database
 
-## Database Schema Requirements
-
-The admin panel requires the following database tables:
-
-### Users Table
+### Roles
 
 ```sql
--- Standard Supabase auth.users table
--- Plus public users table for profiles
+-- rolesEnum: 'admin' | 'teacher' | 'user'
+CREATE TYPE rolesEnum AS ENUM ('admin', 'teacher', 'user');
 ```
 
-### Roles Table
+A user can have one row in `roles` (upserted on admin update). Teachers may have a row in `teacher_class` linking them to a class.
 
-```sql
-CREATE TABLE roles (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT CHECK (role IN ('admin', 'user')) DEFAULT 'user',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-```
-
-### Organisations Tables (if organisations enabled)
-
-```sql
-CREATE TABLE organisations (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE TABLE organisation_memberships (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  organisation_id UUID REFERENCES organisations(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT DEFAULT 'user',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(organisation_id, user_id)
-);
-```
-
-## Usage Examples
-
-### Creating an Admin User
-
-1. First, create a user through normal signup
-2. Manually add an admin role in the database:
+### Promoting a user to admin (manual)
 
 ```sql
 INSERT INTO roles (user_id, role)
-VALUES ('user-uuid-here', 'admin');
+VALUES ('<user-uuid>', 'admin')
+ON CONFLICT (user_id) DO UPDATE SET role = 'admin';
 ```
 
-### Creating Users via Admin Panel
+Local seed admin: `admin@admin.uk` (see root [README.md](./README.md)).
 
-1. Navigate to `/admin/users`
-2. Click "Create User"
-3. Fill in user details
-4. Optionally assign to organisation
-5. Submit form
+### Organisations (optional / dormant)
 
-### Managing Organisations
+Tables `organisations` and `organisation_memberships` exist in `supabase/schemas/index.ts`. With `allowOrganisations = false`, there are **no** `/admin/organisations` routes. Data may still appear on user detail pages if memberships exist.
 
-1. Navigate to `/admin/organisations`
-2. View existing organisations and their members
-3. Create new organisations as needed
-4. Manage memberships through organisation details
+## Security
+
+- **Service role key** — server-only via `lib/supabase/admin.ts` singleton.
+- **Authorization** — every admin action calls `verifyAdminAccess()`; RLS still applies to anon/authenticated clients on public routes.
+- **Input validation** — Zod schemas in forms/utils; email and password rules in `utils/password-validation.ts`.
+- **Inactive users** — cannot receive reset/invite emails until reactivated.
+- **Proxy scope** — only `/admin/*` and `/teacher/*`; public routes stay open.
+
+## Public cache invalidation
+
+After admin edits to home-visible content, actions call:
+
+```typescript
+import { revalidatePublicHomeData } from '@/lib/cache/public-revalidate';
+
+revalidatePath('/parents/news'); // route-specific
+revalidatePublicHomeData('news'); // bust unstable_cache tags
+```
+
+Tags: `public-home`, `news`, `gallery`, `review`, `events`.
 
 ## Troubleshooting
 
-### Common Issues
+| Symptom                         | Check                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| Redirect to login               | Session expired; sign in again                                               |
+| Redirect to `/` or `/teacher`   | User lacks `admin` role                                                      |
+| “Failed to fetch users”         | `list_admin_users` migration applied; service role key set                   |
+| Emails not sent                 | `NEXT_PUBLIC_SITE_URL`; user `is_active`; Supabase Auth URL config           |
+| Public site shows stale content | Admin save should call `revalidatePublicHomeData`; 5‑min cache TTL otherwise |
+| Permission denied on storage    | Bucket policies in `supabase/schemas/buckets/index.sql`                      |
 
-**Admin panel not visible**: Ensure user has `admin` role in roles table
+## Extending the admin panel
 
-**Permission errors**: Verify `SUPABASE_SERVICE_ROLE_KEY` is correctly set
+1. Add Drizzle schema + migration in `supabase/schemas/index.ts` → `bun run db:diff` → `bun run db:migrate`.
+2. Regenerate types: `bun run db:generate-types`.
+3. Create `app/admin/<section>/actions.ts` with `verifyAdminAccess()`.
+4. Add pages under `app/admin/<section>/`.
+5. Add UI in `components/features/admin/`.
+6. Register route in `utils/route-protection.ts` (`navigationRoutes`).
+7. If content appears on the public home page, wire `revalidatePublicHomeData()` in write actions.
 
-**Organisation features missing**: Check `allowOrganisations` setting
+## Related docs
 
-**Email functions not working**: Verify `NEXT_PUBLIC_SITE_URL` is configured
-
-### Debug Tips
-
-1. Check browser console for client-side errors
-2. Verify server logs for server action errors
-3. Confirm database permissions and RLS policies
-4. Test with minimal admin user setup
-
-## Security Considerations
-
-1. **Service Role Key**: Never expose the service role key to client-side code
-2. **Admin Role**: Carefully control who gets admin role access
-3. **Input Sanitization**: All user inputs are validated and sanitized
-4. **Error Logging**: Sensitive errors are logged server-side only
-5. **Rate Limiting**: Consider implementing rate limiting for admin actions
-
-## Extending the Admin Panel
-
-To add new admin features:
-
-1. Add server actions to `utils/admin/actions.ts`
-2. Create UI components in `components/admin/`
-3. Add new pages under `app/admin/`
-4. Update navigation in main dashboard
-5. Follow existing patterns for authorization and error handling
+- [README.md](./README.md) — setup, migrations, deployment
+- [lib/README.md](./lib/README.md) — shared libraries
+- [docs/middleware-to-proxy.md](./docs/middleware-to-proxy.md) — `proxy.ts` conventions
